@@ -1,0 +1,7 @@
+# 301 redirects — Netlify format: /old-path  /new-path  301
+# The site was never deployed under the old "GTA Junk & Garage Cleanouts" name,
+# so there are no legacy URLs to redirect yet.
+# When the live domain or any URL changes in future, add lines like:
+# /old-page/        /new-page/        301!
+# https://old-domain.ca/*  https://gtajunkandpropertycleanout.ca/:splat  301!
+/index.html  /  301

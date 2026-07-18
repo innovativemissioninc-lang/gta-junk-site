@@ -1,0 +1,20 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Simplified icon — favicon, app tile, uniform embroidery -->
+  <rect width="200" height="200" rx="44" fill="#14263D"/>
+  <g transform="translate(100 104) scale(1.28) translate(-100 -104)">
+    <path d="M56 66 L70 30 L94 52 Z" fill="#8E99A6"/>
+    <path d="M63 60 L71 40 L84 52 Z" fill="#0E1C2E"/>
+    <path d="M144 66 L130 30 L106 52 Z" fill="#8E99A6"/>
+    <path d="M137 60 L129 40 L116 52 Z" fill="#0E1C2E"/>
+    <path d="M38 110 L58 100 L58 124 Z" fill="#AEB9C4"/>
+    <path d="M162 110 L142 100 L142 124 Z" fill="#AEB9C4"/>
+    <ellipse cx="100" cy="108" rx="54" ry="50" fill="#AEB9C4"/>
+    <path d="M48 96 Q58 76 82 82 Q100 88 118 82 Q142 76 152 96 Q144 116 119 111 Q100 106 81 111 Q56 116 48 96 Z" fill="#1B2B3F"/>
+    <circle cx="78" cy="95" r="9" fill="#FFFFFF"/>
+    <circle cx="80" cy="96" r="4.2" fill="#1B2B3F"/>
+    <path d="M112 96 Q120 102 129 94" stroke="#FFFFFF" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <ellipse cx="100" cy="133" rx="27" ry="20" fill="#F5F1E8"/>
+    <ellipse cx="100" cy="123" rx="7.5" ry="5.5" fill="#1B2B3F"/>
+    <path d="M90 139 Q101 148 114 137" stroke="#1B2B3F" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  </g>
+</svg>
