@@ -12,7 +12,7 @@ Premium white-glove junk removal & property cleanouts, Toronto & the GTA. Static
 LocalBusiness JSON-LD (home + contact), Service + FAQPage schema on service/location pages, BreadcrumbList site-wide, unique titles/descriptions, canonical URLs, OG/Twitter cards.
 
 ## Placeholders to replace before promoting
-1. Phone: `(416) XXX-XXXX` / `tel:+14160000000` (site-wide find & replace)
+1. ~~Phone~~ — done: (647) 204-0632 live site-wide
 2. HST number in footer (`HST# ______`)
 3. Google review link: `https://g.page/r/PLACEHOLDER/review` (reviews page)
 4. Social URLs in JSON-LD `sameAs` (PLACEHOLDER entries)
