@@ -169,6 +169,13 @@ footer{background:var(--navy-deep);color:#9FB0C2;padding:56px 0 0;font-size:14px
 .foot-grid a:hover{color:#fff}
 .legal{border-top:1px solid #22334A;padding:18px 0 74px;font-size:12.5px;color:#6B7C90;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
 .call-sticky{display:none}
+.sticky-bar{display:none}
 @media(max-width:700px){
-  .call-sticky{display:block;position:fixed;bottom:0;left:0;right:0;z-index:60;background:var(--orange);color:#fff;text-align:center;padding:15px 10px;font-family:'Arial Black',Arial,sans-serif;font-size:15px;text-decoration:none;box-shadow:0 -4px 14px rgba(0,0,0,.25)}
+  .call-sticky{display:none}
+  .sticky-bar{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:60;box-shadow:0 -4px 14px rgba(0,0,0,.28)}
+  .sticky-bar a{flex:1;text-align:center;padding:14px 8px;font-family:'Arial Black',Arial,sans-serif;font-size:14px;text-decoration:none;color:#fff;line-height:1.25}
+  .sticky-bar a small{display:block;font-family:Arial,sans-serif;font-weight:400;font-size:11px;opacity:.92;margin-top:2px}
+  .sticky-bar .sb-call{background:var(--navy)}
+  .sticky-bar .sb-video{background:var(--orange)}
+  body{padding-bottom:4px}
 }

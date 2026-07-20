@@ -27,7 +27,7 @@
   <div class="nav-inner">
     <a class="nav-logo" href="/"><img src="/assets/logo-horizontal-dark.svg" alt="GTA Junk and Property Cleanout — The White-Glove Cleanout Crew"></a>
     <div class="nav-links">
-      <a href="/see-your-price/">See Your Price</a>
+      <a href="/see-your-price/">Send a Video</a>
       <a href="/services/">Services</a>
       <a href="/locations/">Service Areas</a>
       <a href="/realtors/">For Realtors</a>
@@ -49,7 +49,7 @@
       <p class="support">Premium full-service junk removal and property cleanouts for homeowners, estates, and commercial properties across Toronto &amp; the GTA. One visit, one crew, one invoice. Donations and recycling sorted first, landfill last.</p>
       <div class="hero-ctas">
         <a class="btn btn-primary" href="/contact/">REQUEST MY SITE VALUATION →</a>
-        <a class="btn btn-ghost" href="/see-your-price/">📹 SEE YOUR PRICE IN A MINUTE</a>
+        <a class="btn btn-ghost" href="/see-your-price/">📹 SEND US A VIDEO, GET A PRICE</a>
       </div>
       <p class="call">Or talk to a human: <a href="tel:+16472040632">(647) 204-0632</a></p>
     </div>
@@ -73,12 +73,67 @@
 <section style="background:linear-gradient(120deg,var(--navy) 0%,var(--navy-mid) 100%);color:#fff;padding:58px 0">
   <div class="wrap" style="max-width:820px;text-align:center">
     <span class="kicker">New — Video Estimate</span>
-    <h2 style="font-size:clamp(26px,3.6vw,36px);margin-bottom:14px">Don't Want to Wait for a Visit?<br>Film It. See Your Price.</h2>
-    <p style="color:#DBE3EC;font-size:17px;line-height:1.6;margin-bottom:14px">Walk your phone through the space for twenty seconds. We'll read the footage and tell you honestly which finish level it looks like — and roughly what it costs — in about a minute.</p>
+    <h2 style="font-size:clamp(26px,3.6vw,36px);margin-bottom:14px">Send Us a Video.<br>Get a Rough Price for Your Job.</h2>
+    <p style="color:#DBE3EC;font-size:17px;line-height:1.6;margin-bottom:14px">No waiting for a visit, no phone tag. Walk your phone through the garage, basement, or whole house for twenty seconds, send it, and we'll tell you roughly what the job costs — usually in under a minute.</p>
     <p style="color:#94A3B8;font-size:14px;margin-bottom:28px">It's an estimate, not a quote. Your price is still fixed free, in person, before anything moves.</p>
-    <a class="btn btn-primary" href="/see-your-price/">📹 SEE YOUR PRICE NOW →</a>
+    <a class="btn btn-primary" href="/see-your-price/">📹 SEND US A VIDEO →</a>
   </div>
 </section>
+
+<section id="meet-rocky" style="background:var(--navy-deep);color:#fff;padding:64px 0">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kicker">Meet the Crew</span>
+      <h2 style="color:#fff">Ten Seconds. That's the Whole Promise.</h2>
+      <p style="color:#B9C4D2">White gloves on, broom over the shoulder, and a floor you can actually see. This is what we leave behind.</p>
+    </div>
+    <div style="max-width:860px;margin:0 auto;border-radius:16px;overflow:hidden;box-shadow:0 12px 44px rgba(0,0,0,.45);position:relative;background:#000">
+      <video
+        id="rockyVideo"
+        poster="/assets/rocky-intro-poster.jpg"
+        preload="metadata"
+        muted
+        loop
+        playsinline
+        autoplay
+        style="display:block;width:100%;height:auto"
+        aria-label="Rocky, our white-glove cleanout crew mascot, in a cleared garage and loading the trailer">
+        <source src="/assets/rocky-intro.mp4" type="video/mp4">
+        Your browser can't play this video — <a href="/assets/rocky-intro.mp4" style="color:var(--orange)">download it here</a>.
+      </video>
+      <button id="soundToggle" type="button"
+        style="position:absolute;bottom:14px;right:14px;background:rgba(11,21,36,.82);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:9px 16px;font-family:Arial,sans-serif;font-size:13px;font-weight:700;cursor:pointer;backdrop-filter:blur(4px)">
+        🔇 Tap for sound
+      </button>
+    </div>
+    <p style="text-align:center;color:#94A3B8;font-size:14px;margin-top:22px">That garage took one visit.</p>
+    <div style="text-align:center;margin-top:20px">
+      <a class="btn btn-primary" href="/see-your-price/">📹 SEND US A VIDEO, GET A PRICE →</a>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  var v = document.getElementById('rockyVideo');
+  var b = document.getElementById('soundToggle');
+  if (!v || !b) return;
+  b.addEventListener('click', function(){
+    v.muted = !v.muted;
+    b.textContent = v.muted ? '🔇 Tap for sound' : '🔊 Sound on';
+    if (!v.muted && v.paused) v.play().catch(function(){});
+  });
+  // Pause when off-screen so we're not burning a customer's mobile data.
+  if ('IntersectionObserver' in window){
+    new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting) { v.play().catch(function(){}); }
+        else { v.pause(); }
+      });
+    }, { threshold: 0.25 }).observe(v);
+  }
+})();
+</script>
 <section id="services-grid">
   <div class="wrap">
     <div class="sec-head">
@@ -240,6 +295,9 @@
     </div>
   </div>
 </footer>
-<a class="call-sticky" href="tel:+16472040632">📞 Call (647) 204-0632 — 7 Days a Week</a>
+<div class="sticky-bar">
+  <a class="sb-call" href="tel:+16472040632">📞 Call Us<small>(647) 204-0632</small></a>
+  <a class="sb-video" href="/see-your-price/">📹 Send a Video<small>Get a rough price</small></a>
+</div>
 </body>
 </html>
