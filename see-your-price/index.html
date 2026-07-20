@@ -233,65 +233,162 @@
   function handleFile(file){
     errorBox.classList.remove('on');
     result.classList.remove('on');
-    if (!file.type.indexOf || file.type.indexOf('video') !== 0){
-      showError('That doesn\'t look like a video', 'Please choose a video file, or record one directly with your phone camera.');
+
+    // Guard: some Android browsers report an empty MIME type for camera
+    // captures, so fall back to the file extension before rejecting.
+    var type = (file.type || '').toLowerCase();
+    var name = (file.name || '').toLowerCase();
+    var looksVideo = type.indexOf('video') === 0 ||
+                     /\.(mp4|mov|m4v|webm|avi|3gp|mkv|qt)$/.test(name);
+    if (!looksVideo){
+      showError('That doesn\'t look like a video',
+        'Please choose a video file, or tap the button and record one directly with your phone camera.');
       return;
     }
-    if (file.size > 500 * 1024 * 1024){
-      showError('That video is very large', 'Try a shorter clip — twenty to sixty seconds is all we need.');
+    if (file.size > 600 * 1024 * 1024){
+      showError('That video is very large',
+        'Try a shorter clip — twenty to sixty seconds is all we need.');
       return;
     }
+
     stage.style.display = 'none';
     prog.classList.add('on');
     progStep.textContent = 'Reading your walkthrough…';
     progSub.textContent = 'Pulling a few clear frames from your video.';
+
     extractFrames(file).then(sendFrames).catch(function(err){
-      showError('We couldn\'t read that video', 'Your browser had trouble with this file. Try recording a new clip, or give us a call and we\'ll do it the quick way.');
+      showError('We couldn\'t read that video',
+        'Your phone\'s browser had trouble with this clip. Try recording a new one, or call us at (647) 204-0632 and we\'ll do it the quick way.');
       if (window.console) console.error(err);
     });
   }
 
+  /**
+   * Frame extraction.
+   * iOS Safari is the difficult case: it needs playsinline + muted, an explicit
+   * load(), a brief play() to prime the decoder, and it can silently fail to
+   * fire 'seeked'. Every seek is therefore individually timed out, and we
+   * resolve with whatever frames we managed to capture rather than failing the
+   * whole run.
+   */
   function extractFrames(file){
     return new Promise(function(resolve, reject){
       var video = document.createElement('video');
-      video.preload = 'metadata';
       video.muted = true;
+      video.defaultMuted = true;
       video.playsInline = true;
+      video.setAttribute('playsinline', '');
+      video.setAttribute('webkit-playsinline', '');
+      video.setAttribute('muted', '');
+      video.preload = 'auto';
+      video.crossOrigin = 'anonymous';
+
       var url = URL.createObjectURL(file);
-      var frames = [], idx = 0, times = [];
+      var frames = [];
+      var times = [];
+      var idx = 0;
+      var settled = false;
+      var seekTimer = null;
+      var overallTimer = setTimeout(function(){ finish('overall timeout'); }, 45000);
+
+      function cleanup(){
+        clearTimeout(seekTimer);
+        clearTimeout(overallTimer);
+        try { video.pause(); } catch(e){}
+        video.removeAttribute('src');
+        try { video.load(); } catch(e){}
+        URL.revokeObjectURL(url);
+      }
+
+      function finish(reason){
+        if (settled) return;
+        settled = true;
+        cleanup();
+        if (frames.length >= 2) resolve(frames);
+        else reject(new Error('too few frames (' + frames.length + '): ' + reason));
+      }
+
+      function fail(reason){
+        if (settled) return;
+        settled = true;
+        cleanup();
+        reject(new Error(reason));
+      }
+
+      video.onerror = function(){ fail('video decode error'); };
 
       video.onloadedmetadata = function(){
         var dur = video.duration;
-        if (!isFinite(dur) || dur <= 0){ cleanup(); reject(new Error('bad duration')); return; }
-        for (var i = 0; i < FRAME_COUNT; i++){
-          times.push(dur * ((i + 0.5) / FRAME_COUNT));
+        if (!isFinite(dur) || dur <= 0){
+          // Some iOS clips report Infinity until nudged.
+          video.currentTime = 1e6;
+          setTimeout(function(){
+            dur = video.duration;
+            if (!isFinite(dur) || dur <= 0){ fail('unreadable duration'); return; }
+            buildTimes(dur);
+          }, 300);
+          return;
         }
-        seekNext();
+        buildTimes(dur);
       };
-      video.onerror = function(){ cleanup(); reject(new Error('video load error')); };
 
-      function seekNext(){
-        if (idx >= times.length){ cleanup(); resolve(frames); return; }
-        progSub.textContent = 'Frame ' + (idx + 1) + ' of ' + FRAME_COUNT + '…';
-        video.currentTime = times[idx];
+      function buildTimes(dur){
+        for (var i = 0; i < FRAME_COUNT; i++){
+          times.push(Math.max(0.05, dur * ((i + 0.5) / FRAME_COUNT)));
+        }
+        // Prime the decoder — iOS often won't paint to canvas otherwise.
+        var p = video.play();
+        if (p && p.then){
+          p.then(function(){
+            try { video.pause(); } catch(e){}
+            seekNext();
+          }).catch(function(){ seekNext(); });
+        } else {
+          try { video.pause(); } catch(e){}
+          seekNext();
+        }
       }
 
-      video.onseeked = function(){
+      function seekNext(){
+        if (settled) return;
+        if (idx >= times.length){ finish('complete'); return; }
+        progSub.textContent = 'Frame ' + Math.min(idx + 1, FRAME_COUNT) + ' of ' + FRAME_COUNT + '…';
+
+        clearTimeout(seekTimer);
+        // If a seek stalls (iOS does this), skip that frame and carry on.
+        seekTimer = setTimeout(function(){ idx++; seekNext(); }, 4000);
+
+        try { video.currentTime = times[idx]; }
+        catch(e){ idx++; seekNext(); }
+      }
+
+      function capture(){
+        if (settled) return;
+        clearTimeout(seekTimer);
         try {
-          var scale = Math.min(1, FRAME_W / (video.videoWidth || FRAME_W));
-          var c = document.createElement('canvas');
-          c.width = Math.round((video.videoWidth || FRAME_W) * scale);
-          c.height = Math.round((video.videoHeight || 600) * scale);
-          c.getContext('2d').drawImage(video, 0, 0, c.width, c.height);
-          var dataUrl = c.toDataURL('image/jpeg', JPEG_Q);
-          frames.push(dataUrl.split(',')[1]);
+          var vw = video.videoWidth || 0;
+          var vh = video.videoHeight || 0;
+          if (vw && vh){
+            var scale = Math.min(1, FRAME_W / vw);
+            var c = document.createElement('canvas');
+            c.width = Math.max(1, Math.round(vw * scale));
+            c.height = Math.max(1, Math.round(vh * scale));
+            var ctx = c.getContext('2d');
+            ctx.drawImage(video, 0, 0, c.width, c.height);
+            var dataUrl = c.toDataURL('image/jpeg', JPEG_Q);
+            var b64 = dataUrl.split(',')[1];
+            // A pure-black or trivially small frame means nothing rendered.
+            if (b64 && b64.length > 800) frames.push(b64);
+          }
         } catch(e){ /* skip unreadable frame */ }
         idx++;
         seekNext();
-      };
+      }
 
-      function cleanup(){ URL.revokeObjectURL(url); }
+      video.onseeked = capture;
+
       video.src = url;
+      try { video.load(); } catch(e){}
     });
   }
 
