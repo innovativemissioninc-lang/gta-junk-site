@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>See Your Price — Video Estimate | GTA Junk</title>
+<meta name="description" content="Film a quick walkthrough and see your cleanout price range in about a minute. Honest estimate, confirmed free on site before anything moves.">
+<link rel="canonical" href="https://gtajunkandpropertycleanout.ca/see-your-price/">
+<link rel="icon" href="/assets/logo-icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="GTA Junk and Property Cleanout">
+<meta property="og:title" content="See Your Price — Video Estimate | GTA Junk">
+<meta property="og:description" content="Film a quick walkthrough and see your cleanout price range in about a minute. Honest estimate, confirmed free on site before anything moves.">
+<meta property="og:url" content="https://gtajunkandpropertycleanout.ca/see-your-price/">
+<meta property="og:image" content="https://gtajunkandpropertycleanout.ca/assets/og-image.png">
+<meta property="og:image:alt" content="Rocky the raccoon — GTA Junk and Property Cleanout">
+<meta property="og:locale" content="en_CA">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="See Your Price — Video Estimate | GTA Junk">
+<meta name="twitter:description" content="Film a quick walkthrough and see your cleanout price range in about a minute. Honest estimate, confirmed free on site before anything moves.">
+<meta name="twitter:image" content="https://gtajunkandpropertycleanout.ca/assets/og-image.png">
+<style>
+.syp{background:var(--light);padding:56px 0 76px}
+.syp-card{max-width:760px;margin:0 auto;background:#fff;border-radius:16px;padding:36px;box-shadow:0 4px 24px rgba(20,38,61,.10)}
+.drop{border:2.5px dashed #C6D0DC;border-radius:14px;padding:44px 24px;text-align:center;transition:border-color .15s,background .15s;cursor:pointer}
+.drop:hover,.drop.drag{border-color:var(--orange);background:#FFF7EF}
+.drop .icon{font-size:42px;margin-bottom:12px}
+.drop h3{font-size:19px;margin-bottom:8px}
+.drop p{color:var(--slate);font-size:14.5px;margin-bottom:18px}
+.drop input[type=file]{display:none}
+.tips-box{background:#FFF7EF;border-left:4px solid var(--orange);border-radius:10px;padding:18px 20px;margin-top:22px}
+.tips-box h4{font-size:14px;margin-bottom:10px;letter-spacing:.3px}
+.tips-box li{font-size:14px;color:var(--slate);margin-bottom:6px;margin-left:18px}
+.prog{display:none;text-align:center;padding:34px 10px}
+.prog.on{display:block}
+.spin{width:46px;height:46px;border:4px solid #E2E8F0;border-top-color:var(--orange);border-radius:50%;margin:0 auto 18px;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.prog-step{font-family:'Arial Black',Arial,sans-serif;font-size:16px;margin-bottom:6px}
+.prog-sub{font-size:13.5px;color:var(--slate)}
+.res{display:none}
+.res.on{display:block}
+.res-head{text-align:center;padding-bottom:24px;border-bottom:1px solid #E9EEF4;margin-bottom:24px}
+.res-tier{color:var(--orange-dark);font-size:12.5px;font-weight:900;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px}
+.res-head h2{font-size:clamp(24px,4vw,32px);margin-bottom:12px}
+.res-price{font-family:'Arial Black',Arial,sans-serif;font-size:clamp(34px,7vw,48px);color:var(--navy);margin:6px 0 4px}
+.res-msg{color:var(--slate);font-size:15.5px;line-height:1.6;max-width:560px;margin:0 auto}
+.res-sec{margin-bottom:24px}
+.res-sec h3{font-size:15px;margin-bottom:12px;letter-spacing:.3px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--light);border:1px solid #E2E8F0;border-radius:999px;padding:7px 14px;font-size:13.5px;color:var(--navy)}
+.inc li{font-size:14.5px;color:var(--slate);padding:7px 0 7px 26px;position:relative;border-bottom:1px dashed #EDF1F5;list-style:none}
+.inc li::before{content:"\2713";position:absolute;left:2px;color:var(--orange);font-weight:900}
+.haz{background:#FFF7EF;border:1px solid #FBD9B8;border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.haz b{display:block;font-size:14px;margin-bottom:4px}
+.haz p{font-size:13.5px;color:var(--slate);margin:0}
+.note{font-size:13px;color:#7C8794;font-style:italic;margin-top:14px;text-align:center}
+.res-cta{text-align:center;margin-top:28px;padding-top:24px;border-top:1px solid #E9EEF4}
+.res-cta .btn{margin:0 6px 10px}
+.err{background:#FEF2F2;border-left:4px solid #DC2626;border-radius:10px;padding:18px 20px;margin-top:20px;display:none}
+.err.on{display:block}
+.err b{display:block;margin-bottom:6px}
+.err p{font-size:14.5px;color:var(--slate);margin:0}
+.contact-fields{margin-top:26px;padding-top:22px;border-top:1px solid #E9EEF4}
+.contact-fields label{display:block;font-size:13px;font-weight:900;margin:14px 0 6px}
+.contact-fields input{width:100%;padding:12px 14px;border:1.5px solid #D7DEE7;border-radius:9px;font-size:15px;font-family:inherit;background:#FBFCFE}
+.contact-fields input:focus{outline:2px solid var(--orange);border-color:var(--orange)}
+.cf-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.hp{position:absolute;left:-9999px}
+.trust-line{text-align:center;font-size:13px;color:#7C8794;margin-top:20px}
+@media(max-width:600px){.syp-card{padding:24px 18px}.cf-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="/"><img src="/assets/logo-horizontal-dark.svg" alt="GTA Junk and Property Cleanout — The White-Glove Cleanout Crew"></a>
+    <div class="nav-links">
+      <a href="/see-your-price/">See Your Price</a>
+      <a href="/services/">Services</a>
+      <a href="/locations/">Service Areas</a>
+      <a href="/realtors/">For Realtors</a>
+      <a href="/about/">About</a>
+      <a href="/reviews/">Reviews</a>
+      <a class="nav-phone" href="tel:+16472040632">(647) 204-0632</a>
+      <a class="btn btn-primary nav-cta" href="/contact/">GET A QUOTE</a>
+    </div>
+  </div>
+</nav>
+<div class="wrap"><div class="breadcrumbs"><a href="/">Home</a> <span>›</span> <a href="/see-your-price/">See Your Price</a></div></div>
+
+<header class="page-hero">
+  <div class="wrap">
+    <span class="kicker">Video Estimate</span>
+    <h1>See Your Price in About a Minute</h1>
+    <p class="sub">Film a quick walkthrough of the space on your phone. We'll read it and tell you honestly which finish level it looks like — and roughly what it costs. Your price is still fixed free, in person, before anything moves.</p>
+  </div>
+</header>
+
+<section class="syp">
+  <div class="wrap">
+    <div class="syp-card">
+
+      <div id="uploadStage">
+        <label class="drop" id="dropZone" for="videoInput">
+          <div class="icon">📹</div>
+          <h3>Film or upload your walkthrough</h3>
+          <p>Twenty to sixty seconds is plenty. Tap to record on your phone, or drop a video here.</p>
+          <span class="btn btn-primary">CHOOSE OR RECORD A VIDEO</span>
+          <input type="file" id="videoInput" accept="video/*" capture="environment">
+        </label>
+
+        <div class="tips-box">
+          <h4>FOR THE MOST ACCURATE READ</h4>
+          <ul>
+            <li>Turn on every light, and open the garage door or curtains</li>
+            <li>Walk slowly — a steady pan beats a quick sweep</li>
+            <li>Get the far corners, and pan down to the floor</li>
+            <li>Show anything heavy or awkward up close</li>
+          </ul>
+        </div>
+
+        <div class="contact-fields">
+          <div class="cf-row">
+            <div><label for="cName">Your name (optional)</label><input id="cName" autocomplete="name" placeholder="So we know who we're talking to"></div>
+            <div><label for="cPhone">Phone (optional)</label><input id="cPhone" type="tel" autocomplete="tel" placeholder="(647) 555-0123"></div>
+          </div>
+          <div class="cf-row">
+            <div><label for="cEmail">Email (optional)</label><input id="cEmail" type="email" autocomplete="email" placeholder="you@email.com"></div>
+            <div><label for="cCity">City (optional)</label><input id="cCity" placeholder="Toronto, Mississauga, Oakville…"></div>
+          </div>
+          <p class="trust-line">We only use this to follow up on your estimate. No lists, no spam, ever.</p>
+        </div>
+        <input class="hp" type="text" id="websiteUrl" tabindex="-1" autocomplete="off" aria-hidden="true">
+      </div>
+
+      <div class="prog" id="progress">
+        <div class="spin"></div>
+        <div class="prog-step" id="progStep">Reading your walkthrough…</div>
+        <div class="prog-sub" id="progSub">This usually takes under a minute.</div>
+      </div>
+
+      <div class="err" id="errorBox">
+        <b id="errTitle">Something went wrong</b>
+        <p id="errMsg"></p>
+        <p style="margin-top:12px"><a class="btn btn-navy" href="tel:+16472040632">CALL (647) 204-0632</a></p>
+      </div>
+
+      <div class="res" id="result"></div>
+
+    </div>
+  </div>
+</section>
+
+<section style="background:#fff;padding:56px 0">
+  <div class="wrap prose">
+    <h2>How this works — and what it isn't</h2>
+    <p>This tool gives you a fast, honest read so you're not left guessing before you pick up the phone. It is <strong>an estimate, not a quote</strong>. Video can't see what's behind a stack of boxes or underneath a workbench, so we deliberately read a space generously rather than optimistically — we would much rather come in at or under what you were told than surprise you on the day.</p>
+    <p><strong>Your actual price is fixed in person, free, before a single item moves.</strong> That's the number that counts, and once we agree it on site it doesn't change. If the space turns out to be smaller than the video suggested, you pay the smaller number.</p>
+    <p>Some jobs we won't price from video at all — the largest, most detailed transformations have too much riding on the specifics. In those cases we'll say so plainly and come look.</p>
+    <p style="margin-top:22px"><a class="btn btn-primary" href="/contact/">BOOK A FREE ON-SITE VALUATION →</a></p>
+  </div>
+</section>
+
+<div class="banner">
+  <h2>Your Space Back. Down to the Bare Concrete.</h2>
+  <p>Same-day valuations go fast. Request yours — no phone tag, no "someone will call you back."</p>
+  <a class="btn" href="/contact/">REQUEST MY SITE VALUATION →</a>
+  <span class="small">Prefer to talk? <a href="tel:+16472040632">(647) 204-0632</a> — 7 days a week.</span>
+</div>
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <img src="/assets/logo-horizontal-dark.svg" alt="GTA Junk and Property Cleanout" loading="lazy">
+        <p style="font-size:13.5px">Toronto's white-glove cleanout crew. We sort, clear, sweep, and detail — you get your space back.</p>
+      </div>
+      <div><h4>Services</h4><a href="/see-your-price/">See Your Price (video estimate)</a><a href="/services/">All Services</a><a href="/services/junk-removal/">Junk Removal</a><a href="/services/property-cleanouts/">Property Cleanouts</a><a href="/services/garage-cleanouts/">Garage Cleanouts</a><a href="/services/estate-cleanouts/">Estate Cleanouts</a><a href="/services/restoration-debris-removal/">Restoration & Insurance Debris Removal</a></div>
+      <div><h4>Service Areas</h4><a href="/locations/toronto/">Toronto</a><a href="/locations/mississauga/">Mississauga</a><a href="/locations/etobicoke/">Etobicoke</a><a href="/locations/north-york/">North York</a><a href="/locations/scarborough/">Scarborough</a><a href="/locations/vaughan/">Vaughan</a><a href="/locations/brampton/">Brampton</a><a href="/locations/markham/">Markham</a><a href="/locations/richmond-hill/">Richmond Hill</a><a href="/locations/oakville/">Oakville</a><a href="/locations/burlington/">Burlington</a></div>
+      <div>
+        <h4>Company</h4>
+        <a href="/about/">About &amp; The Rocky Story</a>
+        <a href="/reviews/">Reviews</a>
+        <a href="/realtors/">For Real Estate Agents</a>
+        <a href="/blog/">Resources</a>
+        <a href="/contact/">Contact / Get a Quote</a>
+        <h4 style="margin-top:18px">Contact</h4>
+        <a href="tel:+16472040632">(647) 204-0632</a>
+        <a href="mailto:info@gtajunkandpropertycleanout.ca">info@gtajunkandpropertycleanout.ca</a>
+        <p style="font-size:13.5px">Open 7 days, 7am–9pm<br>Serving Toronto &amp; the GTA (we come to you)</p>
+      </div>
+    </div>
+    <div class="legal">
+      <span>© 2026 GTA Junk and Property Cleanout Inc. · HST# ______ · Licensed &amp; insured</span>
+      <span>Responsible disposal: we donate and recycle before we dump.</span>
+    </div>
+  </div>
+</footer>
+<a class="call-sticky" href="tel:+16472040632">📞 Call (647) 204-0632 — 7 Days a Week</a>
+<script>
+(function(){
+  var FRAME_COUNT = 8, FRAME_W = 900, JPEG_Q = 0.72;
+  var input = document.getElementById('videoInput');
+  var drop = document.getElementById('dropZone');
+  var stage = document.getElementById('uploadStage');
+  var prog = document.getElementById('progress');
+  var progStep = document.getElementById('progStep');
+  var progSub = document.getElementById('progSub');
+  var errorBox = document.getElementById('errorBox');
+  var errTitle = document.getElementById('errTitle');
+  var errMsg = document.getElementById('errMsg');
+  var result = document.getElementById('result');
+
+  ['dragenter','dragover'].forEach(function(e){
+    drop.addEventListener(e, function(ev){ ev.preventDefault(); drop.classList.add('drag'); });
+  });
+  ['dragleave','drop'].forEach(function(e){
+    drop.addEventListener(e, function(ev){ ev.preventDefault(); drop.classList.remove('drag'); });
+  });
+  drop.addEventListener('drop', function(ev){
+    if (ev.dataTransfer.files && ev.dataTransfer.files[0]) handleFile(ev.dataTransfer.files[0]);
+  });
+  input.addEventListener('change', function(){ if (input.files[0]) handleFile(input.files[0]); });
+
+  function showError(title, msg){
+    prog.classList.remove('on');
+    stage.style.display = '';
+    errTitle.textContent = title;
+    errMsg.textContent = msg;
+    errorBox.classList.add('on');
+  }
+
+  function handleFile(file){
+    errorBox.classList.remove('on');
+    result.classList.remove('on');
+    if (!file.type.indexOf || file.type.indexOf('video') !== 0){
+      showError('That doesn\'t look like a video', 'Please choose a video file, or record one directly with your phone camera.');
+      return;
+    }
+    if (file.size > 500 * 1024 * 1024){
+      showError('That video is very large', 'Try a shorter clip — twenty to sixty seconds is all we need.');
+      return;
+    }
+    stage.style.display = 'none';
+    prog.classList.add('on');
+    progStep.textContent = 'Reading your walkthrough…';
+    progSub.textContent = 'Pulling a few clear frames from your video.';
+    extractFrames(file).then(sendFrames).catch(function(err){
+      showError('We couldn\'t read that video', 'Your browser had trouble with this file. Try recording a new clip, or give us a call and we\'ll do it the quick way.');
+      if (window.console) console.error(err);
+    });
+  }
+
+  function extractFrames(file){
+    return new Promise(function(resolve, reject){
+      var video = document.createElement('video');
+      video.preload = 'metadata';
+      video.muted = true;
+      video.playsInline = true;
+      var url = URL.createObjectURL(file);
+      var frames = [], idx = 0, times = [];
+
+      video.onloadedmetadata = function(){
+        var dur = video.duration;
+        if (!isFinite(dur) || dur <= 0){ cleanup(); reject(new Error('bad duration')); return; }
+        for (var i = 0; i < FRAME_COUNT; i++){
+          times.push(dur * ((i + 0.5) / FRAME_COUNT));
+        }
+        seekNext();
+      };
+      video.onerror = function(){ cleanup(); reject(new Error('video load error')); };
+
+      function seekNext(){
+        if (idx >= times.length){ cleanup(); resolve(frames); return; }
+        progSub.textContent = 'Frame ' + (idx + 1) + ' of ' + FRAME_COUNT + '…';
+        video.currentTime = times[idx];
+      }
+
+      video.onseeked = function(){
+        try {
+          var scale = Math.min(1, FRAME_W / (video.videoWidth || FRAME_W));
+          var c = document.createElement('canvas');
+          c.width = Math.round((video.videoWidth || FRAME_W) * scale);
+          c.height = Math.round((video.videoHeight || 600) * scale);
+          c.getContext('2d').drawImage(video, 0, 0, c.width, c.height);
+          var dataUrl = c.toDataURL('image/jpeg', JPEG_Q);
+          frames.push(dataUrl.split(',')[1]);
+        } catch(e){ /* skip unreadable frame */ }
+        idx++;
+        seekNext();
+      };
+
+      function cleanup(){ URL.revokeObjectURL(url); }
+      video.src = url;
+    });
+  }
+
+  function sendFrames(frames){
+    if (!frames.length){
+      showError('We couldn\'t read that video', 'No usable frames came through. Try recording a new clip in better light.');
+      return;
+    }
+    progStep.textContent = 'Working out your estimate…';
+    progSub.textContent = 'Almost there.';
+
+    fetch('/.netlify/functions/estimate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        frames: frames,
+        website_url: document.getElementById('websiteUrl').value,
+        contact: {
+          name: document.getElementById('cName').value,
+          phone: document.getElementById('cPhone').value,
+          email: document.getElementById('cEmail').value,
+          city: document.getElementById('cCity').value
+        }
+      })
+    })
+    .then(function(r){ return r.json().then(function(j){ return { status: r.status, body: j }; }); })
+    .then(function(res){
+      prog.classList.remove('on');
+      if (!res.body || res.body.ok !== true){
+        showError('We couldn\'t finish that estimate',
+          (res.body && res.body.message) || 'Give us a call at (647) 204-0632 and we\'ll get you a number the quick way.');
+        return;
+      }
+      render(res.body);
+    })
+    .catch(function(err){
+      showError('We couldn\'t reach our estimator', 'Check your connection and try again, or call us at (647) 204-0632.');
+      if (window.console) console.error(err);
+    });
+  }
+
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
+  }
+
+  function render(d){
+    var h = '';
+
+    if (d.outcome === 'needs_clearer_look'){
+      h += '<div class="res-head">';
+      h += '<div class="res-tier">A Quick Reshoot</div>';
+      h += '<h2>' + esc(d.headline) + '</h2>';
+      h += '<p class="res-msg">' + esc(d.message) + '</p></div>';
+      h += '<div class="res-sec"><h3>WHAT HELPS MOST</h3><ul class="inc">';
+      (d.tips || []).forEach(function(t){ h += '<li>' + esc(t) + '</li>'; });
+      h += '</ul></div>';
+      h += '<div class="res-cta">';
+      h += '<a class="btn btn-navy" href="/see-your-price/">' + esc(d.actions.retry_label) + '</a>';
+      h += '<a class="btn btn-primary" href="' + esc(d.actions.book_url) + '">' + esc(d.actions.book_label) + '</a>';
+      h += '<p style="margin-top:14px;font-size:13.5px;color:#7C8794"><a href="' + esc(d.actions.phone_href) + '" style="color:var(--orange-dark);font-weight:900">' + esc(d.actions.phone_label) + '</a></p>';
+      h += '</div>';
+      result.innerHTML = h;
+      result.classList.add('on');
+      result.scrollIntoView({ behavior:'smooth', block:'start' });
+      return;
+    }
+
+    h += '<div class="res-head">';
+    h += '<div class="res-tier">' + esc(d.tier_tagline) + '</div>';
+    h += '<h2>' + esc(d.headline) + '</h2>';
+    if (d.outcome === 'estimated' && d.price_display){
+      h += '<div class="res-price">' + esc(d.price_display) + '</div>';
+      h += '<p style="font-size:13px;color:#7C8794;margin-bottom:12px">Estimated range — confirmed free, in person, before anything moves</p>';
+    }
+    h += '<p class="res-msg">' + esc(d.message) + '</p></div>';
+
+    if (d.items && d.items.length){
+      h += '<div class="res-sec"><h3>WHAT WE SPOTTED</h3><div class="chips">';
+      d.items.forEach(function(it){
+        var q = it.quantity > 1 ? (it.quantity + ' × ') : '';
+        h += '<span class="chip">' + esc(q + it.label) + '</span>';
+      });
+      h += '</div></div>';
+    }
+
+    if (d.hazard_notes && d.hazard_notes.length){
+      h += '<div class="res-sec"><h3>NEEDS SPECIAL HANDLING</h3>';
+      d.hazard_notes.forEach(function(n){
+        h += '<div class="haz"><b>' + esc(n.flag) + '</b><p>' + esc(n.note) + '</p></div>';
+      });
+      h += '</div>';
+    }
+
+    if (d.includes && d.includes.length){
+      h += '<div class="res-sec"><h3>' + esc(d.tier_name.toUpperCase()) + ' INCLUDES</h3><ul class="inc">';
+      d.includes.forEach(function(i){ h += '<li>' + esc(i) + '</li>'; });
+      h += '</ul></div>';
+    }
+
+    if (d.confidence_note){
+      h += '<p class="note">' + esc(d.confidence_note) + '</p>';
+    }
+
+    h += '<div class="res-cta">';
+    h += '<a class="btn btn-primary" href="' + esc(d.actions.book_url) + '">' + esc(d.actions.book_label) + '</a>';
+    h += '<p style="margin-top:14px;font-size:13.5px;color:#7C8794"><a href="' + esc(d.actions.phone_href) + '" style="color:var(--orange-dark);font-weight:900">' + esc(d.actions.phone_label) + '</a></p>';
+    h += '</div>';
+
+    result.innerHTML = h;
+    result.classList.add('on');
+    result.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+})();
+</script>
+</body>
+</html>

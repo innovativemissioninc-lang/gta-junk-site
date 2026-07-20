@@ -1,0 +1,12 @@
+{
+  "name": "gta-junk-and-property-cleanout",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GTA Junk and Property Cleanout — website and video estimate function",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  },
+  "optionalDependencies": {
+    "@neondatabase/serverless": "^0.10.4"
+  }
+}
