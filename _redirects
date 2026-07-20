@@ -1,7 +1,31 @@
 # 301 redirects — Netlify format: /old-path  /new-path  301
 # The site was never deployed under the old "GTA Junk & Garage Cleanouts" name,
 # so there are no legacy URLs to redirect yet.
-# When the live domain or any URL changes in future, add lines like:
-# /old-page/        /new-page/        301!
-# https://old-domain.ca/*  https://gtajunkandpropertycleanout.ca/:splat  301!
-/index.html  /  301
+
+# --- City page URL migration (July 2026) -------------------------------
+# Old /locations/<city>/ URLs -> new keyword-matched /junk-removal-<city>/
+/locations/toronto   /junk-removal-toronto   301!
+/locations/toronto/   /junk-removal-toronto/   301!
+/locations/etobicoke   /junk-removal-etobicoke   301!
+/locations/etobicoke/   /junk-removal-etobicoke/   301!
+/locations/north-york   /junk-removal-north-york   301!
+/locations/north-york/   /junk-removal-north-york/   301!
+/locations/scarborough   /junk-removal-scarborough   301!
+/locations/scarborough/   /junk-removal-scarborough/   301!
+/locations/mississauga   /junk-removal-mississauga   301!
+/locations/mississauga/   /junk-removal-mississauga/   301!
+/locations/brampton   /junk-removal-brampton   301!
+/locations/brampton/   /junk-removal-brampton/   301!
+/locations/vaughan   /junk-removal-vaughan   301!
+/locations/vaughan/   /junk-removal-vaughan/   301!
+/locations/markham   /junk-removal-markham   301!
+/locations/markham/   /junk-removal-markham/   301!
+/locations/richmond-hill   /junk-removal-richmond-hill   301!
+/locations/richmond-hill/   /junk-removal-richmond-hill/   301!
+/locations/oakville   /junk-removal-oakville   301!
+/locations/oakville/   /junk-removal-oakville/   301!
+/locations/burlington   /junk-removal-burlington   301!
+/locations/burlington/   /junk-removal-burlington/   301!
+
+# Legacy trailing variants
+/locations/*   /locations/   301

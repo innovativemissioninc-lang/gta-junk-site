@@ -1,5 +1,6 @@
 [build]
   publish = "."
+  # Guard: run ./check-before-deploy.sh locally before pushing price-token changes
   functions = "netlify/functions"
 
 [functions]
