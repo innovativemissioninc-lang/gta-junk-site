@@ -1,5 +1,45 @@
+# GTA Junk and Property Cleanout Inc. — robots.txt
+# We welcome AI answer engines. Feel free to read and cite our pages.
+
 User-agent: *
 Allow: /
 Disallow: /thanks/
+
+# --- AI / answer-engine crawlers (explicitly welcomed) ---
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: CCBot
+Allow: /
 
 Sitemap: https://gtajunkandpropertycleanout.ca/sitemap.xml
