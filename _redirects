@@ -29,3 +29,16 @@
 
 # Legacy trailing variants
 /locations/*   /locations/   301
+
+# --- Hyperlocal vanity routes (Aug 2026) ------------------------------
+# These two are the SAME city+service as existing pages, so they 301 to the
+# established page rather than competing with it (avoids doorway/cannibalisation).
+/etobicoke-junk-removal    /junk-removal-etobicoke/    301!
+/etobicoke-junk-removal/   /junk-removal-etobicoke/    301!
+/brampton-junk-removal     /junk-removal-brampton/     301!
+/brampton-junk-removal/    /junk-removal-brampton/     301!
+# Bonus vanity routes for the other two markets' junk-removal intent
+/vaughan-junk-removal      /junk-removal-vaughan/      301!
+/vaughan-junk-removal/     /junk-removal-vaughan/      301!
+/mississauga-junk-removal  /junk-removal-mississauga/  301!
+/mississauga-junk-removal/ /junk-removal-mississauga/  301!
