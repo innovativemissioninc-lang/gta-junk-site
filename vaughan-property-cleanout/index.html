@@ -21,6 +21,73 @@
 <meta name="twitter:description" content="Whole-property cleanouts in Vaughan, Woodbridge, Maple and Kleinburg. Estate clearing, rental turnovers, pre-sale purges. Fixed price before anything moves.">
 <meta name="twitter:image" content="https://gtajunkandpropertycleanout.ca/assets/og-image.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Service", "serviceType": "Whole-Property Cleanouts — Vaughan", "name": "Property Cleanouts in Vaughan — GTA Junk and Property Cleanout", "description": "Whole-property cleanouts in Vaughan, Woodbridge, Maple and Kleinburg. Estate clearing, rental turnovers, pre-sale purges. Fixed price before anything moves.", "url": "https://gtajunkandpropertycleanout.ca/vaughan-property-cleanout/", "provider": {"@id": "https://gtajunkandpropertycleanout.ca/#business"}, "areaServed": {"@type": "City", "name": "Vaughan"}, "offers": {"@type": "Offer", "priceCurrency": "CAD", "price": "1195", "description": "Whole-property cleanouts start from $1,195. Exact price fixed at a free on-site valuation."}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "speakable": {"@type": "SpeakableSpecification", "cssSelector": [".faq summary", ".faq p"]}, "mainEntity": [{"@type": "Question", "name": "Who does whole-property cleanouts in Vaughan?", "acceptedAnswer": {"@type": "Answer", "text": "We do — GTA Junk and Property Cleanout handles whole-property clearing across Vaughan, including Woodbridge, Maple, Concord and Kleinburg. That means the entire house cleared rather than a few items removed: every room, the basement, the garage and the shed, sorted donation-first and finished to the level you choose. Call (647) 204-0632 for a free on-site valuation."}}, {"@type": "Question", "name": "What does a full property cleanout cost in Vaughan?", "acceptedAnswer": {"@type": "Answer", "text": "Whole-property work starts from $1,195 for our Pristine Transformation finish, with lighter clear-and-haul jobs from $495 and mid-level resets from $795. Your exact number depends on volume, weight, access and how far you want the finish taken, and it is fixed in writing at a free on-site valuation before a single item moves. We don't quote a whole property blind over the phone."}}, {"@type": "Question", "name": "Can you clear an estate property before it goes on the market?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, and it's one of our most common Vaughan jobs. We clear the full property, set aside photographs, documents and anything that looks personal for the family to review, route usable furniture to donation, and hand the house back swept and showable for listing photographs. Discretion is standard, not an upgrade."}}, {"@type": "Question", "name": "Where do large appliances and bulky items go in York Region?", "acceptedAnswer": {"@type": "Answer", "text": "York Region operates Community Environmental Centres and waste depots that accept bulky items and large appliances, including the Vaughan Community Environmental Centre (130 McCleary Court) and the Richmond Hill Community Environmental Centre (1124 Elgin Mills Road East). Disposal fees apply to items dropped off as garbage. Verified against York Region's Waste Depots pages, July 2026."}}, {"@type": "Question", "name": "Do you handle rental and tenant turnovers for landlords?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Tenant leave-behinds, unit turnovers and multiplex clearing are handled on a scheduled basis, and property managers can run a trade account with certificates of insurance on file. The unit is cleared, swept and ready to re-list rather than simply emptied."}}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://gtajunkandpropertycleanout.ca/"}, {"@type": "ListItem", "position": 2, "name": "Service Areas", "item": "https://gtajunkandpropertycleanout.ca/locations/"}, {"@type": "ListItem", "position": 3, "name": "Vaughan Property Cleanouts", "item": "https://gtajunkandpropertycleanout.ca/vaughan-property-cleanout/"}]}</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SP2P6CWJYW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SP2P6CWJYW');
+</script>
+<script>
+/* GTA Junk — conversion event tracking. Plain JS, no dependencies. */
+(function(){
+  function send(name, params){ if (typeof gtag === 'function') gtag('event', name, params || {}); }
+  function ready(fn){ if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+
+  ready(function(){
+    var page = location.pathname;
+
+    /* Phone clicks — the primary conversion for this business */
+    document.querySelectorAll('a[href^="tel:"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('phone_click', {
+          page_path: page,
+          link_location: a.closest('nav') ? 'nav'
+                        : a.closest('footer') ? 'footer'
+                        : a.closest('.sticky-bar') ? 'sticky_bar' : 'body'
+        });
+      });
+    });
+
+    /* Form submissions — labelled so an estate lead is distinguishable from a single-item request */
+    document.querySelectorAll('form[name]').forEach(function(f){
+      f.addEventListener('submit', function(){
+        var n = f.getAttribute('name');
+        var value = n === 'estate-assessment' ? 1500
+                  : n === 'partner-enquiry'   ? 800
+                  : 300;
+        send('generate_lead', { form_name: n, page_path: page, currency: 'CAD', value: value });
+        send('form_submit',   { form_name: n, page_path: page });
+      });
+    });
+
+    /* Video estimate tool */
+    if (page.indexOf('/see-your-price') === 0) {
+      document.querySelectorAll('input[type="file"]').forEach(function(i){
+        i.addEventListener('change', function(){
+          if (i.files && i.files.length) send('video_estimate_start', { page_path: page });
+        });
+      });
+    }
+
+    /* Outbound clicks to the Google profile / review form */
+    document.querySelectorAll('a[href*="g.page"], a[href*="maps.google.com"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('review_link_click', {
+          page_path: page,
+          destination: a.href.indexOf('g.page') > -1 ? 'leave_review' : 'google_profile'
+        });
+      });
+    });
+
+    /* Engaged-visit signal: 45 seconds on an estate or service page */
+    if (/estate|services|cleanout/.test(page)) {
+      setTimeout(function(){ send('engaged_view', { page_path: page }); }, 45000);
+    }
+  });
+})();
+</script>
 </head>
 <body>
 <nav>

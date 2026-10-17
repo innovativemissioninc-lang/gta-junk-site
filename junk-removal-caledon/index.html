@@ -21,6 +21,73 @@
 <meta name="twitter:description" content="Junk removal and property cleanouts in Caledon and Bolton. Rural properties, outbuildings, estates. Fixed on-site pricing, verified Peel disposal guidance.">
 <meta name="twitter:image" content="https://gtajunkandpropertycleanout.ca/assets/og-image.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Service", "serviceType": "Junk Removal and Property Cleanouts — Caledon", "name": "Junk Removal in Caledon — GTA Junk and Property Cleanout", "description": "Junk removal and property cleanouts in Caledon and Bolton. Rural properties, outbuildings, estates. Fixed on-site pricing, verified Peel disposal guidance.", "url": "https://gtajunkandpropertycleanout.ca/junk-removal-caledon/", "provider": {"@id": "https://gtajunkandpropertycleanout.ca/#business"}, "areaServed": {"@type": "City", "name": "Caledon"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does Peel collect large appliances from the curb in Caledon?", "acceptedAnswer": {"@type": "Answer", "text": "No. Peel Region <strong>no longer collects large appliances from the curb</strong> anywhere in the Region, Caledon included. Fridges, stoves, washers and dryers must go to a Peel Community Recycling Centre — accepted free of charge — or be taken by your retailer on delivery of the replacement. <em>Verified against Peel Region's Bulky Items page, July 2026.</em>"}}, {"@type": "Question", "name": "What counts as a bulky item here?", "acceptedAnswer": {"@type": "Answer", "text": "Peel defines a bulky item as any household item larger than 1 metre (39 inches) in any one dimension or heavier than 20 kilograms (44 pounds), furniture included regardless of size. Acceptable bulky items are collected free from the curb on your regular garbage day if out by 7:00 a.m. <em>Verified against Peel Region's Bulky Items page, July 2026.</em>"}}, {"@type": "Question", "name": "Rural property — does that change anything?", "acceptedAnswer": {"@type": "Answer", "text": "Collection rules are Region-wide, but rural Caledon properties often mean long driveways, outbuildings and barn clearings that curbside collection was never designed for. That volume is exactly what a single-visit clearing handles. Drop-off fees apply for general bulky items at Peel CRCs. <em>Verified against Peel Region's Bulky Items page, July 2026.</em>"}}, {"@type": "Question", "name": "What does a cleanout cost in Caledon?", "acceptedAnswer": {"@type": "Answer", "text": "Garage cleanouts start from $495, our mid-level finish from $795, and full-property or estate work from $1,195. Your exact price is fixed at a free on-site valuation before anything moves."}}, {"@type": "Question", "name": "Do you actually come out to Bolton and Caledon?", "acceptedAnswer": {"@type": "Answer", "text": "Yes — regularly. We're based in northwest Etobicoke, which puts Bolton closer to us than downtown Toronto is. Same-day and next-day slots are genuinely available here, not a courtesy line."}}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://gtajunkandpropertycleanout.ca/"}, {"@type": "ListItem", "position": 2, "name": "Service Areas", "item": "https://gtajunkandpropertycleanout.ca/locations/"}, {"@type": "ListItem", "position": 3, "name": "Caledon", "item": "https://gtajunkandpropertycleanout.ca/junk-removal-caledon/"}]}</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SP2P6CWJYW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SP2P6CWJYW');
+</script>
+<script>
+/* GTA Junk — conversion event tracking. Plain JS, no dependencies. */
+(function(){
+  function send(name, params){ if (typeof gtag === 'function') gtag('event', name, params || {}); }
+  function ready(fn){ if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+
+  ready(function(){
+    var page = location.pathname;
+
+    /* Phone clicks — the primary conversion for this business */
+    document.querySelectorAll('a[href^="tel:"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('phone_click', {
+          page_path: page,
+          link_location: a.closest('nav') ? 'nav'
+                        : a.closest('footer') ? 'footer'
+                        : a.closest('.sticky-bar') ? 'sticky_bar' : 'body'
+        });
+      });
+    });
+
+    /* Form submissions — labelled so an estate lead is distinguishable from a single-item request */
+    document.querySelectorAll('form[name]').forEach(function(f){
+      f.addEventListener('submit', function(){
+        var n = f.getAttribute('name');
+        var value = n === 'estate-assessment' ? 1500
+                  : n === 'partner-enquiry'   ? 800
+                  : 300;
+        send('generate_lead', { form_name: n, page_path: page, currency: 'CAD', value: value });
+        send('form_submit',   { form_name: n, page_path: page });
+      });
+    });
+
+    /* Video estimate tool */
+    if (page.indexOf('/see-your-price') === 0) {
+      document.querySelectorAll('input[type="file"]').forEach(function(i){
+        i.addEventListener('change', function(){
+          if (i.files && i.files.length) send('video_estimate_start', { page_path: page });
+        });
+      });
+    }
+
+    /* Outbound clicks to the Google profile / review form */
+    document.querySelectorAll('a[href*="g.page"], a[href*="maps.google.com"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('review_link_click', {
+          page_path: page,
+          destination: a.href.indexOf('g.page') > -1 ? 'leave_review' : 'google_profile'
+        });
+      });
+    });
+
+    /* Engaged-visit signal: 45 seconds on an estate or service page */
+    if (/estate|services|cleanout/.test(page)) {
+      setTimeout(function(){ send('engaged_view', { page_path: page }); }, 45000);
+    }
+  });
+})();
+</script>
 </head>
 <body>
 <nav>

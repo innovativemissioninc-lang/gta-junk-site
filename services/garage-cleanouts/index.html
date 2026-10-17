@@ -21,6 +21,73 @@
 <meta name="twitter:description" content="GTA garages taken from packed to bare, degreased concrete — often in one visit. Park inside again. Free on-site valuations.">
 <meta name="twitter:image" content="https://gtajunkandpropertycleanout.ca/assets/og-image.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Service", "serviceType": "Garage Cleanouts", "name": "Garage Cleanouts — GTA Junk and Property Cleanout", "description": "Signature garage cleanouts: full clear-out, sorting, cobweb removal, industrial sweep, and power-degreased bare-concrete finishes across the GTA.", "url": "https://gtajunkandpropertycleanout.ca/services/garage-cleanouts/", "provider": {"@id": "https://gtajunkandpropertycleanout.ca/#business"}, "areaServed": [{"@type": "City", "name": "Toronto"}, {"@type": "City", "name": "Mississauga"}, {"@type": "City", "name": "Etobicoke"}, {"@type": "City", "name": "North York"}, {"@type": "City", "name": "Scarborough"}, {"@type": "City", "name": "Vaughan"}, {"@type": "City", "name": "Brampton"}, {"@type": "City", "name": "Markham"}, {"@type": "City", "name": "Richmond Hill"}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How long does a garage cleanout take?", "acceptedAnswer": {"@type": "Answer", "text": "Most single and double garages are done in one visit — typically a few hours depending on volume and finish level. You'll get a firm timeline along with your fixed price at the on-site valuation."}}, {"@type": "Question", "name": "Can you actually remove oil stains from the concrete?", "acceptedAnswer": {"@type": "Answer", "text": "Our Pristine Transformation tier includes power degreasing of oil-stained concrete. Deep, decades-old staining may not vanish entirely, but the difference is dramatic — we'll set honest expectations when we see the floor."}}, {"@type": "Question", "name": "Do I need to be home during the cleanout?", "acceptedAnswer": {"@type": "Answer", "text": "For the sorting stage, yes — keep-or-go calls are yours to make, and it goes fast. For The Clear-Out tier with a pre-agreed plan, many clients hand us the garage code and come home to bare concrete."}}, {"@type": "Question", "name": "What do you do with tools and things that still work?", "acceptedAnswer": {"@type": "Answer", "text": "Anything usable is set aside for your keep pile or staged for donation to local partners — working tools, bikes, and sports gear get a second life instead of a landfill ticket."}}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://gtajunkandpropertycleanout.ca/"}, {"@type": "ListItem", "position": 2, "name": "Services", "item": "https://gtajunkandpropertycleanout.ca/services/"}, {"@type": "ListItem", "position": 3, "name": "Garage Cleanouts", "item": "https://gtajunkandpropertycleanout.ca/services/garage-cleanouts/"}]}</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SP2P6CWJYW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SP2P6CWJYW');
+</script>
+<script>
+/* GTA Junk — conversion event tracking. Plain JS, no dependencies. */
+(function(){
+  function send(name, params){ if (typeof gtag === 'function') gtag('event', name, params || {}); }
+  function ready(fn){ if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+
+  ready(function(){
+    var page = location.pathname;
+
+    /* Phone clicks — the primary conversion for this business */
+    document.querySelectorAll('a[href^="tel:"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('phone_click', {
+          page_path: page,
+          link_location: a.closest('nav') ? 'nav'
+                        : a.closest('footer') ? 'footer'
+                        : a.closest('.sticky-bar') ? 'sticky_bar' : 'body'
+        });
+      });
+    });
+
+    /* Form submissions — labelled so an estate lead is distinguishable from a single-item request */
+    document.querySelectorAll('form[name]').forEach(function(f){
+      f.addEventListener('submit', function(){
+        var n = f.getAttribute('name');
+        var value = n === 'estate-assessment' ? 1500
+                  : n === 'partner-enquiry'   ? 800
+                  : 300;
+        send('generate_lead', { form_name: n, page_path: page, currency: 'CAD', value: value });
+        send('form_submit',   { form_name: n, page_path: page });
+      });
+    });
+
+    /* Video estimate tool */
+    if (page.indexOf('/see-your-price') === 0) {
+      document.querySelectorAll('input[type="file"]').forEach(function(i){
+        i.addEventListener('change', function(){
+          if (i.files && i.files.length) send('video_estimate_start', { page_path: page });
+        });
+      });
+    }
+
+    /* Outbound clicks to the Google profile / review form */
+    document.querySelectorAll('a[href*="g.page"], a[href*="maps.google.com"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('review_link_click', {
+          page_path: page,
+          destination: a.href.indexOf('g.page') > -1 ? 'leave_review' : 'google_profile'
+        });
+      });
+    });
+
+    /* Engaged-visit signal: 45 seconds on an estate or service page */
+    if (/estate|services|cleanout/.test(page)) {
+      setTimeout(function(){ send('engaged_view', { page_path: page }); }, 45000);
+    }
+  });
+})();
+</script>
 </head>
 <body>
 <nav>

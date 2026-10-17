@@ -21,6 +21,73 @@
 <meta name="twitter:description" content="Junk removal and property cleanouts in Scarborough. White-glove crews, donation-first sorting, fixed on-site pricing. Local disposal guidance included.">
 <meta name="twitter:image" content="https://gtajunkandpropertycleanout.ca/assets/og-image.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Service", "serviceType": "Junk Removal and Property Cleanouts — Scarborough", "name": "Junk Removal in Scarborough — GTA Junk and Property Cleanout", "description": "Junk removal and property cleanouts in Scarborough. White-glove crews, donation-first sorting, fixed on-site pricing. Local disposal guidance included.", "url": "https://gtajunkandpropertycleanout.ca/junk-removal-scarborough/", "provider": {"@id": "https://gtajunkandpropertycleanout.ca/#business"}, "areaServed": {"@type": "City", "name": "Scarborough"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does the City pick up large furniture and appliances?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The City of Toronto collects oversized items such as appliances, furniture and carpets on your regular garbage collection day, set out 0.5 metres (2 feet) from your bins and at the curb by 7:00 a.m. Bulky furniture like couches and mattresses does not need to be dismantled, but you must remove the doors from fridges, ovens and similar appliances first. <em>Verified against the City of Toronto Oversized &amp; Metal Items page, July 2026.</em>"}}, {"@type": "Question", "name": "What won't the City take from the curb?", "acceptedAnswer": {"@type": "Answer", "text": "Construction and renovation waste — drywall, wood, and similar debris — is not collected at the curb, and neither is household hazardous waste such as paint tins and fluorescent tubes. Those must go to a City Drop-Off Depot. This is the single most common reason a Toronto renovation cleanout stalls, and it is exactly the sort of load we handle in one visit instead. <em>Verified against the City of Toronto Oversized &amp; Metal Items page, July 2026.</em>"}}, {"@type": "Question", "name": "What about carpet?", "acceptedAnswer": {"@type": "Answer", "text": "Carpet must be tied in rolls no heavier than 20 kilograms (44 pounds) and no longer than 1.2 metres (4 feet). If you're clearing a whole home's worth of broadloom, that is a lot of cutting and tying — we take it as-is. <em>Verified against the City of Toronto Oversized &amp; Metal Items page, July 2026.</em>"}}, {"@type": "Question", "name": "What does a cleanout cost in Scarborough?", "acceptedAnswer": {"@type": "Answer", "text": "Garage cleanouts start from $495, our mid-level finish from $795, and full-property or estate work from $1,195. Your exact price depends on volume, weight, access and the finish level you choose, and it is fixed at a free on-site valuation before a single item moves. We don't quote blind over the phone — we'd have to pad the number to protect ourselves, and you'd be paying for our guesswork."}}, {"@type": "Question", "name": "Do you offer same-day service in Scarborough?", "acceptedAnswer": {"@type": "Answer", "text": "Same-day and next-day slots are available in Scarborough subject to crew routing. Commercial clients — property managers and restoration companies — get priority emergency response. Call (647) 204-0632 for today's availability."}}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://gtajunkandpropertycleanout.ca/"}, {"@type": "ListItem", "position": 2, "name": "Service Areas", "item": "https://gtajunkandpropertycleanout.ca/locations/"}, {"@type": "ListItem", "position": 3, "name": "Scarborough", "item": "https://gtajunkandpropertycleanout.ca/junk-removal-scarborough/"}]}</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SP2P6CWJYW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SP2P6CWJYW');
+</script>
+<script>
+/* GTA Junk — conversion event tracking. Plain JS, no dependencies. */
+(function(){
+  function send(name, params){ if (typeof gtag === 'function') gtag('event', name, params || {}); }
+  function ready(fn){ if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+
+  ready(function(){
+    var page = location.pathname;
+
+    /* Phone clicks — the primary conversion for this business */
+    document.querySelectorAll('a[href^="tel:"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('phone_click', {
+          page_path: page,
+          link_location: a.closest('nav') ? 'nav'
+                        : a.closest('footer') ? 'footer'
+                        : a.closest('.sticky-bar') ? 'sticky_bar' : 'body'
+        });
+      });
+    });
+
+    /* Form submissions — labelled so an estate lead is distinguishable from a single-item request */
+    document.querySelectorAll('form[name]').forEach(function(f){
+      f.addEventListener('submit', function(){
+        var n = f.getAttribute('name');
+        var value = n === 'estate-assessment' ? 1500
+                  : n === 'partner-enquiry'   ? 800
+                  : 300;
+        send('generate_lead', { form_name: n, page_path: page, currency: 'CAD', value: value });
+        send('form_submit',   { form_name: n, page_path: page });
+      });
+    });
+
+    /* Video estimate tool */
+    if (page.indexOf('/see-your-price') === 0) {
+      document.querySelectorAll('input[type="file"]').forEach(function(i){
+        i.addEventListener('change', function(){
+          if (i.files && i.files.length) send('video_estimate_start', { page_path: page });
+        });
+      });
+    }
+
+    /* Outbound clicks to the Google profile / review form */
+    document.querySelectorAll('a[href*="g.page"], a[href*="maps.google.com"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('review_link_click', {
+          page_path: page,
+          destination: a.href.indexOf('g.page') > -1 ? 'leave_review' : 'google_profile'
+        });
+      });
+    });
+
+    /* Engaged-visit signal: 45 seconds on an estate or service page */
+    if (/estate|services|cleanout/.test(page)) {
+      setTimeout(function(){ send('engaged_view', { page_path: page }); }, 45000);
+    }
+  });
+})();
+</script>
 </head>
 <body>
 <nav>

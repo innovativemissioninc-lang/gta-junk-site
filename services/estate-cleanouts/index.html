@@ -21,6 +21,73 @@
 <meta name="twitter:description" content="Compassionate, discreet estate cleanouts across the GTA. Valuables set aside, donations handled, and the home left list-ready.">
 <meta name="twitter:image" content="https://gtajunkandpropertycleanout.ca/assets/og-image.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Service", "serviceType": "Estate Cleanouts", "name": "Estate Cleanouts — GTA Junk and Property Cleanout", "description": "Compassionate estate cleanouts: careful sorting of valuables and keepsakes, donation-first disposal with receipts, and list-ready finishes across the GTA.", "url": "https://gtajunkandpropertycleanout.ca/services/estate-cleanouts/", "provider": {"@id": "https://gtajunkandpropertycleanout.ca/#business"}, "areaServed": [{"@type": "City", "name": "Toronto"}, {"@type": "City", "name": "Mississauga"}, {"@type": "City", "name": "Etobicoke"}, {"@type": "City", "name": "North York"}, {"@type": "City", "name": "Scarborough"}, {"@type": "City", "name": "Vaughan"}, {"@type": "City", "name": "Brampton"}, {"@type": "City", "name": "Markham"}, {"@type": "City", "name": "Richmond Hill"}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do you handle valuables and personal documents?", "acceptedAnswer": {"@type": "Answer", "text": "Every room is checked before loading. Photos, documents, jewellery, and anything personal goes into a clean, labelled bin handed directly to the executor or family — we protect it, you decide on it."}}, {"@type": "Question", "name": "Can you provide donation receipts for the estate?", "acceptedAnswer": {"@type": "Answer", "text": "Where our donation partners issue receipts, we pass them along for the estate's records, along with an itemized invoice for the cleanout itself."}}, {"@type": "Question", "name": "How quickly can an estate be cleared?", "acceptedAnswer": {"@type": "Answer", "text": "Most homes are cleared in one to two visits. If you're working against a listing or appraisal date, tell us at the valuation — we build the schedule around your deadline."}}, {"@type": "Question", "name": "Can you work directly with our realtor or lawyer?", "acceptedAnswer": {"@type": "Answer", "text": "Yes — we regularly coordinate timing, access, and finish level directly with realtors, stagers, and estate lawyers so out-of-town executors don't have to project-manage from a distance."}}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://gtajunkandpropertycleanout.ca/"}, {"@type": "ListItem", "position": 2, "name": "Services", "item": "https://gtajunkandpropertycleanout.ca/services/"}, {"@type": "ListItem", "position": 3, "name": "Estate Cleanouts", "item": "https://gtajunkandpropertycleanout.ca/services/estate-cleanouts/"}]}</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SP2P6CWJYW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SP2P6CWJYW');
+</script>
+<script>
+/* GTA Junk — conversion event tracking. Plain JS, no dependencies. */
+(function(){
+  function send(name, params){ if (typeof gtag === 'function') gtag('event', name, params || {}); }
+  function ready(fn){ if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+
+  ready(function(){
+    var page = location.pathname;
+
+    /* Phone clicks — the primary conversion for this business */
+    document.querySelectorAll('a[href^="tel:"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('phone_click', {
+          page_path: page,
+          link_location: a.closest('nav') ? 'nav'
+                        : a.closest('footer') ? 'footer'
+                        : a.closest('.sticky-bar') ? 'sticky_bar' : 'body'
+        });
+      });
+    });
+
+    /* Form submissions — labelled so an estate lead is distinguishable from a single-item request */
+    document.querySelectorAll('form[name]').forEach(function(f){
+      f.addEventListener('submit', function(){
+        var n = f.getAttribute('name');
+        var value = n === 'estate-assessment' ? 1500
+                  : n === 'partner-enquiry'   ? 800
+                  : 300;
+        send('generate_lead', { form_name: n, page_path: page, currency: 'CAD', value: value });
+        send('form_submit',   { form_name: n, page_path: page });
+      });
+    });
+
+    /* Video estimate tool */
+    if (page.indexOf('/see-your-price') === 0) {
+      document.querySelectorAll('input[type="file"]').forEach(function(i){
+        i.addEventListener('change', function(){
+          if (i.files && i.files.length) send('video_estimate_start', { page_path: page });
+        });
+      });
+    }
+
+    /* Outbound clicks to the Google profile / review form */
+    document.querySelectorAll('a[href*="g.page"], a[href*="maps.google.com"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('review_link_click', {
+          page_path: page,
+          destination: a.href.indexOf('g.page') > -1 ? 'leave_review' : 'google_profile'
+        });
+      });
+    });
+
+    /* Engaged-visit signal: 45 seconds on an estate or service page */
+    if (/estate|services|cleanout/.test(page)) {
+      setTimeout(function(){ send('engaged_view', { page_path: page }); }, 45000);
+    }
+  });
+})();
+</script>
 </head>
 <body>
 <nav>

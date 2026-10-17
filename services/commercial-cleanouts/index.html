@@ -21,6 +21,73 @@
 <meta name="twitter:description" content="Office, retail, multiplex and portfolio cleanouts across the GTA. COIs on file, weigh tickets, after-hours scheduling, Net-30 for trade accounts.">
 <meta name="twitter:image" content="https://gtajunkandpropertycleanout.ca/assets/og-image.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Service", "serviceType": "Commercial Cleanouts", "name": "Commercial Cleanouts — GTA Junk and Property Cleanout", "description": "Office, retail, multiplex and portfolio cleanouts across the GTA with COIs, weigh tickets, after-hours scheduling and Net-30 terms.", "url": "https://gtajunkandpropertycleanout.ca/services/commercial-cleanouts/", "provider": {"@id": "https://gtajunkandpropertycleanout.ca/#business"}, "areaServed": [{"@type": "City", "name": "Toronto"}, {"@type": "City", "name": "Etobicoke"}, {"@type": "City", "name": "North York"}, {"@type": "City", "name": "Scarborough"}, {"@type": "City", "name": "Mississauga"}, {"@type": "City", "name": "Brampton"}, {"@type": "City", "name": "Vaughan"}, {"@type": "City", "name": "Markham"}, {"@type": "City", "name": "Richmond Hill"}, {"@type": "City", "name": "Oakville"}, {"@type": "City", "name": "Burlington"}, {"@type": "City", "name": "Caledon"}, {"@type": "City", "name": "Pickering"}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Do you carry insurance and WSIB coverage?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. We carry commercial liability insurance and WSIB coverage, and certificates of insurance are supplied before we attend site. Most property-managed buildings require a COI on file, and we handle that as routine paperwork rather than a special request."}}, {"@type": "Question", "name": "Can you work after hours or on weekends?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. For occupied buildings we schedule outside business hours so tenants, staff and customers never encounter the work. Elevator bookings and loading-dock windows are coordinated with your building management in advance."}}, {"@type": "Question", "name": "Do you offer terms for commercial accounts?", "acceptedAnswer": {"@type": "Answer", "text": "Net-30 terms are available for established commercial accounts. New accounts typically start on completion-of-work terms and move to Net-30 after the first few jobs — tell us what your accounts payable process needs and we'll work to it."}}, {"@type": "Question", "name": "What documentation do you provide?", "acceptedAnswer": {"@type": "Answer", "text": "Itemised invoices as standard. On request: certificates of insurance, transfer-station weigh tickets for heavy loads, and before/after photographs for your own records or an insurance file."}}, {"@type": "Question", "name": "How fast can you respond to an emergency?", "acceptedAnswer": {"@type": "Answer", "text": "Same-day response is available across the GTA subject to crew routing, and commercial clients get priority over residential bookings. For genuine emergencies — a burst pipe, an eviction, a lease expiry — phone dispatch directly rather than using the online form."}}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://gtajunkandpropertycleanout.ca/"}, {"@type": "ListItem", "position": 2, "name": "Services", "item": "https://gtajunkandpropertycleanout.ca/services/"}, {"@type": "ListItem", "position": 3, "name": "Commercial Cleanouts", "item": "https://gtajunkandpropertycleanout.ca/services/commercial-cleanouts/"}]}</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SP2P6CWJYW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SP2P6CWJYW');
+</script>
+<script>
+/* GTA Junk — conversion event tracking. Plain JS, no dependencies. */
+(function(){
+  function send(name, params){ if (typeof gtag === 'function') gtag('event', name, params || {}); }
+  function ready(fn){ if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+
+  ready(function(){
+    var page = location.pathname;
+
+    /* Phone clicks — the primary conversion for this business */
+    document.querySelectorAll('a[href^="tel:"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('phone_click', {
+          page_path: page,
+          link_location: a.closest('nav') ? 'nav'
+                        : a.closest('footer') ? 'footer'
+                        : a.closest('.sticky-bar') ? 'sticky_bar' : 'body'
+        });
+      });
+    });
+
+    /* Form submissions — labelled so an estate lead is distinguishable from a single-item request */
+    document.querySelectorAll('form[name]').forEach(function(f){
+      f.addEventListener('submit', function(){
+        var n = f.getAttribute('name');
+        var value = n === 'estate-assessment' ? 1500
+                  : n === 'partner-enquiry'   ? 800
+                  : 300;
+        send('generate_lead', { form_name: n, page_path: page, currency: 'CAD', value: value });
+        send('form_submit',   { form_name: n, page_path: page });
+      });
+    });
+
+    /* Video estimate tool */
+    if (page.indexOf('/see-your-price') === 0) {
+      document.querySelectorAll('input[type="file"]').forEach(function(i){
+        i.addEventListener('change', function(){
+          if (i.files && i.files.length) send('video_estimate_start', { page_path: page });
+        });
+      });
+    }
+
+    /* Outbound clicks to the Google profile / review form */
+    document.querySelectorAll('a[href*="g.page"], a[href*="maps.google.com"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('review_link_click', {
+          page_path: page,
+          destination: a.href.indexOf('g.page') > -1 ? 'leave_review' : 'google_profile'
+        });
+      });
+    });
+
+    /* Engaged-visit signal: 45 seconds on an estate or service page */
+    if (/estate|services|cleanout/.test(page)) {
+      setTimeout(function(){ send('engaged_view', { page_path: page }); }, 45000);
+    }
+  });
+})();
+</script>
 </head>
 <body>
 <nav>

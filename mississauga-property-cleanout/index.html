@@ -21,6 +21,73 @@
 <meta name="twitter:description" content="Whole-property cleanouts in Mississauga, Malton, Streetsville and Port Credit. Estate clearing, condo turnovers, downsizing. Peel appliance rules handled.">
 <meta name="twitter:image" content="https://gtajunkandpropertycleanout.ca/assets/og-image.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Service", "serviceType": "Whole-Property Cleanouts — Mississauga", "name": "Property Cleanouts in Mississauga — GTA Junk and Property Cleanout", "description": "Whole-property cleanouts in Mississauga, Malton, Streetsville and Port Credit. Estate clearing, condo turnovers, downsizing. Peel appliance rules handled.", "url": "https://gtajunkandpropertycleanout.ca/mississauga-property-cleanout/", "provider": {"@id": "https://gtajunkandpropertycleanout.ca/#business"}, "areaServed": {"@type": "City", "name": "Mississauga"}, "offers": {"@type": "Offer", "priceCurrency": "CAD", "price": "1195", "description": "Whole-property cleanouts start from $1,195. Exact price fixed at a free on-site valuation."}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "speakable": {"@type": "SpeakableSpecification", "cssSelector": [".faq summary", ".faq p"]}, "mainEntity": [{"@type": "Question", "name": "Who does whole-property cleanouts in Mississauga?", "acceptedAnswer": {"@type": "Answer", "text": "We do — GTA Junk and Property Cleanout clears whole properties across Mississauga, including Malton, Streetsville, Erin Mills and Port Credit. The entire property is cleared as one project rather than a series of pickups: every room, the basement, the garage and the shed, sorted donation-first. Call (647) 204-0632 for a free on-site valuation."}}, {"@type": "Question", "name": "Does Peel Region collect large appliances from the curb?", "acceptedAnswer": {"@type": "Answer", "text": "No. Peel Region no longer collects large appliances such as fridges, freezers, washers and dryers at the curb — they must be taken to a Community Recycling Centre. This is the rule that most often leaves an old appliance sitting in a Mississauga or Brampton garage indefinitely. We haul them as part of the cleanout. Verified against Peel Region — Bulky Items, July 2026."}}, {"@type": "Question", "name": "What does a full property cleanout cost in Mississauga?", "acceptedAnswer": {"@type": "Answer", "text": "Whole-property work starts from $1,195 for our Pristine Transformation finish, with lighter clear-and-haul jobs from $495 and mid-level resets from $795. The exact number depends on volume, weight, access and finish level, and it is fixed in writing at a free on-site valuation before anything moves."}}, {"@type": "Question", "name": "Can you work around condo elevator and loading-dock bookings?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. For condo turnovers around Port Credit and the Hurontario corridor we schedule against the building's elevator booking and loading-dock windows, and provide certificates of insurance where the property manager requires them. Booking around the building's rules is what keeps a turnover to a single day."}}, {"@type": "Question", "name": "How quickly can you get to Malton?", "acceptedAnswer": {"@type": "Answer", "text": "Malton is one of the closest markets to our northwest Etobicoke base — a matter of minutes rather than a cross-city run. Same-day and next-day slots are realistic there, subject to crew routing. Call (647) 204-0632 for today's availability."}}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://gtajunkandpropertycleanout.ca/"}, {"@type": "ListItem", "position": 2, "name": "Service Areas", "item": "https://gtajunkandpropertycleanout.ca/locations/"}, {"@type": "ListItem", "position": 3, "name": "Mississauga Property Cleanouts", "item": "https://gtajunkandpropertycleanout.ca/mississauga-property-cleanout/"}]}</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SP2P6CWJYW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SP2P6CWJYW');
+</script>
+<script>
+/* GTA Junk — conversion event tracking. Plain JS, no dependencies. */
+(function(){
+  function send(name, params){ if (typeof gtag === 'function') gtag('event', name, params || {}); }
+  function ready(fn){ if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+
+  ready(function(){
+    var page = location.pathname;
+
+    /* Phone clicks — the primary conversion for this business */
+    document.querySelectorAll('a[href^="tel:"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('phone_click', {
+          page_path: page,
+          link_location: a.closest('nav') ? 'nav'
+                        : a.closest('footer') ? 'footer'
+                        : a.closest('.sticky-bar') ? 'sticky_bar' : 'body'
+        });
+      });
+    });
+
+    /* Form submissions — labelled so an estate lead is distinguishable from a single-item request */
+    document.querySelectorAll('form[name]').forEach(function(f){
+      f.addEventListener('submit', function(){
+        var n = f.getAttribute('name');
+        var value = n === 'estate-assessment' ? 1500
+                  : n === 'partner-enquiry'   ? 800
+                  : 300;
+        send('generate_lead', { form_name: n, page_path: page, currency: 'CAD', value: value });
+        send('form_submit',   { form_name: n, page_path: page });
+      });
+    });
+
+    /* Video estimate tool */
+    if (page.indexOf('/see-your-price') === 0) {
+      document.querySelectorAll('input[type="file"]').forEach(function(i){
+        i.addEventListener('change', function(){
+          if (i.files && i.files.length) send('video_estimate_start', { page_path: page });
+        });
+      });
+    }
+
+    /* Outbound clicks to the Google profile / review form */
+    document.querySelectorAll('a[href*="g.page"], a[href*="maps.google.com"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('review_link_click', {
+          page_path: page,
+          destination: a.href.indexOf('g.page') > -1 ? 'leave_review' : 'google_profile'
+        });
+      });
+    });
+
+    /* Engaged-visit signal: 45 seconds on an estate or service page */
+    if (/estate|services|cleanout/.test(page)) {
+      setTimeout(function(){ send('engaged_view', { page_path: page }); }, 45000);
+    }
+  });
+})();
+</script>
 </head>
 <body>
 <nav>

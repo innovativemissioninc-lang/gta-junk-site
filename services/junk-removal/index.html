@@ -21,6 +21,73 @@
 <meta name="twitter:description" content="White-glove junk removal across the GTA. Furniture, appliances, renovation debris, and hot tubs — wiped, loaded, donated first, gone.">
 <meta name="twitter:image" content="https://gtajunkandpropertycleanout.ca/assets/og-image.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Service", "serviceType": "Junk Removal", "name": "Junk Removal — GTA Junk and Property Cleanout", "description": "Full-service white-glove junk removal: furniture, appliances, electronics, renovation debris, and heavy extractions across Toronto and the GTA.", "url": "https://gtajunkandpropertycleanout.ca/services/junk-removal/", "provider": {"@id": "https://gtajunkandpropertycleanout.ca/#business"}, "areaServed": [{"@type": "City", "name": "Toronto"}, {"@type": "City", "name": "Mississauga"}, {"@type": "City", "name": "Etobicoke"}, {"@type": "City", "name": "North York"}, {"@type": "City", "name": "Scarborough"}, {"@type": "City", "name": "Vaughan"}, {"@type": "City", "name": "Brampton"}, {"@type": "City", "name": "Markham"}, {"@type": "City", "name": "Richmond Hill"}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How quickly can you remove junk in Toronto?", "acceptedAnswer": {"@type": "Answer", "text": "Same-day and next-day slots are available across the GTA, subject to crew availability. Book a site valuation online or call — we confirm a 2-hour arrival window, not a vague 'sometime Thursday.'"}}, {"@type": "Question", "name": "How is junk removal priced?", "acceptedAnswer": {"@type": "Answer", "text": "On site, before we start. We look at the volume, the weight, the access, and your chosen finish level, then fix a firm price. No phone guesses, no meter running, no surprises at the end."}}, {"@type": "Question", "name": "Can you take items from inside the house, basement, or upstairs?", "acceptedAnswer": {"@type": "Answer", "text": "Yes — that's the point of a full-service crew. We do the carrying, from any floor, with property protection down first. You point; we handle the stairs."}}, {"@type": "Question", "name": "What happens to my stuff after you take it?", "acceptedAnswer": {"@type": "Answer", "text": "It gets sorted: donation partners first for usable goods, certified recyclers for metals and electronics, and the transfer station only for what's left. We're happy to tell you where things went."}}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://gtajunkandpropertycleanout.ca/"}, {"@type": "ListItem", "position": 2, "name": "Services", "item": "https://gtajunkandpropertycleanout.ca/services/"}, {"@type": "ListItem", "position": 3, "name": "Junk Removal", "item": "https://gtajunkandpropertycleanout.ca/services/junk-removal/"}]}</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SP2P6CWJYW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SP2P6CWJYW');
+</script>
+<script>
+/* GTA Junk — conversion event tracking. Plain JS, no dependencies. */
+(function(){
+  function send(name, params){ if (typeof gtag === 'function') gtag('event', name, params || {}); }
+  function ready(fn){ if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+
+  ready(function(){
+    var page = location.pathname;
+
+    /* Phone clicks — the primary conversion for this business */
+    document.querySelectorAll('a[href^="tel:"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('phone_click', {
+          page_path: page,
+          link_location: a.closest('nav') ? 'nav'
+                        : a.closest('footer') ? 'footer'
+                        : a.closest('.sticky-bar') ? 'sticky_bar' : 'body'
+        });
+      });
+    });
+
+    /* Form submissions — labelled so an estate lead is distinguishable from a single-item request */
+    document.querySelectorAll('form[name]').forEach(function(f){
+      f.addEventListener('submit', function(){
+        var n = f.getAttribute('name');
+        var value = n === 'estate-assessment' ? 1500
+                  : n === 'partner-enquiry'   ? 800
+                  : 300;
+        send('generate_lead', { form_name: n, page_path: page, currency: 'CAD', value: value });
+        send('form_submit',   { form_name: n, page_path: page });
+      });
+    });
+
+    /* Video estimate tool */
+    if (page.indexOf('/see-your-price') === 0) {
+      document.querySelectorAll('input[type="file"]').forEach(function(i){
+        i.addEventListener('change', function(){
+          if (i.files && i.files.length) send('video_estimate_start', { page_path: page });
+        });
+      });
+    }
+
+    /* Outbound clicks to the Google profile / review form */
+    document.querySelectorAll('a[href*="g.page"], a[href*="maps.google.com"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('review_link_click', {
+          page_path: page,
+          destination: a.href.indexOf('g.page') > -1 ? 'leave_review' : 'google_profile'
+        });
+      });
+    });
+
+    /* Engaged-visit signal: 45 seconds on an estate or service page */
+    if (/estate|services|cleanout/.test(page)) {
+      setTimeout(function(){ send('engaged_view', { page_path: page }); }, 45000);
+    }
+  });
+})();
+</script>
 </head>
 <body>
 <nav>

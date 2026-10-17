@@ -21,6 +21,73 @@
 <meta name="twitter:description" content="Trade partner programme for GTA real estate agents, stagers, property managers and restoration companies. Priority scheduling, preferred rates, referral credit.">
 <meta name="twitter:image" content="https://gtajunkandpropertycleanout.ca/assets/og-image.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Service", "serviceType": "Trade Partner Programme", "name": "Partner Programme — GTA Junk and Property Cleanout", "description": "Referral and trade partner programme for GTA real estate agents, stagers, property managers and restoration companies.", "url": "https://gtajunkandpropertycleanout.ca/partners/", "provider": {"@id": "https://gtajunkandpropertycleanout.ca/#business"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How does the referral credit work?", "acceptedAnswer": {"@type": "Answer", "text": "Register once as a partner. Every completed job you refer earns a credit, confirmed when your account is set up. We pay within seven days of job completion — reliably and without chasing, because partners talk to each other and that reputation is worth more than the credit itself."}}, {"@type": "Question", "name": "Do my clients get a different rate?", "acceptedAnswer": {"@type": "Answer", "text": "Partner clients receive our preferred rate, and you keep the credit separately. You look like the person with good connections, your client pays less than they would cold, and nobody is surprised by an invoice."}}, {"@type": "Question", "name": "How quickly can you turn a property around?", "acceptedAnswer": {"@type": "Answer", "text": "For partner bookings: valuation today, cleared tomorrow, photo-ready the day after, where scheduling allows. If you're working against an MLS date, an appraisal or a lease expiry, say so when you book and we build the schedule around it."}}, {"@type": "Question", "name": "Can you coordinate directly with my stager or contractor?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, and most partners prefer it. Give us the contact and we'll sequence around their timeline so you're not project-managing a cleanout between showings."}}, {"@type": "Question", "name": "What do you need from me to open an account?", "acceptedAnswer": {"@type": "Answer", "text": "A name, a phone number, and the type of work you send. That's the whole application. COIs, W-9-equivalent paperwork and Net-30 setup follow if your organisation requires them."}}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://gtajunkandpropertycleanout.ca/"}, {"@type": "ListItem", "position": 2, "name": "Partner With Us", "item": "https://gtajunkandpropertycleanout.ca/partners/"}]}</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SP2P6CWJYW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SP2P6CWJYW');
+</script>
+<script>
+/* GTA Junk — conversion event tracking. Plain JS, no dependencies. */
+(function(){
+  function send(name, params){ if (typeof gtag === 'function') gtag('event', name, params || {}); }
+  function ready(fn){ if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+
+  ready(function(){
+    var page = location.pathname;
+
+    /* Phone clicks — the primary conversion for this business */
+    document.querySelectorAll('a[href^="tel:"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('phone_click', {
+          page_path: page,
+          link_location: a.closest('nav') ? 'nav'
+                        : a.closest('footer') ? 'footer'
+                        : a.closest('.sticky-bar') ? 'sticky_bar' : 'body'
+        });
+      });
+    });
+
+    /* Form submissions — labelled so an estate lead is distinguishable from a single-item request */
+    document.querySelectorAll('form[name]').forEach(function(f){
+      f.addEventListener('submit', function(){
+        var n = f.getAttribute('name');
+        var value = n === 'estate-assessment' ? 1500
+                  : n === 'partner-enquiry'   ? 800
+                  : 300;
+        send('generate_lead', { form_name: n, page_path: page, currency: 'CAD', value: value });
+        send('form_submit',   { form_name: n, page_path: page });
+      });
+    });
+
+    /* Video estimate tool */
+    if (page.indexOf('/see-your-price') === 0) {
+      document.querySelectorAll('input[type="file"]').forEach(function(i){
+        i.addEventListener('change', function(){
+          if (i.files && i.files.length) send('video_estimate_start', { page_path: page });
+        });
+      });
+    }
+
+    /* Outbound clicks to the Google profile / review form */
+    document.querySelectorAll('a[href*="g.page"], a[href*="maps.google.com"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('review_link_click', {
+          page_path: page,
+          destination: a.href.indexOf('g.page') > -1 ? 'leave_review' : 'google_profile'
+        });
+      });
+    });
+
+    /* Engaged-visit signal: 45 seconds on an estate or service page */
+    if (/estate|services|cleanout/.test(page)) {
+      setTimeout(function(){ send('engaged_view', { page_path: page }); }, 45000);
+    }
+  });
+})();
+</script>
 </head>
 <body>
 <nav>

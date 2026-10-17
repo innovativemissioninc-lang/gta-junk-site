@@ -21,6 +21,73 @@
 <meta name="twitter:description" content="Pre-listing cleanouts for GTA agents: cleared tomorrow, photos Friday. Priority scheduling, discreet crews, partner referral program.">
 <meta name="twitter:image" content="https://gtajunkandpropertycleanout.ca/assets/og-image.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Service", "serviceType": "Pre-Listing Cleanouts for Real Estate Agents", "name": "Realtor Partner Program — GTA Junk and Property Cleanout", "description": "Priority pre-listing cleanouts, estate clearing, and Pristine-finish detailing for GTA real estate agents, with a partner referral program.", "url": "https://gtajunkandpropertycleanout.ca/realtors/", "provider": {"@id": "https://gtajunkandpropertycleanout.ca/#business"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How fast can you make a listing ready to photograph?", "acceptedAnswer": {"@type": "Answer", "text": "For most homes: valuation today, cleanout tomorrow, photos the day after. If you're racing an MLS date, call us directly — partner agents get priority scheduling and we build the plan around your photographer, stager, and open house."}}, {"@type": "Question", "name": "Can you work in occupied or semi-occupied homes?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. We clear designated rooms and items from your list while leaving the rest untouched, with full floor and wall protection. Crews are discreet with sellers and neighbours — no loud branding moments on a quiet street."}}, {"@type": "Question", "name": "How does the partner program work?", "acceptedAnswer": {"@type": "Answer", "text": "Register once as a partner agent. You get priority booking, a dedicated contact, preferred partner pricing for your clients, and a referral credit on every completed job you send. Details are confirmed when you open your account — one email or call is all it takes."}}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://gtajunkandpropertycleanout.ca/"}, {"@type": "ListItem", "position": 2, "name": "For Real Estate Agents", "item": "https://gtajunkandpropertycleanout.ca/realtors/"}]}</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SP2P6CWJYW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SP2P6CWJYW');
+</script>
+<script>
+/* GTA Junk — conversion event tracking. Plain JS, no dependencies. */
+(function(){
+  function send(name, params){ if (typeof gtag === 'function') gtag('event', name, params || {}); }
+  function ready(fn){ if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+
+  ready(function(){
+    var page = location.pathname;
+
+    /* Phone clicks — the primary conversion for this business */
+    document.querySelectorAll('a[href^="tel:"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('phone_click', {
+          page_path: page,
+          link_location: a.closest('nav') ? 'nav'
+                        : a.closest('footer') ? 'footer'
+                        : a.closest('.sticky-bar') ? 'sticky_bar' : 'body'
+        });
+      });
+    });
+
+    /* Form submissions — labelled so an estate lead is distinguishable from a single-item request */
+    document.querySelectorAll('form[name]').forEach(function(f){
+      f.addEventListener('submit', function(){
+        var n = f.getAttribute('name');
+        var value = n === 'estate-assessment' ? 1500
+                  : n === 'partner-enquiry'   ? 800
+                  : 300;
+        send('generate_lead', { form_name: n, page_path: page, currency: 'CAD', value: value });
+        send('form_submit',   { form_name: n, page_path: page });
+      });
+    });
+
+    /* Video estimate tool */
+    if (page.indexOf('/see-your-price') === 0) {
+      document.querySelectorAll('input[type="file"]').forEach(function(i){
+        i.addEventListener('change', function(){
+          if (i.files && i.files.length) send('video_estimate_start', { page_path: page });
+        });
+      });
+    }
+
+    /* Outbound clicks to the Google profile / review form */
+    document.querySelectorAll('a[href*="g.page"], a[href*="maps.google.com"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('review_link_click', {
+          page_path: page,
+          destination: a.href.indexOf('g.page') > -1 ? 'leave_review' : 'google_profile'
+        });
+      });
+    });
+
+    /* Engaged-visit signal: 45 seconds on an estate or service page */
+    if (/estate|services|cleanout/.test(page)) {
+      setTimeout(function(){ send('engaged_view', { page_path: page }); }, 45000);
+    }
+  });
+})();
+</script>
 </head>
 <body>
 <nav>

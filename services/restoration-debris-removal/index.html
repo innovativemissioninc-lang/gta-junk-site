@@ -21,6 +21,73 @@
 <meta name="twitter:description" content="Flood and fire debris removal for GTA restoration companies. Continuous hauls, weigh tickets, and adjuster-ready documentation.">
 <meta name="twitter:image" content="https://gtajunkandpropertycleanout.ca/assets/og-image.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Service", "serviceType": "Restoration & Insurance Debris Removal", "name": "Restoration & Insurance Debris Removal — GTA Junk and Property Cleanout", "description": "Flood and fire debris removal for restoration companies: continuous hauls, weigh tickets, tonnage pricing, and adjuster-ready documentation across the GTA.", "url": "https://gtajunkandpropertycleanout.ca/services/restoration-debris-removal/", "provider": {"@id": "https://gtajunkandpropertycleanout.ca/#business"}, "areaServed": [{"@type": "City", "name": "Toronto"}, {"@type": "City", "name": "Mississauga"}, {"@type": "City", "name": "Etobicoke"}, {"@type": "City", "name": "North York"}, {"@type": "City", "name": "Scarborough"}, {"@type": "City", "name": "Vaughan"}, {"@type": "City", "name": "Brampton"}, {"@type": "City", "name": "Markham"}, {"@type": "City", "name": "Richmond Hill"}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How fast can you respond to an emergency tear-out?", "acceptedAnswer": {"@type": "Answer", "text": "Same-day response is available across the GTA for restoration partners, subject to crew scheduling. Emergency calls get priority routing — phone dispatch directly for the fastest window."}}, {"@type": "Question", "name": "What documentation do you provide for insurance claims?", "acceptedAnswer": {"@type": "Answer", "text": "Transfer-station weigh tickets for every load, itemized invoices, tonnage-based pricing for heavy debris, and before/after photos on request — formatted so the file is adjuster-ready."}}, {"@type": "Question", "name": "Do you do the demolition itself?", "acceptedAnswer": {"@type": "Answer", "text": "We handle debris removal and light, non-structural teardown. Structural demolition and licensed abatement stay with your remediation contractor — we keep the site clear so their work never stalls."}}, {"@type": "Question", "name": "Do you offer trade accounts for restoration companies?", "acceptedAnswer": {"@type": "Answer", "text": "Yes — recurring restoration partners get priority dispatch, COIs on file, and Net-30 terms. Set it up once and booking becomes a text message."}}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://gtajunkandpropertycleanout.ca/"}, {"@type": "ListItem", "position": 2, "name": "Services", "item": "https://gtajunkandpropertycleanout.ca/services/"}, {"@type": "ListItem", "position": 3, "name": "Restoration & Insurance Debris Removal", "item": "https://gtajunkandpropertycleanout.ca/services/restoration-debris-removal/"}]}</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SP2P6CWJYW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SP2P6CWJYW');
+</script>
+<script>
+/* GTA Junk — conversion event tracking. Plain JS, no dependencies. */
+(function(){
+  function send(name, params){ if (typeof gtag === 'function') gtag('event', name, params || {}); }
+  function ready(fn){ if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+
+  ready(function(){
+    var page = location.pathname;
+
+    /* Phone clicks — the primary conversion for this business */
+    document.querySelectorAll('a[href^="tel:"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('phone_click', {
+          page_path: page,
+          link_location: a.closest('nav') ? 'nav'
+                        : a.closest('footer') ? 'footer'
+                        : a.closest('.sticky-bar') ? 'sticky_bar' : 'body'
+        });
+      });
+    });
+
+    /* Form submissions — labelled so an estate lead is distinguishable from a single-item request */
+    document.querySelectorAll('form[name]').forEach(function(f){
+      f.addEventListener('submit', function(){
+        var n = f.getAttribute('name');
+        var value = n === 'estate-assessment' ? 1500
+                  : n === 'partner-enquiry'   ? 800
+                  : 300;
+        send('generate_lead', { form_name: n, page_path: page, currency: 'CAD', value: value });
+        send('form_submit',   { form_name: n, page_path: page });
+      });
+    });
+
+    /* Video estimate tool */
+    if (page.indexOf('/see-your-price') === 0) {
+      document.querySelectorAll('input[type="file"]').forEach(function(i){
+        i.addEventListener('change', function(){
+          if (i.files && i.files.length) send('video_estimate_start', { page_path: page });
+        });
+      });
+    }
+
+    /* Outbound clicks to the Google profile / review form */
+    document.querySelectorAll('a[href*="g.page"], a[href*="maps.google.com"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('review_link_click', {
+          page_path: page,
+          destination: a.href.indexOf('g.page') > -1 ? 'leave_review' : 'google_profile'
+        });
+      });
+    });
+
+    /* Engaged-visit signal: 45 seconds on an estate or service page */
+    if (/estate|services|cleanout/.test(page)) {
+      setTimeout(function(){ send('engaged_view', { page_path: page }); }, 45000);
+    }
+  });
+})();
+</script>
 </head>
 <body>
 <nav>
