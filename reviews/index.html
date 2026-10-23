@@ -162,8 +162,8 @@
       </div>
     </div>
     <div class="legal">
-      <span>© 2026 GTA Junk and Property Cleanout Inc. · HST# ______ · Licensed &amp; insured</span>
-      <span>Responsible disposal: we donate and recycle before we dump.</span>
+      <span>© 2026 GTA Junk and Property Cleanout Inc. · Licensed &amp; insured</span>
+      <span>Responsible disposal: we donate and recycle before we dump. &nbsp;&middot;&nbsp; <a href="/privacy/">Privacy Policy</a> &nbsp;&middot;&nbsp; <a href="/terms/">Terms of Service</a></span>
     </div>
   </div>
 </footer>
@@ -171,5 +171,32 @@
   <a class="sb-call" href="tel:+16472040632">📞 Call Us<small>(647) 204-0632</small></a>
   <a class="sb-video" href="/see-your-price/">📹 Send a Video<small>Get a rough price</small></a>
 </div>
+<style>
+#ckbar{position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#14263D;color:#E8EEF5;
+ padding:14px 18px;display:none;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center;
+ font:14.5px/1.5 Arial,Helvetica,sans-serif;box-shadow:0 -2px 14px rgba(0,0,0,.25)}
+#ckbar a{color:#F97316;text-decoration:underline}
+#ckbar button{background:#F97316;color:#fff;border:0;border-radius:7px;padding:9px 20px;
+ font:700 14.5px Arial,Helvetica,sans-serif;cursor:pointer}
+#ckbar button:hover{background:#EA580C}
+@media(max-width:700px){#ckbar{bottom:64px;font-size:13.5px;padding:12px 14px}}
+</style>
+<div id="ckbar" role="region" aria-label="Cookie notice">
+  <span>We use Google Analytics cookies to see which pages are useful. We don't sell your data or run advertising trackers here. <a href="/privacy/">Privacy Policy</a></span>
+  <button type="button" id="ckok">Got it</button>
+</div>
+<script>
+(function(){
+  try{
+    if(localStorage.getItem('gtajunk_ck')==='1') return;
+    var b=document.getElementById('ckbar'); if(!b) return;
+    b.style.display='flex';
+    document.getElementById('ckok').addEventListener('click',function(){
+      b.style.display='none';
+      try{localStorage.setItem('gtajunk_ck','1');}catch(e){}
+    });
+  }catch(e){}
+})();
+</script>
 </body>
 </html>
