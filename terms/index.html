@@ -63,9 +63,13 @@
     document.querySelectorAll('form[name]').forEach(function(f){
       f.addEventListener('submit', function(){
         var n = f.getAttribute('name');
-        var value = n === 'estate-assessment' ? 1500
-                  : n === 'partner-enquiry'   ? 800
-                  : 300;
+        var VAL = {
+          'estate-cleanout-lead': 1200, 'hoarding-cleanout-lead': 3500,
+          'prelisting-cleanout-lead': 1500, 'restoration-debris-lead': 1800,
+          'commercial-cleanout-lead': 2000, 'fast-quote': 1200,
+          'estate-assessment': 1500, 'partner-enquiry': 800, 'partner-referral': 800
+        };
+        var value = VAL[n] || 300;
         send('generate_lead', { form_name: n, page_path: page, currency: 'CAD', value: value });
         send('form_submit',   { form_name: n, page_path: page });
       });
@@ -101,7 +105,7 @@
 <body>
 <nav>
   <div class="nav-inner">
-    <a class="nav-logo" href="/"><img src="/assets/logo-horizontal-dark.svg" alt="GTA Junk and Property Cleanout — The White-Glove Cleanout Crew"></a>
+    <a class="nav-logo" href="/"><img src="/assets/logo-horizontal-dark.svg" alt="GTA Junk and Property Cleanout — The White-Glove Cleanout Crew" fetchpriority="high" decoding="async"></a>
     <div class="nav-links">
       <a href="/see-your-price/">Send a Video</a>
       <a href="/services/">Services</a>
@@ -131,14 +135,22 @@
 <li>All prices are subject to HST.</li>
 </ul>
 
-<h2>2. Scheduling and access</h2>
+<h2>2. Deposits on larger jobs</h2>
+<ul>
+<li>Jobs quoted above <strong>$2,000</strong> require a <strong>30% deposit</strong> to confirm the booking.</li>
+<li>The deposit reserves your crew, vehicle and disposal window, all of which we commit to in advance on large jobs.</li>
+<li>The deposit is applied in full against the final invoice. The balance is due on completion, after you have walked the space with us.</li>
+<li>If you cancel with more than 72 hours’ notice, the deposit is refunded in full. Inside 72 hours we retain the deposit to cover the reserved crew day and disposal booking, unless we are able to re-fill the slot.</li>
+<li>If we cancel for any reason, the deposit is refunded in full.</li>
+</ul>
+<h2>3. Scheduling and access</h2>
 <ul>
 <li>You are responsible for providing safe and lawful access to the property.</li>
 <li>If we cannot access the property at the agreed time, or the job is cancelled with less than 24 hours' notice, we may charge a call-out fee to cover crew and vehicle time.</li>
 <li>For condominiums and managed buildings, elevator and loading-dock bookings are your responsibility unless we have agreed otherwise in writing.</li>
 </ul>
 
-<h2>3. What we will not remove</h2>
+<h2>4. What we will not remove</h2>
 <p>We are registered with the Ontario Ministry of the Environment, Conservation and Parks as a waste transportation system (EASR R-004-5477911257). That registration covers "EASR waste" and does not permit us to carry certain materials. We will refuse, and we will tell you plainly why:</p>
 <ul>
 <li>Asbestos or material suspected of containing asbestos</li>
@@ -150,17 +162,17 @@
 </ul>
 <p>We will also not remove anything we have reason to believe is not yours to dispose of.</p>
 
-<h2>4. Valuables, documents and keepsakes</h2>
+<h2>5. Valuables, documents and keepsakes</h2>
 <ul>
 <li>Our crews set aside items that appear personal or valuable &mdash; photographs, documents, jewellery, cash, medals &mdash; for you to review before anything leaves the property.</li>
 <li>Despite this, <strong>please remove anything irreplaceable before we arrive.</strong> Once an item has been removed and disposed of or donated, it generally cannot be recovered.</li>
 <li>If you are not on site, tell us in advance what to watch for.</li>
 </ul>
 
-<h2>5. Where your items go</h2>
+<h2>6. Where your items go</h2>
 <p>Usable items are routed to donation partners where they can be accepted. Scrap metal goes to a recycler, electronics to e-waste handling, and refrigerant-containing appliances to a facility that recovers refrigerant. The remainder goes to a licensed transfer station. Once an item leaves the property, ownership passes to us for the purpose of lawful disposal or donation.</p>
 
-<h2>6. Property protection and damage</h2>
+<h2>7. Property protection and damage</h2>
 <ul>
 <li>We lay floor runners and protect door frames as standard, and our crews carry rather than drag.</li>
 <li>We carry $2,000,000 in commercial general liability insurance. A certificate is available on request.</li>
@@ -168,23 +180,23 @@
 <li>We are not responsible for pre-existing damage, or for damage that is unavoidable in removing an item you have asked us to remove &mdash; for example marks left behind a fixed appliance. We will point these out where we can.</li>
 </ul>
 
-<h2>7. Payment</h2>
+<h2>8. Payment</h2>
 <ul>
 <li>Payment is due on completion unless we have agreed trade account terms in writing.</li>
 <li>Trade accounts for property managers, restoration contractors and estate professionals are available on request, normally Net-30.</li>
 <li>Deposits may be required for large multi-day projects, and will be set out in your written quote.</li>
 </ul>
 
-<h2>8. Limits of liability</h2>
+<h2>9. Limits of liability</h2>
 <p>Our liability for any claim relating to a job is limited to the amount you paid for that job, except where the law does not permit such a limit. Nothing in these terms limits liability for personal injury or death caused by our negligence, or for anything else that cannot be limited under Ontario law.</p>
 
-<h2>9. Photographs</h2>
+<h2>10. Photographs</h2>
 <p>We may take before-and-after photographs for our own records and quality control. We will not publish any photograph of your property or belongings without your written permission. See our <a href="/privacy/">Privacy Policy</a> for details.</p>
 
-<h2>10. Governing law</h2>
+<h2>11. Governing law</h2>
 <p>These terms are governed by the laws of the Province of Ontario and the federal laws of Canada that apply in it.</p>
 
-<h2>11. Contact</h2>
+<h2>12. Contact</h2>
 <p>GTA Junk and Property Cleanout Inc.<br>
 Etobicoke, Ontario<br>
 (647) 204-0632<br>
@@ -198,13 +210,13 @@ gtajunkandpropertycleanout@gmail.com</p>
         <img src="/assets/logo-horizontal-dark.svg" alt="GTA Junk and Property Cleanout" loading="lazy">
         <p style="font-size:13.5px">Toronto's white-glove cleanout crew. We sort, clear, sweep, and detail — you get your space back.</p>
       </div>
-      <div><h4>Services</h4><a href="/see-your-price/">See Your Price (video estimate)</a><a href="/services/">All Services</a><a href="/services/junk-removal/">Junk Removal</a><a href="/services/property-cleanouts/">Property Cleanouts</a><a href="/services/garage-cleanouts/">Garage Cleanouts</a><a href="/services/estate-cleanouts/">Estate Cleanouts</a><a href="/estate-cleanout-services-ontario/">Estate Cleanouts &mdash; Ontario-wide</a><a href="/services/restoration-debris-removal/">Restoration & Insurance Debris Removal</a></div>
-      <div><h4>Service Areas</h4><a href="/junk-removal-aurora/">Aurora</a><a href="/junk-removal-bolton/">Bolton</a><a href="/junk-removal-bramalea/">Bramalea</a><a href="/junk-removal-brampton/">Brampton</a><a href="/junk-removal-burlington/">Burlington</a><a href="/junk-removal-caledon/">Caledon</a><a href="/junk-removal-east-york/">East York</a><a href="/junk-removal-etobicoke/">Etobicoke</a><a href="/junk-removal-georgetown/">Georgetown</a><a href="/junk-removal-king-city/">King City</a><a href="/junk-removal-malton/">Malton</a><a href="/junk-removal-markham/">Markham</a><a href="/junk-removal-mississauga/">Mississauga</a><a href="/junk-removal-north-york/">North York</a><a href="/junk-removal-oakville/">Oakville</a><a href="/junk-removal-pickering/">Pickering</a><a href="/junk-removal-rexdale/">Rexdale</a><a href="/junk-removal-richmond-hill/">Richmond Hill</a><a href="/junk-removal-scarborough/">Scarborough</a><a href="/junk-removal-toronto/">Toronto</a><a href="/junk-removal-vaughan/">Vaughan</a><a href="/junk-removal-woodbridge/">Woodbridge</a><a href="/junk-removal-york/">York</a></div>
+      <div><h4>Services</h4><a href="/see-your-price/">See Your Price (video estimate)</a><a href="/services/">All Services</a><a href="/services/junk-removal/">Junk Removal</a><a href="/pre-listing-cleanouts/">Property Cleanouts</a><a href="/services/garage-cleanouts/">Garage Cleanouts</a><a href="/estate-cleanouts/">Estate Cleanouts</a><a href="/hoarding-cleanouts/">Hoarding Cleanouts</a><a href="/pre-listing-cleanouts/">Pre-Listing Cleanouts</a><a href="/commercial-cleanouts/">Commercial Cleanouts</a><a href="/insurance-restoration-cleanouts/">Insurance &amp; Restoration Debris</a></div>
+      <div><h4>Service Areas</h4><a href="/junk-removal-ajax/">Ajax</a><a href="/junk-removal-aurora/">Aurora</a><a href="/junk-removal-bolton/">Bolton</a><a href="/junk-removal-bramalea/">Bramalea</a><a href="/junk-removal-brampton/">Brampton</a><a href="/junk-removal-burlington/">Burlington</a><a href="/junk-removal-caledon/">Caledon</a><a href="/junk-removal-east-york/">East York</a><a href="/junk-removal-etobicoke/">Etobicoke</a><a href="/junk-removal-georgetown/">Georgetown</a><a href="/junk-removal-king-city/">King City</a><a href="/junk-removal-malton/">Malton</a><a href="/junk-removal-markham/">Markham</a><a href="/junk-removal-mississauga/">Mississauga</a><a href="/junk-removal-north-york/">North York</a><a href="/junk-removal-oakville/">Oakville</a><a href="/junk-removal-pickering/">Pickering</a><a href="/junk-removal-rexdale/">Rexdale</a><a href="/junk-removal-richmond-hill/">Richmond Hill</a><a href="/junk-removal-scarborough/">Scarborough</a><a href="/junk-removal-toronto/">Toronto</a><a href="/junk-removal-vaughan/">Vaughan</a><a href="/junk-removal-woodbridge/">Woodbridge</a><a href="/junk-removal-whitby/">Whitby</a><a href="/junk-removal-oshawa/">Oshawa</a><a href="/junk-removal-newmarket/">Newmarket</a><a href="/junk-removal-milton/">Milton</a><a href="/junk-removal-york/">York</a></div>
       <div>
         <h4>Company</h4>
         <a href="/about/">About &amp; The Rocky Story</a>
         <a href="/reviews/">Reviews</a><a href="https://maps.google.com/?cid=4585715728644704101" target="_blank" rel="noopener">See us on Google &#9733; 5.0</a><a href="https://g.page/r/CWUHyrYovKM_EAI/review" target="_blank" rel="nofollow noopener">Leave a Google review</a>
-        <a href="/partners/">Partner With Us</a><a href="/realtors/">For Real Estate Agents</a>
+        <a href="/partners/">Partner With Us</a><a href="/pre-listing-cleanouts/">For Real Estate Agents</a>
         <a href="/blog/">Resources</a>
         <a href="/contact/">Contact / Get a Quote</a>
         <h4 style="margin-top:18px">Contact</h4>

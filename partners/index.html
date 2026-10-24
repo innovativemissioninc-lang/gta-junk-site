@@ -3,21 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Partner With Us | Agents, Stagers &amp; Property Managers</title>
+<title>Referral Partners | Realtors, Estate Lawyers &amp; Property Managers</title>
 <meta name="description" content="Trade partner programme for GTA real estate agents, stagers, property managers and restoration companies. Priority scheduling, preferred rates, referral credit.">
 <link rel="canonical" href="https://gtajunkandpropertycleanout.ca/partners/">
 <link rel="icon" href="/assets/logo-icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/site.css">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="GTA Junk and Property Cleanout">
-<meta property="og:title" content="Partner With Us | Agents, Stagers &amp; Property Managers">
+<meta property="og:title" content="Referral Partners | Realtors, Estate Lawyers &amp; Property Managers">
 <meta property="og:description" content="Trade partner programme for GTA real estate agents, stagers, property managers and restoration companies. Priority scheduling, preferred rates, referral credit.">
 <meta property="og:url" content="https://gtajunkandpropertycleanout.ca/partners/">
 <meta property="og:image" content="https://gtajunkandpropertycleanout.ca/assets/og-image.png">
 <meta property="og:image:alt" content="Rocky the raccoon — GTA Junk and Property Cleanout">
 <meta property="og:locale" content="en_CA">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Partner With Us | Agents, Stagers &amp; Property Managers">
+<meta name="twitter:title" content="Referral Partners | Realtors, Estate Lawyers &amp; Property Managers">
 <meta name="twitter:description" content="Trade partner programme for GTA real estate agents, stagers, property managers and restoration companies. Priority scheduling, preferred rates, referral credit.">
 <meta name="twitter:image" content="https://gtajunkandpropertycleanout.ca/assets/og-image.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Service", "serviceType": "Trade Partner Programme", "name": "Partner Programme — GTA Junk and Property Cleanout", "description": "Referral and trade partner programme for GTA real estate agents, stagers, property managers and restoration companies.", "url": "https://gtajunkandpropertycleanout.ca/partners/", "provider": {"@id": "https://gtajunkandpropertycleanout.ca/#business"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How does the referral credit work?", "acceptedAnswer": {"@type": "Answer", "text": "Register once as a partner. Every completed job you refer earns a credit, confirmed when your account is set up. We pay within seven days of job completion — reliably and without chasing, because partners talk to each other and that reputation is worth more than the credit itself."}}, {"@type": "Question", "name": "Do my clients get a different rate?", "acceptedAnswer": {"@type": "Answer", "text": "Partner clients receive our preferred rate, and you keep the credit separately. You look like the person with good connections, your client pays less than they would cold, and nobody is surprised by an invoice."}}, {"@type": "Question", "name": "How quickly can you turn a property around?", "acceptedAnswer": {"@type": "Answer", "text": "For partner bookings: valuation today, cleared tomorrow, photo-ready the day after, where scheduling allows. If you're working against an MLS date, an appraisal or a lease expiry, say so when you book and we build the schedule around it."}}, {"@type": "Question", "name": "Can you coordinate directly with my stager or contractor?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, and most partners prefer it. Give us the contact and we'll sequence around their timeline so you're not project-managing a cleanout between showings."}}, {"@type": "Question", "name": "What do you need from me to open an account?", "acceptedAnswer": {"@type": "Answer", "text": "A name, a phone number, and the type of work you send. That's the whole application. COIs, W-9-equivalent paperwork and Net-30 setup follow if your organisation requires them."}}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://gtajunkandpropertycleanout.ca/"}, {"@type": "ListItem", "position": 2, "name": "Partner With Us", "item": "https://gtajunkandpropertycleanout.ca/partners/"}]}</script>
@@ -54,9 +54,13 @@
     document.querySelectorAll('form[name]').forEach(function(f){
       f.addEventListener('submit', function(){
         var n = f.getAttribute('name');
-        var value = n === 'estate-assessment' ? 1500
-                  : n === 'partner-enquiry'   ? 800
-                  : 300;
+        var VAL = {
+          'estate-cleanout-lead': 1200, 'hoarding-cleanout-lead': 3500,
+          'prelisting-cleanout-lead': 1500, 'restoration-debris-lead': 1800,
+          'commercial-cleanout-lead': 2000, 'fast-quote': 1200,
+          'estate-assessment': 1500, 'partner-enquiry': 800, 'partner-referral': 800
+        };
+        var value = VAL[n] || 300;
         send('generate_lead', { form_name: n, page_path: page, currency: 'CAD', value: value });
         send('form_submit',   { form_name: n, page_path: page });
       });
@@ -92,12 +96,12 @@
 <body>
 <nav>
   <div class="nav-inner">
-    <a class="nav-logo" href="/"><img src="/assets/logo-horizontal-dark.svg" alt="GTA Junk and Property Cleanout — The White-Glove Cleanout Crew"></a>
+    <a class="nav-logo" href="/"><img src="/assets/logo-horizontal-dark.svg" alt="GTA Junk and Property Cleanout — The White-Glove Cleanout Crew" fetchpriority="high" decoding="async"></a>
     <div class="nav-links">
       <a href="/see-your-price/">Send a Video</a>
       <a href="/services/">Services</a>
       <a href="/locations/">Service Areas</a>
-      <a href="/realtors/">For Realtors</a>
+      <a href="/pre-listing-cleanouts/">For Realtors</a>
       <a href="/about/">About</a>
       <a href="/reviews/">Reviews</a><a href="https://maps.google.com/?cid=4585715728644704101" target="_blank" rel="noopener">See us on Google &#9733; 5.0</a><a href="https://g.page/r/CWUHyrYovKM_EAI/review" target="_blank" rel="nofollow noopener">Leave a Google review</a>
       <a class="nav-phone" href="tel:+16472040632">(647) 204-0632</a>
@@ -106,25 +110,27 @@
   </div>
 </nav>
 <div class="wrap"><div class="breadcrumbs"><a href="/">Home</a> <span>›</span> <a href="/partners/">Partner With Us</a></div></div>
-<header class="page-hero"><div class="wrap"><span class="kicker">Partner Programme</span><h1>Partner With Us</h1><p class="sub">Built for the people whose timelines we live inside: real estate agents, stagers, property managers, and restoration companies.</p><div class="hero-ctas"><a class="btn btn-primary" href="/contact/">REQUEST MY SITE VALUATION →</a><a class="btn btn-ghost" href="tel:+16472040632">CALL (647) 204-0632</a></div></div></header>
+<header class="page-hero"><div class="wrap"><span class="kicker">Partner Programme</span><h1>Partner With Us</h1><p class="sub">Built for the people whose timelines we live inside: real estate agents, estate lawyers and trustees, stagers, property managers, restoration contractors and biohazard remediation firms.</p><div class="hero-ctas"><a class="btn btn-primary" href="#refer">SEND US A REFERRAL →</a><a class="btn btn-ghost" href="tel:+16472040632">CALL (647) 204-0632</a></div></div></header>
 <section><div class="wrap">
-<div class="sec-head"><span class="kicker">Who This Is For</span><h2>Four Kinds of Partner. One Standard.</h2>
+<div class="sec-head"><span class="kicker">Who This Is For</span><h2>Six Kinds of Partner. One Standard.</h2>
 <p>Each of these relationships has a different pressure point. We've built the programme around the specific thing that goes wrong for each of you.</p></div>
 <div class="grid-cards">
-<div class="gcard"><span class="tag">Real Estate Agents</span><h3>Listings that go live on schedule</h3><p>Estate contents, hoarding situations and pre-listing purges cleared in one visit, finished so the property photographs like it's already staged. Discreet crews, one point of contact, and priority scheduling when an MLS date is on the line.</p><a class="more" href="/realtors/">Agent details →</a></div>
+<div class="gcard"><span class="tag">Real Estate Agents</span><h3>Listings that go live on schedule</h3><p>Estate contents, hoarding situations and pre-listing purges cleared in one visit, finished so the property photographs like it's already staged. Discreet crews, one point of contact, and priority scheduling when an MLS date is on the line.</p><a class="more" href="/pre-listing-cleanouts/">Agent details →</a></div>
 <div class="gcard"><span class="tag">Home Stagers</span><h3>An empty canvas, not an aftermath</h3><p>You can't stage around a pile. We clear the property to your brief — including what stays — and hand it over swept, degreased and ready for your furniture delivery. We coordinate directly with your schedule rather than through the agent.</p></div>
-<div class="gcard"><span class="tag">Property Managers</span><h3>Turnovers that don't cost you weeks</h3><p>Tenant leave-behinds cleared and units showable in a single visit. COIs on file before we attend, after-hours scheduling so residents never see us, one itemised invoice, and Net-30 for established accounts.</p><a class="more" href="/services/commercial-cleanouts/">Commercial details →</a></div>
-<div class="gcard"><span class="tag">Restoration Companies</span><h3>Debris that never stalls remediation</h3><p>We stage on site and load as your crew strips, clearing tear-outs in one continuous haul so drying equipment isn't waiting on a dump run. Weigh tickets and photographs supplied for the insurance file. Licensed abatement stays with your certified contractor.</p><a class="more" href="/services/restoration-debris-removal/">Restoration details →</a></div>
+<div class="gcard"><span class="tag">Property Managers</span><h3>Turnovers that don't cost you weeks</h3><p>Tenant leave-behinds cleared and units showable in a single visit. COIs on file before we attend, after-hours scheduling so residents never see us, one itemised invoice, and Net-30 for established accounts.</p><a class="more" href="/commercial-cleanouts/">Commercial details →</a></div>
+<div class="gcard"><span class="tag">Restoration Companies</span><h3>Debris that never stalls remediation</h3><p>We stage on site and load as your crew strips, clearing tear-outs in one continuous haul so drying equipment isn't waiting on a dump run. Weigh tickets and photographs supplied for the insurance file. Licensed abatement stays with your certified contractor.</p><a class="more" href="/insurance-restoration-cleanouts/">Restoration details →</a></div>
+<div class="gcard"><span class="tag">Estate Lawyers &amp; Trustees</span><h3>A contractor who does not become your problem</h3><p>You administer the estate; we clear the property and hand you the paperwork for the file — dated before-and-after photographs, weigh tickets, donation receipts where issued, and one itemised invoice billed to the estate. We work to your closing or listing date and deal with the family directly so you do not have to relay it. Referring firms get priority scheduling.</p><a class="more" href="/estate-cleanouts/">Estate cleanout details →</a></div>
+<div class="gcard"><span class="tag">Remediation &amp; Biohazard Firms</span><h3>The non-hazardous bulk, cleared around you</h3><p>You hold the certifications for the hazardous portion. We are registered for non-hazardous waste transportation (R-004-5477911257) and clear the bulk — furniture, contents, structural debris — so your certified scope is not tied up moving sofas. We refer confirmed biohazard out to partners like you, and we would rather that referral run both ways.</p><a class="more" href="/hoarding-cleanouts/">Hoarding cleanout details →</a></div>
 </div>
 </div></section>
 
 <section style="background:var(--light)"><div class="wrap">
-<div class="sec-head"><span class="kicker">What Partners Get</span><h2>The Terms</h2></div>
+<div class="sec-head"><span class="kicker">What Partners Get</span><h2>The Terms</h2><p>Plain and in writing, because a vague referral arrangement is worth nothing to either of us.</p></div>
 <div class="prose">
 <ul>
-<li><strong>Priority scheduling</strong> — partner jobs are routed ahead of general bookings when a deadline is real</li>
-<li><strong>Preferred client pricing</strong> — your clients pay a partner rate</li>
-<li><strong>Referral credit</strong> on every completed job, paid within seven days</li>
+<li><strong>A referral fee of 10% of the job value, to a maximum of $500</strong> — paid by e-transfer within seven days of the client settling their invoice, on every completed job you send us. On an estate cleanout that is typically $120 to $250; on a hoarding project it is the full $500.</li>
+<li><strong>Or priority scheduling instead, if a fee is not appropriate for you</strong> — some professionals cannot accept referral fees, and several of our partners would rather have the calendar than the cheque. Partner jobs are routed ahead of general bookings when a deadline is real, and we hold slots for listing, closing and inspection dates.</li>
+<li><strong>Preferred client pricing</strong> — your clients pay a partner rate, and the deposit requirement on jobs over $2,000 is waived for established accounts</li>
 <li><strong>One direct contact</strong> — a mobile number that answers, not a queue</li>
 <li><strong>Documentation as standard</strong> — COIs, itemised invoices, weigh tickets, before/after photographs on request</li>
 <li><strong>Net-30 terms</strong> for established commercial accounts</li>
@@ -132,6 +138,79 @@
 </ul>
 </div>
 </div></section>
+
+
+<section id="refer" style="background:var(--navy);color:#fff">
+  <div class="wrap" style="max-width:720px">
+    <div class="sec-head">
+      <span class="kicker" style="color:var(--orange)">Already Have a Client for Us?</span>
+      <h2 style="color:#fff">Send Us a Referral</h2>
+      <p style="color:#C9D5E3">Pass the job across and we take it from there — we contact your client within one business hour, book the valuation, and keep you posted on what happens. Your referral fee is paid within seven days of their invoice settling.</p>
+    </div>
+    <div class="book-box">
+    <form name="partner-referral" method="POST" action="/thanks/" data-netlify="true" netlify-honeypot="bot-field">
+      <input type="hidden" name="form-name" value="partner-referral">
+      <p style="display:none"><label>Leave this blank: <input name="bot-field"></label></p>
+
+      <div class="form-row">
+        <div><label for="rf-you">Your name</label><input id="rf-you" name="referrer_name" required placeholder="Your name"></div>
+        <div><label for="rf-firm">Your firm or brokerage</label><input id="rf-firm" name="referrer_firm" placeholder="Brokerage, firm or company"></div>
+      </div>
+      <div class="form-row">
+        <div><label for="rf-yourphone">Your phone</label><input id="rf-yourphone" name="referrer_phone" type="tel" required placeholder="(416) 555-0123"></div>
+        <div><label for="rf-youremail">Your email</label><input id="rf-youremail" name="referrer_email" type="email" required placeholder="you@firm.ca"></div>
+      </div>
+      <div><label for="rf-type">You are a</label>
+        <select id="rf-type" name="referrer_type" required>
+          <option value="">Select…</option>
+          <option>Real estate agent / brokerage</option>
+          <option>Estate lawyer or trustee</option>
+          <option>Property manager / landlord</option>
+          <option>Restoration or remediation contractor</option>
+          <option>Home stager</option>
+          <option>Other professional</option>
+        </select>
+      </div>
+
+      <hr style="border:0;border-top:1px solid #E9EEF4;margin:26px 0">
+
+      <div class="form-row">
+        <div><label for="rf-client">Client name</label><input id="rf-client" name="client_name" required placeholder="Who should we contact"></div>
+        <div><label for="rf-clientphone">Client phone</label><input id="rf-clientphone" name="client_phone" type="tel" required placeholder="(416) 555-0123"></div>
+      </div>
+      <div class="form-row">
+        <div><label for="rf-prop">Property address or city</label><input id="rf-prop" name="property" required placeholder="Street and city, or just the city"></div>
+        <div><label for="rf-job">Job type</label>
+          <select id="rf-job" name="job_type" required>
+            <option value="">Select…</option>
+            <option>Estate cleanout</option>
+            <option>Hoarding cleanout</option>
+            <option>Pre-listing / realtor-ready</option>
+            <option>Insurance / restoration debris</option>
+            <option>Commercial / tenant turnover</option>
+            <option>Not sure yet</option>
+          </select>
+        </div>
+      </div>
+      <div><label for="rf-date">Is there a fixed date?</label><input id="rf-date" name="deadline" placeholder="Listing, closing, inspection or possession date — or leave blank"></div>
+      <div><label for="rf-notes">Anything we should know before we call them?</label><textarea id="rf-notes" name="notes" rows="3" placeholder="Condition of the property, family situation, access, how they would prefer to be contacted"></textarea></div>
+
+      <div><label for="rf-pref">How would you like the referral handled?</label>
+        <select id="rf-pref" name="referral_preference" required>
+          <option value="">Select…</option>
+          <option>Pay me the referral fee (10%, max $500)</option>
+          <option>No fee — give me priority scheduling instead</option>
+          <option>No fee — donate it, I just want the client looked after</option>
+          <option>Let’s discuss</option>
+        </select>
+      </div>
+
+      <button class="btn btn-primary" type="submit" style="width:100%;margin-top:20px">SEND THE REFERRAL →</button>
+      <p class="book-note">We contact your client within one business hour during working hours, and we tell them you sent us. You get an update either way — including if they decide not to go ahead.</p>
+    </form>
+    </div>
+  </div>
+</section>
 
 <section class="form-sec"><div class="wrap">
 <div class="sec-head"><span class="kicker">Two Minutes</span><h2>Open a Partner Account</h2>
@@ -183,13 +262,13 @@
         <img src="/assets/logo-horizontal-dark.svg" alt="GTA Junk and Property Cleanout" loading="lazy">
         <p style="font-size:13.5px">Toronto's white-glove cleanout crew. We sort, clear, sweep, and detail — you get your space back.</p>
       </div>
-      <div><h4>Services</h4><a href="/see-your-price/">See Your Price (video estimate)</a><a href="/services/">All Services</a><a href="/services/junk-removal/">Junk Removal</a><a href="/services/property-cleanouts/">Property Cleanouts</a><a href="/services/garage-cleanouts/">Garage Cleanouts</a><a href="/services/estate-cleanouts/">Estate Cleanouts</a><a href="/estate-cleanout-services-ontario/">Estate Cleanouts &mdash; Ontario-wide</a><a href="/services/restoration-debris-removal/">Restoration & Insurance Debris Removal</a></div>
-      <div><h4>Service Areas</h4><a href="/junk-removal-aurora/">Aurora</a><a href="/junk-removal-bolton/">Bolton</a><a href="/junk-removal-bramalea/">Bramalea</a><a href="/junk-removal-brampton/">Brampton</a><a href="/junk-removal-burlington/">Burlington</a><a href="/junk-removal-caledon/">Caledon</a><a href="/junk-removal-east-york/">East York</a><a href="/junk-removal-etobicoke/">Etobicoke</a><a href="/junk-removal-georgetown/">Georgetown</a><a href="/junk-removal-king-city/">King City</a><a href="/junk-removal-malton/">Malton</a><a href="/junk-removal-markham/">Markham</a><a href="/junk-removal-mississauga/">Mississauga</a><a href="/junk-removal-north-york/">North York</a><a href="/junk-removal-oakville/">Oakville</a><a href="/junk-removal-pickering/">Pickering</a><a href="/junk-removal-rexdale/">Rexdale</a><a href="/junk-removal-richmond-hill/">Richmond Hill</a><a href="/junk-removal-scarborough/">Scarborough</a><a href="/junk-removal-toronto/">Toronto</a><a href="/junk-removal-vaughan/">Vaughan</a><a href="/junk-removal-woodbridge/">Woodbridge</a><a href="/junk-removal-york/">York</a></div>
+      <div><h4>Services</h4><a href="/see-your-price/">See Your Price (video estimate)</a><a href="/services/">All Services</a><a href="/services/junk-removal/">Junk Removal</a><a href="/pre-listing-cleanouts/">Property Cleanouts</a><a href="/services/garage-cleanouts/">Garage Cleanouts</a><a href="/estate-cleanouts/">Estate Cleanouts</a><a href="/hoarding-cleanouts/">Hoarding Cleanouts</a><a href="/pre-listing-cleanouts/">Pre-Listing Cleanouts</a><a href="/commercial-cleanouts/">Commercial Cleanouts</a><a href="/insurance-restoration-cleanouts/">Insurance &amp; Restoration Debris</a></div>
+      <div><h4>Service Areas</h4><a href="/junk-removal-ajax/">Ajax</a><a href="/junk-removal-aurora/">Aurora</a><a href="/junk-removal-bolton/">Bolton</a><a href="/junk-removal-bramalea/">Bramalea</a><a href="/junk-removal-brampton/">Brampton</a><a href="/junk-removal-burlington/">Burlington</a><a href="/junk-removal-caledon/">Caledon</a><a href="/junk-removal-east-york/">East York</a><a href="/junk-removal-etobicoke/">Etobicoke</a><a href="/junk-removal-georgetown/">Georgetown</a><a href="/junk-removal-king-city/">King City</a><a href="/junk-removal-malton/">Malton</a><a href="/junk-removal-markham/">Markham</a><a href="/junk-removal-mississauga/">Mississauga</a><a href="/junk-removal-north-york/">North York</a><a href="/junk-removal-oakville/">Oakville</a><a href="/junk-removal-pickering/">Pickering</a><a href="/junk-removal-rexdale/">Rexdale</a><a href="/junk-removal-richmond-hill/">Richmond Hill</a><a href="/junk-removal-scarborough/">Scarborough</a><a href="/junk-removal-toronto/">Toronto</a><a href="/junk-removal-vaughan/">Vaughan</a><a href="/junk-removal-woodbridge/">Woodbridge</a><a href="/junk-removal-whitby/">Whitby</a><a href="/junk-removal-oshawa/">Oshawa</a><a href="/junk-removal-newmarket/">Newmarket</a><a href="/junk-removal-milton/">Milton</a><a href="/junk-removal-york/">York</a></div>
       <div>
         <h4>Company</h4>
         <a href="/about/">About &amp; The Rocky Story</a>
         <a href="/reviews/">Reviews</a><a href="https://maps.google.com/?cid=4585715728644704101" target="_blank" rel="noopener">See us on Google &#9733; 5.0</a><a href="https://g.page/r/CWUHyrYovKM_EAI/review" target="_blank" rel="nofollow noopener">Leave a Google review</a>
-        <a href="/partners/">Partner With Us</a><a href="/realtors/">For Real Estate Agents</a>
+        <a href="/partners/">Partner With Us</a><a href="/pre-listing-cleanouts/">For Real Estate Agents</a>
         <a href="/blog/">Resources</a>
         <a href="/contact/">Contact / Get a Quote</a>
         <h4 style="margin-top:18px">Contact</h4>

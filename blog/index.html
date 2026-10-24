@@ -54,9 +54,13 @@
     document.querySelectorAll('form[name]').forEach(function(f){
       f.addEventListener('submit', function(){
         var n = f.getAttribute('name');
-        var value = n === 'estate-assessment' ? 1500
-                  : n === 'partner-enquiry'   ? 800
-                  : 300;
+        var VAL = {
+          'estate-cleanout-lead': 1200, 'hoarding-cleanout-lead': 3500,
+          'prelisting-cleanout-lead': 1500, 'restoration-debris-lead': 1800,
+          'commercial-cleanout-lead': 2000, 'fast-quote': 1200,
+          'estate-assessment': 1500, 'partner-enquiry': 800, 'partner-referral': 800
+        };
+        var value = VAL[n] || 300;
         send('generate_lead', { form_name: n, page_path: page, currency: 'CAD', value: value });
         send('form_submit',   { form_name: n, page_path: page });
       });
@@ -92,7 +96,7 @@
 <body>
 <nav>
   <div class="nav-inner">
-    <a class="nav-logo" href="/"><img src="/assets/logo-horizontal-dark.svg" alt="GTA Junk and Property Cleanout — The White-Glove Cleanout Crew"></a>
+    <a class="nav-logo" href="/"><img src="/assets/logo-horizontal-dark.svg" alt="GTA Junk and Property Cleanout — The White-Glove Cleanout Crew" fetchpriority="high" decoding="async"></a>
     <div class="nav-links">
       <a href="/see-your-price/">Send a Video</a>
       <a href="/services/">Services</a>
@@ -131,13 +135,13 @@
         <img src="/assets/logo-horizontal-dark.svg" alt="GTA Junk and Property Cleanout" loading="lazy">
         <p style="font-size:13.5px">Toronto's white-glove cleanout crew. We sort, clear, sweep, and detail — you get your space back.</p>
       </div>
-      <div><h4>Services</h4><a href="/see-your-price/">See Your Price (video estimate)</a><a href="/services/">All Services</a><a href="/services/junk-removal/">Junk Removal</a><a href="/services/property-cleanouts/">Property Cleanouts</a><a href="/services/garage-cleanouts/">Garage Cleanouts</a><a href="/services/estate-cleanouts/">Estate Cleanouts</a><a href="/estate-cleanout-services-ontario/">Estate Cleanouts &mdash; Ontario-wide</a><a href="/services/restoration-debris-removal/">Restoration & Insurance Debris Removal</a></div>
-      <div><h4>Service Areas</h4><a href="/junk-removal-aurora/">Aurora</a><a href="/junk-removal-bolton/">Bolton</a><a href="/junk-removal-bramalea/">Bramalea</a><a href="/junk-removal-brampton/">Brampton</a><a href="/junk-removal-burlington/">Burlington</a><a href="/junk-removal-caledon/">Caledon</a><a href="/junk-removal-east-york/">East York</a><a href="/junk-removal-etobicoke/">Etobicoke</a><a href="/junk-removal-georgetown/">Georgetown</a><a href="/junk-removal-king-city/">King City</a><a href="/junk-removal-malton/">Malton</a><a href="/junk-removal-markham/">Markham</a><a href="/junk-removal-mississauga/">Mississauga</a><a href="/junk-removal-north-york/">North York</a><a href="/junk-removal-oakville/">Oakville</a><a href="/junk-removal-pickering/">Pickering</a><a href="/junk-removal-rexdale/">Rexdale</a><a href="/junk-removal-richmond-hill/">Richmond Hill</a><a href="/junk-removal-scarborough/">Scarborough</a><a href="/junk-removal-toronto/">Toronto</a><a href="/junk-removal-vaughan/">Vaughan</a><a href="/junk-removal-woodbridge/">Woodbridge</a><a href="/junk-removal-york/">York</a></div>
+      <div><h4>Services</h4><a href="/see-your-price/">See Your Price (video estimate)</a><a href="/services/">All Services</a><a href="/services/junk-removal/">Junk Removal</a><a href="/pre-listing-cleanouts/">Property Cleanouts</a><a href="/services/garage-cleanouts/">Garage Cleanouts</a><a href="/estate-cleanouts/">Estate Cleanouts</a><a href="/hoarding-cleanouts/">Hoarding Cleanouts</a><a href="/pre-listing-cleanouts/">Pre-Listing Cleanouts</a><a href="/commercial-cleanouts/">Commercial Cleanouts</a><a href="/insurance-restoration-cleanouts/">Insurance &amp; Restoration Debris</a></div>
+      <div><h4>Service Areas</h4><a href="/junk-removal-ajax/">Ajax</a><a href="/junk-removal-aurora/">Aurora</a><a href="/junk-removal-bolton/">Bolton</a><a href="/junk-removal-bramalea/">Bramalea</a><a href="/junk-removal-brampton/">Brampton</a><a href="/junk-removal-burlington/">Burlington</a><a href="/junk-removal-caledon/">Caledon</a><a href="/junk-removal-east-york/">East York</a><a href="/junk-removal-etobicoke/">Etobicoke</a><a href="/junk-removal-georgetown/">Georgetown</a><a href="/junk-removal-king-city/">King City</a><a href="/junk-removal-malton/">Malton</a><a href="/junk-removal-markham/">Markham</a><a href="/junk-removal-mississauga/">Mississauga</a><a href="/junk-removal-north-york/">North York</a><a href="/junk-removal-oakville/">Oakville</a><a href="/junk-removal-pickering/">Pickering</a><a href="/junk-removal-rexdale/">Rexdale</a><a href="/junk-removal-richmond-hill/">Richmond Hill</a><a href="/junk-removal-scarborough/">Scarborough</a><a href="/junk-removal-toronto/">Toronto</a><a href="/junk-removal-vaughan/">Vaughan</a><a href="/junk-removal-woodbridge/">Woodbridge</a><a href="/junk-removal-whitby/">Whitby</a><a href="/junk-removal-oshawa/">Oshawa</a><a href="/junk-removal-newmarket/">Newmarket</a><a href="/junk-removal-milton/">Milton</a><a href="/junk-removal-york/">York</a></div>
       <div>
         <h4>Company</h4>
         <a href="/about/">About &amp; The Rocky Story</a>
         <a href="/reviews/">Reviews</a><a href="https://maps.google.com/?cid=4585715728644704101" target="_blank" rel="noopener">See us on Google &#9733; 5.0</a><a href="https://g.page/r/CWUHyrYovKM_EAI/review" target="_blank" rel="nofollow noopener">Leave a Google review</a>
-        <a href="/partners/">Partner With Us</a><a href="/realtors/">For Real Estate Agents</a>
+        <a href="/partners/">Partner With Us</a><a href="/pre-listing-cleanouts/">For Real Estate Agents</a>
         <a href="/blog/">Resources</a>
         <a href="/contact/">Contact / Get a Quote</a>
         <h4 style="margin-top:18px">Contact</h4>

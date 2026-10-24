@@ -179,3 +179,50 @@ footer{background:var(--navy-deep);color:#9FB0C2;padding:56px 0 0;font-size:14px
   .sticky-bar .sb-video{background:var(--orange)}
   body{padding-bottom:4px}
 }
+
+/* --- High-ticket pricing table (added in premium repositioning) --- */
+.pricelist{background:#fff;border:1.5px solid #E2E8F0;border-radius:16px;overflow:hidden;margin-top:26px}
+.pricerow{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;padding:18px 24px;border-bottom:1px solid #EDF1F5}
+.pricerow:last-child{border-bottom:0}
+.pricerow:nth-child(odd){background:#FBFCFD}
+.pricerow h4{font-size:16.5px;margin:0 0 3px}
+.pricerow p{font-size:13.5px;color:var(--slate);margin:0;max-width:62ch}
+.pricerow .amt{font-family:'Arial Black',Arial,sans-serif;font-size:23px;white-space:nowrap;color:var(--navy)}
+.pricerow .amt small{display:block;font-family:Arial,sans-serif;font-weight:400;font-size:11.5px;color:#7C8794;letter-spacing:.4px}
+@media(max-width:640px){.pricerow{grid-template-columns:1fr;gap:8px}.pricerow .amt{font-size:21px}}
+.deposit-note{background:var(--navy);color:#E8EEF5;border-radius:14px;padding:20px 24px;margin-top:22px;font-size:14.5px;line-height:1.6}
+.deposit-note b{color:var(--orange)}
+/* --- Niche landing pages --- */
+.lp-trust{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:22px 0 4px}
+.lp-trust span{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:12.5px;font-weight:700;padding:7px 14px;border-radius:999px}
+.lp-hero{background:var(--navy);color:#fff;padding:62px 0 54px;text-align:center}
+.lp-hero h1{font-size:clamp(27px,4.4vw,44px);line-height:1.12;margin-bottom:14px}
+.lp-hero .sub{color:#C9D5E3;font-size:clamp(15.5px,2vw,18px);max-width:66ch;margin:0 auto 10px}
+.lp-price{display:inline-block;background:rgba(249,115,22,.16);border:1.5px solid var(--orange);color:#fff;border-radius:999px;padding:9px 20px;font-weight:900;margin:16px 0 6px}
+.pain{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:8px}
+.pain div{background:#fff;border:1px solid #E2E8F0;border-left:4px solid var(--orange);border-radius:12px;padding:20px 22px}
+.pain h3{font-size:16px;margin-bottom:7px}
+.pain p{font-size:14.5px;color:var(--slate)}
+@media(max-width:760px){.pain{grid-template-columns:1fr}}
+.ba-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.ba{background:#F1F5F9;border:2px dashed #CBD5E1;border-radius:14px;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;text-align:center;color:#94A3B8;font-size:13.5px;font-weight:700;padding:18px}
+@media(max-width:640px){.ba-grid{grid-template-columns:1fr}}
+.lp-nav{background:var(--navy);padding:14px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+.lp-nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.lp-nav img{height:38px;display:block}
+.lp-nav a.ph{color:#fff;font-weight:900;font-size:17px;text-decoration:none}
+
+/* --- Owner-only checklist page --- */
+.ck-warn{background:#FEF3C7;border:1.5px solid #F59E0B;border-radius:12px;padding:16px 20px;font-size:14px;margin-bottom:28px}
+.ck-sec{background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:26px 28px;margin-bottom:22px}
+.ck-sec h2{font-size:20px;margin-bottom:6px}
+.ck-sec .why{font-size:13.5px;color:#7C8794;margin-bottom:16px;font-style:italic}
+.ck-list{list-style:none;margin:0}
+.ck-list li{position:relative;padding:9px 0 9px 30px;border-bottom:1px dashed #EDF1F5;font-size:14.5px;color:var(--slate)}
+.ck-list li:last-child{border-bottom:0}
+.ck-list li::before{content:"\25A1";position:absolute;left:4px;top:8px;color:var(--orange);font-weight:900;font-size:16px}
+.ck-list li b{color:var(--navy)}
+.tmpl{background:#F8FAFC;border-left:4px solid var(--orange);border-radius:10px;padding:18px 20px;margin:14px 0;font-size:14.5px;line-height:1.65;white-space:pre-wrap;font-family:Georgia,'Times New Roman',serif}
+.tmpl-h{font-size:13px;font-weight:900;letter-spacing:.6px;color:var(--orange-dark);margin:22px 0 2px}
+.copybtn{background:var(--navy);color:#fff;border:0;border-radius:7px;padding:7px 16px;font:700 13px Arial,sans-serif;cursor:pointer;margin-top:8px}
+.copybtn:hover{background:var(--orange)}

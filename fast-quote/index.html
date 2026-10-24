@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Get a Fast Cleanout Quote | GTA Junk and Property Cleanout</title>
+<meta name="description" content="Send a few details and photos, get a quote back the same day. Estate, hoarding, pre-listing and commercial cleanouts across Toronto and the GTA. Licensed, insured, fixed written pricing.">
+<meta name="robots" content="noindex, follow">
+<link rel="canonical" href="https://gtajunkandpropertycleanout.ca/fast-quote/">
+<link rel="icon" href="/assets/logo-icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Get a Fast Cleanout Quote | GTA Junk and Property Cleanout">
+<meta property="og:description" content="Send a few details and photos, get a quote back the same day. Licensed, insured, fixed written pricing.">
+<meta property="og:url" content="https://gtajunkandpropertycleanout.ca/fast-quote/">
+<meta property="og:image" content="https://gtajunkandpropertycleanout.ca/assets/og-image.png">
+<meta property="og:locale" content="en_CA">
+<style>
+.fq-wrap{max-width:680px;margin:0 auto;padding:0 20px}
+.fq-top{background:var(--navy);padding:18px 0;text-align:center}
+.fq-top img{height:44px}
+.fq-head{background:var(--navy);color:#fff;padding:8px 0 46px;text-align:center}
+.fq-head h1{font-size:clamp(25px,4.2vw,38px);line-height:1.15;margin-bottom:12px}
+.fq-head p{color:#C9D5E3;font-size:16px;max-width:52ch;margin:0 auto}
+.fq-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:20px}
+.fq-pills span{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px}
+.fq-card{background:#fff;border-radius:16px;box-shadow:0 8px 34px rgba(20,38,61,.14);padding:32px 28px;margin:-30px auto 0;position:relative;z-index:2}
+.fq-card input,.fq-card select,.fq-card textarea{width:100%;padding:13px 14px;border:1.5px solid #D7DEE7;border-radius:9px;font-size:16px;font-family:inherit;background:#FBFCFE}
+.fq-card input:focus,.fq-card select:focus,.fq-card textarea:focus{outline:2px solid var(--orange);border-color:var(--orange)}
+.fq-card input[type=file]{padding:11px;background:#F6F8FB;font-size:14px}
+.fq-hint{font-size:12.5px;color:#7C8794;margin-top:5px}
+.fq-sub{width:100%;margin-top:22px;font-size:16px;padding:16px}
+.fq-call{text-align:center;margin:26px auto 0;max-width:680px;padding:0 20px}
+.fq-call a{font-family:'Arial Black',Arial,sans-serif;font-size:26px;color:var(--navy);text-decoration:none;display:block;margin-top:4px}
+.fq-foot{text-align:center;padding:36px 20px 48px;color:#7C8794;font-size:12.5px;line-height:1.8}
+.fq-foot a{color:#64748B}
+@media(max-width:620px){.fq-card{padding:24px 18px}}
+</style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SP2P6CWJYW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SP2P6CWJYW');
+</script>
+<script>
+/* GTA Junk — conversion event tracking. Plain JS, no dependencies. */
+(function(){
+  function send(name, params){ if (typeof gtag === 'function') gtag('event', name, params || {}); }
+  function ready(fn){ if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+
+  ready(function(){
+    var page = location.pathname;
+
+    /* Phone clicks — the primary conversion for this business */
+    document.querySelectorAll('a[href^="tel:"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('phone_click', {
+          page_path: page,
+          link_location: a.closest('nav') ? 'nav'
+                        : a.closest('footer') ? 'footer'
+                        : a.closest('.sticky-bar') ? 'sticky_bar' : 'body'
+        });
+      });
+    });
+
+    /* Form submissions — labelled so an estate lead is distinguishable from a single-item request */
+    document.querySelectorAll('form[name]').forEach(function(f){
+      f.addEventListener('submit', function(){
+        var n = f.getAttribute('name');
+        var VAL = {
+          'estate-cleanout-lead': 1200, 'hoarding-cleanout-lead': 3500,
+          'prelisting-cleanout-lead': 1500, 'restoration-debris-lead': 1800,
+          'commercial-cleanout-lead': 2000, 'fast-quote': 1200,
+          'estate-assessment': 1500, 'partner-enquiry': 800, 'partner-referral': 800
+        };
+        var value = VAL[n] || 300;
+        send('generate_lead', { form_name: n, page_path: page, currency: 'CAD', value: value });
+        send('form_submit',   { form_name: n, page_path: page });
+      });
+    });
+
+    /* Video estimate tool */
+    if (page.indexOf('/see-your-price') === 0) {
+      document.querySelectorAll('input[type="file"]').forEach(function(i){
+        i.addEventListener('change', function(){
+          if (i.files && i.files.length) send('video_estimate_start', { page_path: page });
+        });
+      });
+    }
+
+    /* Outbound clicks to the Google profile / review form */
+    document.querySelectorAll('a[href*="g.page"], a[href*="maps.google.com"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('review_link_click', {
+          page_path: page,
+          destination: a.href.indexOf('g.page') > -1 ? 'leave_review' : 'google_profile'
+        });
+      });
+    });
+
+    /* Engaged-visit signal: 45 seconds on an estate or service page */
+    if (/estate|services|cleanout/.test(page)) {
+      setTimeout(function(){ send('engaged_view', { page_path: page }); }, 45000);
+    }
+  });
+})();
+</script>
+</head>
+<body style="background:#F4F7FA">
+
+<div class="fq-top"><a href="/"><img src="/assets/logo-horizontal-dark.svg" alt="GTA Junk and Property Cleanout" fetchpriority="high" decoding="async"></a></div>
+
+<header class="fq-head">
+  <div class="fq-wrap">
+    <h1>Get Your Cleanout Priced — Today</h1>
+    <p>Send a few details and a couple of photos. We come back the same day with a realistic range, then fix the exact price in writing at a free on-site valuation.</p>
+    <div class="fq-pills">
+      <span>MECP licensed waste carrier</span><span>$2M insured</span><span>5.0 on Google</span><span>Owner on every job</span><span>Fixed written price</span>
+    </div>
+  </div>
+</header>
+
+<div class="fq-wrap">
+<div class="fq-card">
+  <form name="fast-quote" method="POST" action="/thanks/" data-netlify="true" netlify-honeypot="bot-field" enctype="multipart/form-data">
+    <input type="hidden" name="form-name" value="fast-quote">
+    <p style="display:none"><label>Leave this blank: <input name="bot-field"></label></p>
+
+    <div class="form-row">
+      <div><label for="fq-name">Your name</label><input id="fq-name" name="name" required autocomplete="name" placeholder="Your name"></div>
+      <div><label for="fq-phone">Phone</label><input id="fq-phone" name="phone" type="tel" required autocomplete="tel" placeholder="(416) 555-0123"></div>
+    </div>
+
+    <div class="form-row">
+      <div><label for="fq-email">Email</label><input id="fq-email" name="email" type="email" required autocomplete="email" placeholder="you@email.com"></div>
+      <div><label for="fq-city">City</label>
+        <select id="fq-city" name="city" required>
+          <option value="">Select…</option>
+          <option>Toronto</option><option>Etobicoke</option><option>North York</option><option>Scarborough</option><option>East York</option><option>York</option><option>Rexdale</option><option>Mississauga</option><option>Brampton</option><option>Bramalea</option><option>Malton</option><option>Caledon</option><option>Bolton</option><option>Vaughan</option><option>Woodbridge</option><option>Markham</option><option>Richmond Hill</option><option>Aurora</option><option>Newmarket</option><option>King City</option><option>Pickering</option><option>Ajax</option><option>Whitby</option><option>Oshawa</option><option>Oakville</option><option>Burlington</option><option>Milton</option><option>Georgetown</option><option>Other (within 200 km of Toronto)</option>
+        </select>
+      </div>
+    </div>
+
+    <div><label for="fq-address">Property address</label><input id="fq-address" name="address" required autocomplete="street-address" placeholder="Street address of the property to be cleared">
+      <p class="fq-hint">We use this to route the nearest crew and check access. It is never published or shared.</p></div>
+
+    <div><label for="fq-job">What kind of job is it?</label>
+      <select id="fq-job" name="job_type" required>
+        <option value="">Select…</option>
+        <option value="Estate cleanout">Estate cleanout — from $1,200</option><option value="Hoarding cleanout">Hoarding cleanout — from $3,500</option><option value="Pre-listing / realtor-ready">Pre-listing / realtor-ready — from $1,500</option><option value="Insurance / restoration debris">Insurance / restoration debris — from $1,800</option><option value="Commercial cleanout">Commercial cleanout — from $2,000</option><option value="Garage cleanout">Garage cleanout — from $1,200</option><option value="Not sure yet">Not sure yet — help me work it out</option>
+      </select>
+    </div>
+
+    <div><label for="fq-when">When do you need it done?</label>
+      <select id="fq-when" name="timeline" required>
+        <option value="">Select…</option>
+        <option>As soon as possible — this week</option>
+        <option>Within two weeks</option>
+        <option>This month</option>
+        <option>I have a fixed date (listing, closing, inspection)</option>
+        <option>Just getting a price for now</option>
+      </select>
+    </div>
+
+    <div><label for="fq-photos">Photos (optional, but it speeds this up a lot)</label>
+      <input id="fq-photos" name="photos" type="file" accept="image/*,video/*" multiple>
+      <p class="fq-hint">Two or three wide shots of the fullest rooms gets you a far tighter number. Up to about 8 MB in total. Photos of a property are treated as confidential and are never published without your written permission — see our <a href="/privacy/">privacy policy</a>.</p>
+    </div>
+
+    <div><label for="fq-details">Anything we should know?</label>
+      <textarea id="fq-details" name="details" rows="3" placeholder="Size of the property, how full it is, stairs or elevator, parking, whether anyone will be home"></textarea></div>
+
+    <button class="btn btn-primary fq-sub" type="submit">SEND IT — GET MY QUOTE TODAY →</button>
+    <p class="fq-hint" style="text-align:center;margin-top:14px">No obligation. No deposit to get a quote. We never sell or share your details.</p>
+  </form>
+</div>
+</div>
+
+<div class="fq-call">
+  <span style="font-size:13.5px;color:#64748B;font-weight:700;letter-spacing:.5px">RATHER JUST TALK? WE ANSWER — THERE IS NO CALL CENTRE.</span>
+  <a href="tel:+16472040632">(647) 204-0632</a>
+  <span style="font-size:13px;color:#7C8794">7 days a week, 7am–9pm</span>
+</div>
+
+<div class="fq-foot">
+  GTA Junk and Property Cleanout Inc. · Etobicoke, Ontario · MECP registered waste transportation system R-004-5477911257 · $2M commercial general liability<br>
+  Estate cleanouts from $1,200 · Hoarding from $3,500 · Pre-listing from $1,500 · Commercial from $2,000 · Prices before HST · 30% deposit on jobs over $2,000<br>
+  <a href="/">Main site</a> &nbsp;·&nbsp; <a href="/privacy/">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms/">Terms of Service</a>
+</div>
+
+<style>
+#ckbar{position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#14263D;color:#E8EEF5;
+ padding:14px 18px;display:none;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center;
+ font:14.5px/1.5 Arial,Helvetica,sans-serif;box-shadow:0 -2px 14px rgba(0,0,0,.25)}
+#ckbar a{color:#F97316;text-decoration:underline}
+#ckbar button{background:#F97316;color:#fff;border:0;border-radius:7px;padding:9px 20px;
+ font:700 14.5px Arial,Helvetica,sans-serif;cursor:pointer}
+#ckbar button:hover{background:#EA580C}
+@media(max-width:700px){#ckbar{bottom:64px;font-size:13.5px;padding:12px 14px}}
+</style>
+<div id="ckbar" role="region" aria-label="Cookie notice">
+  <span>We use Google Analytics cookies to see which pages are useful. We don't sell your data or run advertising trackers here. <a href="/privacy/">Privacy Policy</a></span>
+  <button type="button" id="ckok">Got it</button>
+</div>
+<script>
+(function(){
+  try{
+    if(localStorage.getItem('gtajunk_ck')==='1') return;
+    var b=document.getElementById('ckbar'); if(!b) return;
+    b.style.display='flex';
+    document.getElementById('ckok').addEventListener('click',function(){
+      b.style.display='none';
+      try{localStorage.setItem('gtajunk_ck','1');}catch(e){}
+    });
+  }catch(e){}
+})();
+</script>
+
+</body>
+</html>

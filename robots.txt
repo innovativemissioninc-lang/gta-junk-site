@@ -4,6 +4,8 @@
 User-agent: *
 Allow: /
 Disallow: /thanks/
+Disallow: /owner-growth-checklist-k7m2/
+Disallow: /fast-quote/
 
 # --- AI / answer-engine crawlers (explicitly welcomed) ---
 User-agent: GPTBot

@@ -60,9 +60,13 @@ body{background:var(--navy-deep)}
     document.querySelectorAll('form[name]').forEach(function(f){
       f.addEventListener('submit', function(){
         var n = f.getAttribute('name');
-        var value = n === 'estate-assessment' ? 1500
-                  : n === 'partner-enquiry'   ? 800
-                  : 300;
+        var VAL = {
+          'estate-cleanout-lead': 1200, 'hoarding-cleanout-lead': 3500,
+          'prelisting-cleanout-lead': 1500, 'restoration-debris-lead': 1800,
+          'commercial-cleanout-lead': 2000, 'fast-quote': 1200,
+          'estate-assessment': 1500, 'partner-enquiry': 800, 'partner-referral': 800
+        };
+        var value = VAL[n] || 300;
         send('generate_lead', { form_name: n, page_path: page, currency: 'CAD', value: value });
         send('form_submit',   { form_name: n, page_path: page });
       });
@@ -97,7 +101,7 @@ body{background:var(--navy-deep)}
 </head>
 <body>
 <div class="rev-wrap">
-  <img class="badge" src="/assets/logo-badge.svg" alt="Rocky the raccoon giving a white-gloved thumbs-up">
+  <img class="badge" src="/assets/logo-badge.svg" alt="Rocky the raccoon giving a white-gloved thumbs-up" fetchpriority="high" decoding="async">
   <h1>How did we do?</h1>
   <p class="lede">If we found your floor again, a quick review genuinely helps a new local business get found by your neighbours. It takes about thirty seconds.</p>
 

@@ -42,3 +42,27 @@
 /vaughan-junk-removal/     /junk-removal-vaughan/      301!
 /mississauga-junk-removal  /junk-removal-mississauga/  301!
 /mississauga-junk-removal/ /junk-removal-mississauga/  301!
+
+# --- Service page consolidation (October 2026) -------------------------
+# Niche landing pages are now the canonical page for each money term.
+# Old /services/<x>/ URLs and the long-form estate page fold into them.
+/services/estate-cleanouts   /estate-cleanouts/   301!
+/services/estate-cleanouts/   /estate-cleanouts/   301!
+/estate-cleanout-services-ontario   /estate-cleanouts/   301!
+/estate-cleanout-services-ontario/   /estate-cleanouts/   301!
+/services/commercial-cleanouts   /commercial-cleanouts/   301!
+/services/commercial-cleanouts/   /commercial-cleanouts/   301!
+/services/restoration-debris-removal   /insurance-restoration-cleanouts/   301!
+/services/restoration-debris-removal/   /insurance-restoration-cleanouts/   301!
+/services/property-cleanouts   /pre-listing-cleanouts/   301!
+/services/property-cleanouts/   /pre-listing-cleanouts/   301!
+/realtors   /pre-listing-cleanouts/   301!
+/realtors/   /pre-listing-cleanouts/   301!
+
+# Convenience aliases for ad traffic and print
+/get-a-quote   /fast-quote/   301!
+/get-a-quote/   /fast-quote/   301!
+/quote   /fast-quote/   301!
+/quote/   /fast-quote/   301!
+/estate   /estate-cleanouts/   301!
+/hoarding   /hoarding-cleanouts/   301!
