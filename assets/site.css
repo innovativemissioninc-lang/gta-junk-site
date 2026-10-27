@@ -226,3 +226,48 @@ footer{background:var(--navy-deep);color:#9FB0C2;padding:56px 0 0;font-size:14px
 .tmpl-h{font-size:13px;font-weight:900;letter-spacing:.6px;color:var(--orange-dark);margin:22px 0 2px}
 .copybtn{background:var(--navy);color:#fff;border:0;border-radius:7px;padding:7px 16px;font:700 13px Arial,sans-serif;cursor:pointer;margin-top:8px}
 .copybtn:hover{background:var(--orange)}
+
+/* --- Module 3: specialized clearances grid --- */
+.sc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+@media(max-width:1000px){.sc-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:680px){.sc-grid{grid-template-columns:1fr}}
+.sc{background:#fff;border:1.5px solid #E2E8F0;border-radius:16px;padding:26px 24px;display:flex;flex-direction:column;transition:border-color .15s,box-shadow .15s}
+.sc:hover{border-color:var(--orange);box-shadow:0 8px 28px rgba(20,38,61,.10)}
+.sc .num{font:900 11px/1 Arial,sans-serif;letter-spacing:2px;color:var(--orange-dark)}
+.sc h3{font-size:18.5px;margin:10px 0 4px;line-height:1.25}
+.sc .rate{font-family:'Arial Black',Arial,sans-serif;font-size:21px;color:var(--navy);margin:8px 0 2px}
+.sc .rate small{display:block;font:400 11.5px Arial,sans-serif;color:#7C8794;letter-spacing:.4px;margin-top:2px}
+.sc .lbl{font:900 10.5px Arial,sans-serif;letter-spacing:1.2px;color:#94A3B8;margin:16px 0 5px}
+.sc p.scope{font-size:14px;color:var(--slate);margin:0}
+.sc ul{list-style:none;margin:0}
+.sc ul li{font-size:13.5px;color:var(--slate);padding:4px 0 4px 18px;position:relative}
+.sc ul li::before{content:"\2022";position:absolute;left:3px;color:var(--orange);font-weight:900}
+.sc .sc-cta{margin-top:auto;padding-top:20px;display:flex;flex-direction:column;gap:8px}
+.sc .sc-cta .btn{width:100%;text-align:center}
+.sc .sc-call{font-size:12.5px;color:#7C8794;text-align:center}
+.sc .sc-call a{color:var(--orange-dark);font-weight:700}
+
+/* --- compliance banner --- */
+.compband{background:var(--navy);border-radius:16px;padding:26px 28px;margin-bottom:30px;color:#E8EEF5}
+.compband h3{color:#fff;font-size:16px;margin-bottom:4px}
+.compband .cb-sub{font-size:13px;color:#94A3B8;margin-bottom:18px}
+.cb-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:900px){.cb-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.cb-grid{grid-template-columns:1fr}}
+.cb{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:11px;padding:15px 16px}
+.cb b{display:block;color:#fff;font-size:13.5px;margin-bottom:3px}
+.cb span{font-size:12.5px;color:#B6C4D4;line-height:1.5}
+
+/* --- intake widget --- */
+.intake{background:#fff;border:1.5px solid #E2E8F0;border-radius:16px;padding:30px 28px;max-width:720px;margin:0 auto}
+.drop{border:2px dashed #CBD5E1;border-radius:12px;padding:26px 20px;text-align:center;background:#FBFCFE;cursor:pointer;transition:border-color .15s,background .15s}
+.drop:hover,.drop.hot{border-color:var(--orange);background:#FFF7ED}
+.drop .big{font-size:15px;font-weight:900;color:var(--navy);margin-bottom:4px}
+.drop .small{font-size:12.5px;color:#7C8794}
+.drop input[type=file]{display:none}
+.filelist{margin-top:12px;font-size:13px;color:var(--slate)}
+.filelist div{padding:5px 0;border-bottom:1px dashed #EDF1F5}
+.intake input,.intake select,.intake textarea{width:100%;padding:13px 14px;border:1.5px solid #D7DEE7;border-radius:9px;font-size:15.5px;font-family:inherit;background:#FBFCFE}
+.intake input:focus,.intake select:focus,.intake textarea:focus{outline:2px solid var(--orange);border-color:var(--orange)}
+.vid-tip{background:#F1F5F9;border-left:4px solid var(--navy);border-radius:9px;padding:14px 16px;font-size:13.5px;color:var(--slate);margin:16px 0}
+.vid-tip b{color:var(--navy)}

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Specialised Clearances &amp; Light Demolition | GTA | Project Work From $1,500</title>
+<meta name="description" content="Six high-ticket clearance and light demolition verticals across Toronto and the GTA — hoarder houses, shed and garage demolition, commercial white-box, pre-sale rip-outs, pool and deck tear-outs, estate clearances. MECP licensed, $2M insured.">
+<link rel="canonical" href="https://gtajunkandpropertycleanout.ca/specialized-clearances/">
+<link rel="icon" href="/assets/logo-icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="GTA Junk and Property Cleanout">
+<meta property="og:title" content="Specialised Clearances &amp; Light Demolition | GTA | Project Work From $1,500">
+<meta property="og:description" content="Six high-ticket clearance and light demolition verticals across Toronto and the GTA — hoarder houses, shed and garage demolition, commercial white-box, pre-sale rip-outs, pool and deck tear-outs, estate clearances. MECP licensed, $2M insured.">
+<meta property="og:url" content="https://gtajunkandpropertycleanout.ca/specialized-clearances/">
+<meta property="og:image" content="https://gtajunkandpropertycleanout.ca/assets/og-image.png">
+<meta property="og:locale" content="en_CA">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Specialised Clearances &amp; Light Demolition | GTA | Project Work From $1,500">
+<meta name="twitter:description" content="Six high-ticket clearance and light demolition verticals across Toronto and the GTA — hoarder houses, shed and garage demolition, commercial white-box, pre-sale rip-outs, pool and deck tear-outs, estate clearances. MECP licensed, $2M insured.">
+<meta name="twitter:image" content="https://gtajunkandpropertycleanout.ca/assets/og-image.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Service", "serviceType": "Specialised Clearances and Light Demolition", "name": "Specialised Clearances and Light Demolition — GTA Junk and Property Cleanout", "description": "Six high-ticket clearance and light demolition verticals across Toronto and the GTA — hoarder houses, shed and garage demolition, commercial white-box, pre-sale rip-outs, pool and deck tear-outs, estate clearances. MECP licensed, $2M insured.", "url": "https://gtajunkandpropertycleanout.ca/specialized-clearances/", "provider": {"@id": "https://gtajunkandpropertycleanout.ca/#business"}, "areaServed": [{"@type": "City", "name": "Toronto"}, {"@type": "City", "name": "Mississauga"}, {"@type": "City", "name": "Brampton"}, {"@type": "City", "name": "Vaughan"}, {"@type": "City", "name": "Markham"}, {"@type": "City", "name": "Richmond Hill"}, {"@type": "City", "name": "Oakville"}, {"@type": "City", "name": "Burlington"}, {"@type": "City", "name": "Milton"}, {"@type": "City", "name": "Ajax"}, {"@type": "City", "name": "Whitby"}, {"@type": "City", "name": "Oshawa"}, {"@type": "City", "name": "Pickering"}, {"@type": "City", "name": "Newmarket"}], "offers": {"@type": "Offer", "priceCurrency": "CAD", "price": "1500", "description": "Project work only. Minimum engagement $1,500 CAD. Fixed in writing at a free on-site assessment; a 30% deposit confirms the booking."}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://gtajunkandpropertycleanout.ca/"}, {"@type": "ListItem", "position": 2, "name": "Services", "item": "https://gtajunkandpropertycleanout.ca/services/"}, {"@type": "ListItem", "position": 3, "name": "Specialised Clearances", "item": "https://gtajunkandpropertycleanout.ca/specialized-clearances/"}]}</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SP2P6CWJYW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SP2P6CWJYW');
+</script>
+<script>
+/* GTA Junk — conversion event tracking. Plain JS, no dependencies. */
+(function(){
+  function send(name, params){ if (typeof gtag === 'function') gtag('event', name, params || {}); }
+  function ready(fn){ if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+
+  ready(function(){
+    var page = location.pathname;
+
+    /* Phone clicks — the primary conversion for this business */
+    document.querySelectorAll('a[href^="tel:"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('phone_click', {
+          page_path: page,
+          link_location: a.closest('nav') ? 'nav'
+                        : a.closest('footer') ? 'footer'
+                        : a.closest('.sticky-bar') ? 'sticky_bar' : 'body'
+        });
+      });
+    });
+
+    /* Form submissions — labelled so an estate lead is distinguishable from a single-item request */
+    document.querySelectorAll('form[name]').forEach(function(f){
+      f.addEventListener('submit', function(){
+        var n = f.getAttribute('name');
+        var VAL = {
+          'estate-cleanout-lead': 1200, 'hoarding-cleanout-lead': 3500,
+          'prelisting-cleanout-lead': 1500, 'restoration-debris-lead': 1800,
+          'commercial-cleanout-lead': 2000, 'fast-quote': 1200,
+          'estate-assessment': 1500, 'partner-enquiry': 800, 'partner-referral': 800
+        };
+        var value = VAL[n] || 300;
+        send('generate_lead', { form_name: n, page_path: page, currency: 'CAD', value: value });
+        send('form_submit',   { form_name: n, page_path: page });
+      });
+    });
+
+    /* Video estimate tool */
+    if (page.indexOf('/see-your-price') === 0) {
+      document.querySelectorAll('input[type="file"]').forEach(function(i){
+        i.addEventListener('change', function(){
+          if (i.files && i.files.length) send('video_estimate_start', { page_path: page });
+        });
+      });
+    }
+
+    /* Outbound clicks to the Google profile / review form */
+    document.querySelectorAll('a[href*="g.page"], a[href*="maps.google.com"]').forEach(function(a){
+      a.addEventListener('click', function(){
+        send('review_link_click', {
+          page_path: page,
+          destination: a.href.indexOf('g.page') > -1 ? 'leave_review' : 'google_profile'
+        });
+      });
+    });
+
+    /* Engaged-visit signal: 45 seconds on an estate or service page */
+    if (/estate|services|cleanout/.test(page)) {
+      setTimeout(function(){ send('engaged_view', { page_path: page }); }, 45000);
+    }
+  });
+})();
+</script>
+</head>
+<body>
+<div class="lp-nav"><div class="wrap"><a href="/" aria-label="GTA Junk and Property Cleanout home"><img src="/assets/logo-horizontal-dark.svg" alt="GTA Junk and Property Cleanout — licensed Ontario clearance and demolition contractor" fetchpriority="high" decoding="async"></a><div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"><a class="ph" href="tel:+16472040632">(647) 204-0632</a><a class="btn btn-primary" href="#assessment">REQUEST ASSESSMENT</a></div></div></div>
+<header class="lp-hero">
+  <div class="wrap">
+    <h1>Specialised Clearances and Light Demolition</h1>
+    <p class="sub">Project work across Toronto and the GTA. Heavy commercial hydraulic equipment, a licensed MECP waste carrier, $2M insured — and a fixed written price before anything moves.</p>
+    <p class="lp-price">Project work from $1,500 <span style="font-weight:400;font-size:13.5px">· to $12,000+ on hoarder properties</span></p>
+    <div class="hero-ctas" style="justify-content:center;margin-top:22px">
+      <a class="btn btn-primary" href="tel:+16472040632">CALL (647) 204-0632</a>
+      <a class="btn btn-ghost" href="#assessment">SEND PHOTOS OR VIDEO</a>
+    </div>
+  </div>
+</header>
+<section id="specialized" style="background:var(--light)">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kicker">Specialised Clearances &amp; Light Demolition</span>
+      <h2>Six Verticals. Project Work Only.</h2>
+      <p>We have moved away from single-item pickups and half-load runs entirely. What we do now is project work — the jobs that need heavy commercial hydraulic equipment, a crew that will work a full day, and a contractor who handles the permit, the separation and the paperwork rather than leaving a pile behind.</p>
+    </div>
+    <div class="compband">
+  <h3>Trust &amp; Compliance</h3>
+  <p class="cb-sub">Four things worth verifying before you let a crew onto a property or into a tenanted building. All of ours are checkable.</p>
+  <div class="cb-grid">
+    <div class="cb"><b>$2M Commercial Liability</b><span>Commercial general liability insurance. Certificates of insurance issued on request and held on file for property managers, building management and estate counsel.</span></div>
+    <div class="cb"><b>Licensed MECP Waste Hauler</b><span>Registered with Ontario’s Ministry of the Environment, Conservation and Parks as a waste transportation system. Registration R-004-5477911257. Non-hazardous waste.</span></div>
+    <div class="cb"><b>Heavy Commercial Hydraulic Equipment</b><span>Heavy-duty commercial hydraulic dump trailer. Bulk material — sand base, concrete, demolition debris — moves in one mobilisation rather than across multiple bin swaps.</span></div>
+    <div class="cb"><b>Certified Disposal Receipts</b><span>Weigh tickets and transfer station receipts supplied with every commercial and insurance invoice, plus dated before-and-after photographs for the file.</span></div>
+  </div>
+</div>
+    <div class="sc-grid">
+      <div class="sc">
+  <span class="num">VERTICAL 01</span>
+  <h3>Hoarder House &amp; Heavy Clutter Cleans</h3>
+  <p class="rate">$4,000&ndash;$12,000+<small>PROJECT RATE · MULTI-DAY</small></p>
+  <p class="lbl">SCOPE OF SERVICE</p>
+  <p class="scope">Severe, floor-to-ceiling accumulation excavated room by room — including gross filth, spoiled food, vermin droppings and entrenched odour. Hand-sorted rather than shovelled, so cash, documents, jewellery and medication are recovered and returned. Unmarked vehicle, nothing staged on the lawn, pace set by the resident. Confirmed biohazard is referred to a licensed remediation partner.</p>
+  <p class="lbl">WHO IT IS FOR</p>
+  <ul><li>Families and adult children</li><li>Landlords facing an inspection date</li><li>Case workers and occupational therapists</li><li>Estate trustees</li></ul>
+  <div class="sc-cta">
+    <a class="btn btn-primary" href="tel:+16472040632">REQUEST SITE ASSESSMENT</a>
+    <span class="sc-call">Or <a href="/hoarding-cleanouts/">see full scope and pricing &rarr;</a></span>
+  </div>
+</div><div class="sc">
+  <span class="num">VERTICAL 02</span>
+  <h3>Light Structural Demolition</h3>
+  <p class="rate">$1,800&ndash;$4,500<small>PERMIT OBTAINED BEFORE START</small></p>
+  <p class="lbl">SCOPE OF SERVICE</p>
+  <p class="scope">Detached sheds, single and double garages, sunrooms, porches and small additions taken down and hauled out in the same mobilisation. Municipal demolition permit confirmed and obtained first; utilities verified disconnected. Slab and footing removal priced as a separate line. Materials separated as they load — metal to a recycler, lumber and shingles routed correctly.</p>
+  <p class="lbl">WHO IT IS FOR</p>
+  <ul><li>Homeowners pre-rebuild</li><li>Realtors clearing a liability before listing</li><li>Property managers</li><li>General contractors needing the haul</li></ul>
+  <div class="sc-cta">
+    <a class="btn btn-primary" href="tel:+16472040632">REQUEST SITE ASSESSMENT</a>
+    <span class="sc-call">Or <a href="/demolition-sheds-garages/">see full scope and pricing &rarr;</a></span>
+  </div>
+</div><div class="sc">
+  <span class="num">VERTICAL 03</span>
+  <h3>Commercial Tenant Default &amp; White-Box</h3>
+  <p class="rate">$2,500&ndash;$7,500<small>AFTER-HOURS · NET-30 AVAILABLE</small></p>
+  <p class="lbl">SCOPE OF SERVICE</p>
+  <p class="scope">Tenant-default and abandonment clearing, cubicle and workstation teardown, and full white-box decommissioning — fixtures, millwork, partitions, signage and abandoned cabling out, unit handed back show-ready. Certified transfer station receipts supplied for your file. We work the dock and elevator windows the building gives us, including overnight.</p>
+  <p class="lbl">WHO IT IS FOR</p>
+  <ul><li>Commercial property managers</li><li>Plaza and asset operators</li><li>Landlords post-default</li><li>Leasing and brokerage teams</li></ul>
+  <div class="sc-cta">
+    <a class="btn btn-primary" href="tel:+16472040632">REQUEST SITE ASSESSMENT</a>
+    <span class="sc-call">Or <a href="/commercial-cleanouts/">see full scope and pricing &rarr;</a></span>
+  </div>
+</div><div class="sc">
+  <span class="num">VERTICAL 04</span>
+  <h3>Pre-Sale Staging Rip-Out &amp; Carpet Extraction</h3>
+  <p class="rate">$1,500&ndash;$3,500<small>BOOKED TO YOUR MLS DATE</small></p>
+  <p class="lbl">SCOPE OF SERVICE</p>
+  <p class="scope">Carpet, underlay and tack strip pulled to subfloor; dated built-ins, mirrored walls, valances and popcorn-era fixtures stripped out so the property shows bare and photographs clean. Depersonalised rather than binned — family photographs and personal effects are boxed and returned to the seller. Finished at least one clear day before the shoot.</p>
+  <p class="lbl">WHO IT IS FOR</p>
+  <ul><li>Listing agents and SRES realtors</li><li>Home stagers</li><li>Sellers preparing to list</li><li>Estate trustees selling the property</li></ul>
+  <div class="sc-cta">
+    <a class="btn btn-primary" href="tel:+16472040632">REQUEST SITE ASSESSMENT</a>
+    <span class="sc-call">Or <a href="/pre-listing-cleanouts/">see full scope and pricing &rarr;</a></span>
+  </div>
+</div><div class="sc">
+  <span class="num">VERTICAL 05</span>
+  <h3>Above-Ground Pool &amp; Deck Tear-Outs</h3>
+  <p class="rate">$1,500&ndash;$3,200<small>POOL, DECK AND SAND BASE</small></p>
+  <p class="lbl">SCOPE OF SERVICE</p>
+  <p class="scope">Pool drained to municipal requirements, wall, liner and frame dismantled, surround deck, steps and pergola cut down, and the sand base — commonly three to six tonnes — taken out in bulk by hydraulic dump trailer. Steel and aluminium separated for the recycler, pressure-treated lumber routed correctly, yard raked level and ready to seed.</p>
+  <p class="lbl">WHO IT IS FOR</p>
+  <ul><li>Homeowners with an unused pool</li><li>Realtors pre-listing</li><li>Landlords removing a liability</li><li>New owners inheriting one</li></ul>
+  <div class="sc-cta">
+    <a class="btn btn-primary" href="tel:+16472040632">REQUEST SITE ASSESSMENT</a>
+    <span class="sc-call">Or <a href="/pool-deck-removal/">see full scope and pricing &rarr;</a></span>
+  </div>
+</div><div class="sc">
+  <span class="num">VERTICAL 06</span>
+  <h3>Estate Complete Clearance &amp; Leftover Buyout</h3>
+  <p class="rate">$2,000&ndash;$4,500<small>DOCUMENTED FOR THE ESTATE FILE</small></p>
+  <p class="lbl">SCOPE OF SERVICE</p>
+  <p class="scope">Whole property cleared to broom-clean and real-estate ready. Every room sorted before it is loaded, with documents, photographs and apparent valuables set aside and itemised for the executor. Donation receipts where the receiving charity issues them, dated before-and-after photographs, and one invoice billed to the estate. Leftover buyout considered after an auction or estate sale.</p>
+  <p class="lbl">WHO IT IS FOR</p>
+  <ul><li>Executors and estate trustees</li><li>Probate lawyers and estate planners</li><li>Out-of-province families</li><li>Listing agents on an estate sale</li></ul>
+  <div class="sc-cta">
+    <a class="btn btn-primary" href="tel:+16472040632">REQUEST SITE ASSESSMENT</a>
+    <span class="sc-call">Or <a href="/estate-cleanouts/">see full scope and pricing &rarr;</a></span>
+  </div>
+</div>
+    </div>
+    <p class="tier-note" style="margin-top:26px;font-size:13.5px">Every project is priced in a free on-site assessment and fixed in writing before anything moves. <b>Minimum engagement $1,500.</b> All prices before HST. Heavy materials priced by the tonne with scale tickets provided.</p>
+  </div>
+</section>
+
+<section id="assessment" style="background:#fff">
+  <div class="wrap"><div class="intake">
+  <div class="sec-head" style="margin-bottom:22px">
+    <span class="kicker">Fastest Route to a Number</span>
+    <h2 style="font-size:clamp(21px,2.8vw,28px)">Send Photos or a 20-Second Walkthrough</h2>
+    <p style="font-size:15px">On project work, two or three wide shots gets you a far tighter range than any phone conversation. A twenty-second video walking through the space is better still.</p>
+  </div>
+
+  <form name="site-assessment" method="POST" action="/thanks/" data-netlify="true" netlify-honeypot="bot-field" enctype="multipart/form-data">
+    <input type="hidden" name="form-name" value="site-assessment">
+    <p style="display:none"><label>Leave this blank: <input name="bot-field"></label></p>
+
+    <div class="form-row">
+      <div><label for="sa-name">Your name</label><input id="sa-name" name="name" required autocomplete="name" placeholder="Your name"></div>
+      <div><label for="sa-phone">Phone</label><input id="sa-phone" name="phone" type="tel" required autocomplete="tel" placeholder="(416) 555-0123"></div>
+    </div>
+    <div class="form-row">
+      <div><label for="sa-email">Email</label><input id="sa-email" name="email" type="email" required autocomplete="email" placeholder="you@email.com"></div>
+      <div><label for="sa-vertical">Which service</label>
+        <select id="sa-vertical" name="vertical" required>
+          <option value="">Select…</option>
+          <option>Hoarder house / heavy clutter &mdash; $4,000&ndash;$12,000+</option>
+          <option>Light structural demolition &mdash; $1,800&ndash;$4,500</option>
+          <option>Commercial tenant default / white-box &mdash; $2,500&ndash;$7,500</option>
+          <option>Pre-sale rip-out / carpet extraction &mdash; $1,500&ndash;$3,500</option>
+          <option>Above-ground pool / deck tear-out &mdash; $1,500&ndash;$3,200</option>
+          <option>Estate complete clearance &mdash; $2,000&ndash;$4,500</option>
+          <option>Not sure &mdash; help me work it out</option>
+        </select>
+      </div>
+    </div>
+    <div><label for="sa-address">Property address</label><input id="sa-address" name="address" required autocomplete="street-address" placeholder="Street address of the site"></div>
+
+    <p class="lbl" style="font:900 10.5px Arial,sans-serif;letter-spacing:1.2px;color:#94A3B8;margin:20px 0 6px">PHOTOS &amp; VIDEO</p>
+    <label class="drop" id="sa-drop" for="sa-files">
+      <span class="big">Tap to add photos or a video</span>
+      <span class="small">Or drag files here &middot; JPG, PNG, HEIC, MP4, MOV &middot; up to about 8&nbsp;MB total</span>
+      <input id="sa-files" name="media" type="file" accept="image/*,video/*" multiple>
+    </label>
+    <div class="filelist" id="sa-filelist"></div>
+
+    <div class="vid-tip">
+      <b>What to film in twenty seconds.</b> Stand in the doorway, pan slowly across the whole space, then walk to the far end and turn around. Narrate what is leaving and what is staying. Do not tidy first &mdash; we price what is actually there, and a staged photo only produces a quote we have to revise on site.
+    </div>
+
+    <div><label for="sa-notes">Anything we should know?</label><textarea id="sa-notes" name="notes" rows="3" placeholder="Timeline or fixed date, access and parking, stairs or elevator, whether anyone will be home, anything sensitive"></textarea></div>
+
+    <button class="btn btn-primary" type="submit" style="width:100%;margin-top:20px;padding:16px;font-size:15.5px">REQUEST MY SITE ASSESSMENT &rarr;</button>
+    <p class="book-note">Free, no obligation, no deposit to book the assessment. Minimum engagement $1,500 &mdash; if your job is smaller we will tell you on the phone. Property photographs are confidential and never published without your written permission.</p>
+  </form>
+</div>
+
+<script>
+(function(){
+  var inp=document.getElementById('sa-files'),drop=document.getElementById('sa-drop'),list=document.getElementById('sa-filelist');
+  if(!inp||!drop||!list) return;
+  function render(){
+    list.innerHTML='';
+    var t=0;
+    for(var i=0;i<inp.files.length;i++){
+      var f=inp.files[i]; t+=f.size;
+      var d=document.createElement('div');
+      d.textContent=f.name+'  \u00b7  '+(f.size/1048576).toFixed(1)+' MB';
+      list.appendChild(d);
+    }
+    if(inp.files.length){
+      var s=document.createElement('div');
+      s.style.fontWeight='700'; s.style.color=(t>8388608?'#B91C1C':'#14263D');
+      s.textContent=inp.files.length+' file'+(inp.files.length>1?'s':'')+'  \u00b7  '+(t/1048576).toFixed(1)+' MB total'+(t>8388608?'  \u2014 that is over the limit, please remove one':'');
+      list.appendChild(s);
+    }
+  }
+  inp.addEventListener('change',render);
+  ['dragenter','dragover'].forEach(function(e){drop.addEventListener(e,function(ev){ev.preventDefault();drop.classList.add('hot');});});
+  ['dragleave','drop'].forEach(function(e){drop.addEventListener(e,function(ev){ev.preventDefault();drop.classList.remove('hot');});});
+  drop.addEventListener('drop',function(ev){ if(ev.dataTransfer&&ev.dataTransfer.files.length){ inp.files=ev.dataTransfer.files; render(); } });
+})();
+</script></div>
+</section>
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <img src="/assets/logo-horizontal-dark.svg" alt="GTA Junk and Property Cleanout" loading="lazy">
+        <p style="font-size:13.5px">Toronto's white-glove cleanout crew. We sort, clear, sweep, and detail — you get your space back.</p>
+      </div>
+      <div><h4>Services</h4><a href="/see-your-price/">See Your Price (video estimate)</a><a href="/services/">All Services</a><a href="/services/junk-removal/">Junk Removal</a><a href="/pre-listing-cleanouts/">Property Cleanouts</a><a href="/services/garage-cleanouts/">Garage Cleanouts</a><a href="/estate-cleanouts/">Estate Cleanouts</a><a href="/hoarding-cleanouts/">Hoarding Cleanouts</a><a href="/pre-listing-cleanouts/">Pre-Listing Cleanouts</a><a href="/commercial-cleanouts/">Commercial Cleanouts</a><a href="/insurance-restoration-cleanouts/">Insurance &amp; Restoration Debris</a></div>
+      <div><h4>Service Areas</h4><a href="/junk-removal-ajax/">Ajax</a><a href="/junk-removal-aurora/">Aurora</a><a href="/junk-removal-bolton/">Bolton</a><a href="/junk-removal-bramalea/">Bramalea</a><a href="/junk-removal-brampton/">Brampton</a><a href="/junk-removal-burlington/">Burlington</a><a href="/junk-removal-caledon/">Caledon</a><a href="/junk-removal-east-york/">East York</a><a href="/junk-removal-etobicoke/">Etobicoke</a><a href="/junk-removal-georgetown/">Georgetown</a><a href="/junk-removal-king-city/">King City</a><a href="/junk-removal-malton/">Malton</a><a href="/junk-removal-markham/">Markham</a><a href="/junk-removal-mississauga/">Mississauga</a><a href="/junk-removal-north-york/">North York</a><a href="/junk-removal-oakville/">Oakville</a><a href="/junk-removal-pickering/">Pickering</a><a href="/junk-removal-rexdale/">Rexdale</a><a href="/junk-removal-richmond-hill/">Richmond Hill</a><a href="/junk-removal-scarborough/">Scarborough</a><a href="/junk-removal-toronto/">Toronto</a><a href="/junk-removal-vaughan/">Vaughan</a><a href="/junk-removal-woodbridge/">Woodbridge</a><a href="/junk-removal-whitby/">Whitby</a><a href="/junk-removal-oshawa/">Oshawa</a><a href="/junk-removal-newmarket/">Newmarket</a><a href="/junk-removal-milton/">Milton</a><a href="/junk-removal-york/">York</a></div>
+      <div>
+        <h4>Company</h4>
+        <a href="/about/">About &amp; The Rocky Story</a>
+        <a href="/reviews/">Reviews</a><a href="https://maps.google.com/?cid=4585715728644704101" target="_blank" rel="noopener">See us on Google &#9733; 5.0</a><a href="https://g.page/r/CWUHyrYovKM_EAI/review" target="_blank" rel="nofollow noopener">Leave a Google review</a>
+        <a href="/partners/">Partner With Us</a><a href="/pre-listing-cleanouts/">For Real Estate Agents</a>
+        <a href="/blog/">Resources</a>
+        <a href="/contact/">Contact / Get a Quote</a>
+        <h4 style="margin-top:18px">Contact</h4>
+        <a href="tel:+16472040632">(647) 204-0632</a>
+        <a href="mailto:gtajunkandpropertycleanout@gmail.com">gtajunkandpropertycleanout@gmail.com</a>
+        <p style="font-size:13.5px">Open 7 days, 7am–9pm<br>Serving Toronto &amp; the GTA (we come to you)</p>
+      </div>
+    </div>
+    <div class="legal">
+      <span>© 2026 GTA Junk and Property Cleanout Inc. · Licensed &amp; insured</span>
+      <span>Responsible disposal: we donate and recycle before we dump. &nbsp;&middot;&nbsp; <a href="/privacy/">Privacy Policy</a> &nbsp;&middot;&nbsp; <a href="/terms/">Terms of Service</a></span>
+    </div>
+  </div>
+</footer>
+<div class="sticky-bar">
+  <a class="sb-call" href="tel:+16472040632">📞 Call Us<small>(647) 204-0632</small></a>
+  <a class="sb-video" href="/see-your-price/">📹 Send a Video<small>Get a rough price</small></a>
+</div>
+<style>
+#ckbar{position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#14263D;color:#E8EEF5;
+ padding:14px 18px;display:none;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center;
+ font:14.5px/1.5 Arial,Helvetica,sans-serif;box-shadow:0 -2px 14px rgba(0,0,0,.25)}
+#ckbar a{color:#F97316;text-decoration:underline}
+#ckbar button{background:#F97316;color:#fff;border:0;border-radius:7px;padding:9px 20px;
+ font:700 14.5px Arial,Helvetica,sans-serif;cursor:pointer}
+#ckbar button:hover{background:#EA580C}
+@media(max-width:700px){#ckbar{bottom:64px;font-size:13.5px;padding:12px 14px}}
+</style>
+<div id="ckbar" role="region" aria-label="Cookie notice">
+  <span>We use Google Analytics cookies to see which pages are useful. We don't sell your data or run advertising trackers here. <a href="/privacy/">Privacy Policy</a></span>
+  <button type="button" id="ckok">Got it</button>
+</div>
+<script>
+(function(){
+  try{
+    if(localStorage.getItem('gtajunk_ck')==='1') return;
+    var b=document.getElementById('ckbar'); if(!b) return;
+    b.style.display='flex';
+    document.getElementById('ckok').addEventListener('click',function(){
+      b.style.display='none';
+      try{localStorage.setItem('gtajunk_ck','1');}catch(e){}
+    });
+  }catch(e){}
+})();
+</script>
+</body>
+</html>

@@ -66,3 +66,12 @@
 /quote/   /fast-quote/   301!
 /estate   /estate-cleanouts/   301!
 /hoarding   /hoarding-cleanouts/   301!
+
+# --- Vertical aliases (October 2026) -----------------------------------
+/demolition   /demolition-sheds-garages/   301!
+/shed-removal   /demolition-sheds-garages/   301!
+/garage-demolition   /demolition-sheds-garages/   301!
+/pool-removal   /pool-deck-removal/   301!
+/deck-removal   /pool-deck-removal/   301!
+/white-box   /commercial-cleanouts/   301!
+/clearances   /specialized-clearances/   301!
