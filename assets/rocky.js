@@ -327,6 +327,14 @@
         bubble('rocky', html);
         messages.push({ role: 'assistant', content: reply });
         lastService = data.service || lastService;
+        // Degraded means the model call failed and Rocky answered from the
+        // scripted fallback — usually an expired key or an empty credit
+        // balance. Surface it, because the failure is otherwise invisible:
+        // Rocky does not error, he just quietly gets less useful.
+        if (data.degraded) {
+          ga('rocky_degraded', { page: location.pathname });
+          try { console.warn('Rocky is running in fallback mode — check ANTHROPIC_API_KEY and the Anthropic credit balance.'); } catch (e) {}
+        }
         answered = true;
         chips(data.suggestions);
         speak(reply);

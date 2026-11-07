@@ -30,7 +30,7 @@
 const P = require('./_pricing.js');
 
 const MODEL = 'claude-haiku-5-5';     // fast and cheap; the hard rules live in code, not in model capability
-const MAX_TOKENS = 700;
+const MAX_TOKENS = 1600;            // adaptive thinking counts toward this, so leave headroom
 const MAX_TURNS = 24;
 const MAX_CHARS = 1200;               // per user message
 const RATE_LIMIT = { windowMs: 60000, max: 12 };
@@ -140,7 +140,9 @@ async function callClaude(apiKey, system, messages) {
     body: JSON.stringify({
       model: MODEL,
       max_tokens: MAX_TOKENS,
-      temperature: 0.4,
+      // No `temperature`: it is deprecated on Haiku 5.5 and the API rejects the
+      // whole request with a 400 if it is sent. That cost us a silent outage —
+      // every call failed and Rocky served the scripted fallback instead.
       system,
       messages
     })
