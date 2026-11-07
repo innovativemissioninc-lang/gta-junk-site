@@ -39,7 +39,7 @@ Every job is priced in a free on-site valuation and fixed in writing before work
 
 We are a premium operator. We are not the cheapest quote you will get, and we say so plainly: the price covers property protection, donation sorting, a crew that carries rather than drags, and a finished space rather than an emptied one.
 
-We also offer a video estimate: a customer films a short phone walkthrough and gets a rough price. https://gtajunkandpropertycleanout.ca/see-your-price/
+We also offer a video estimate: a customer films a short phone walkthrough and gets an indicative project range, which is then fixed in writing at a free on-site assessment. https://gtajunkandpropertycleanout.ca/see-your-price/
 
 ## Dedicated service pages
 
@@ -75,3 +75,7 @@ Our city pages carry municipal disposal rules verified against official regional
 - Video estimate: https://gtajunkandpropertycleanout.ca/see-your-price/
 - Phone: (647) 204-0632
 - Partner with us (B2B — property managers, restoration firms, realtors): https://gtajunkandpropertycleanout.ca/partners/
+
+## AI concierge
+
+Rocky is the AI guide on every page of the site. He answers service, pricing-range, coverage and scheduling questions, and identifies himself as an AI rather than as a person. He quotes only the published ranges listed above and always states that the firm price is fixed in writing at a free on-site assessment.

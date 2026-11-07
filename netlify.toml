@@ -6,6 +6,10 @@
 [functions]
   node_bundler = "esbuild"
 
+# Rocky is a short, chatty endpoint; it needs no bundled extras.
+[functions."rocky"]
+  included_files = []
+
 # The estimate endpoint needs headroom: vision analysis of 8 frames.
 [functions."estimate"]
   included_files = []
@@ -16,7 +20,7 @@
     X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(self), microphone=(), geolocation=()"
+    Permissions-Policy = "camera=(self), microphone=(self), geolocation=()"
 
 [[headers]]
   for = "/assets/*"

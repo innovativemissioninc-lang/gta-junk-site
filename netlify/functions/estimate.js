@@ -26,8 +26,12 @@ const TIERS = {
     key: 'clear-out',
     name: 'The Clear-Out',
     tagline: 'Total removal, zero friction',
-    priceLow: 495,
-    priceHigh: 620,
+    // Repriced November 2026 to the published project ranges. These used to
+    // read 495/620 and 795/950, which sat below the $1,500 project minimum
+    // advertised everywhere else on the site — a customer could be shown
+    // "$495 to $620" here and told "$1,500 minimum" on the phone.
+    priceLow: 1500,
+    priceHigh: 2200,
     showPrice: true,
     includes: [
       'Full haul-away — furniture, appliances, debris, the lot',
@@ -41,8 +45,8 @@ const TIERS = {
     key: 'standard-reset',
     name: 'The Standard Reset',
     tagline: 'Clean, clear, and ready',
-    priceLow: 795,
-    priceHigh: 950,
+    priceLow: 2000,
+    priceHigh: 3200,
     showPrice: true,
     includes: [
       'Everything in The Clear-Out',

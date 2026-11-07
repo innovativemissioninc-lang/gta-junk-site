@@ -83,3 +83,6 @@
 /hoarder-cleanout-toronto   /hoarding-cleanouts-toronto/   301!
 /shed-demolition-toronto   /garage-demolition-toronto/   301!
 /pool-removal-toronto   /above-ground-pool-removal-toronto/   301!
+
+# --- Rocky AI concierge endpoint -----------------------------------
+/api/rocky   /.netlify/functions/rocky   200

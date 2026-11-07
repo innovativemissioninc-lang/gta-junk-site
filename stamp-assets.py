@@ -10,16 +10,24 @@ exactly when the file does. Run before every deploy.
 import hashlib, glob, os, re, sys
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+ASSETS = [
+    ('assets/site.css', r'href="/assets/site\.css(?:\?v=[0-9a-f]+)?"', 'href="/assets/site.css?v={h}"'),
+    ('assets/rocky.js', r'src="/assets/rocky\.js(?:\?v=[0-9a-f]+)?"', 'src="/assets/rocky.js?v={h}"'),
+]
 h = hashlib.md5(open('assets/site.css', 'rb').read()).hexdigest()[:10]
-pat = re.compile(r'href="/assets/site\.css(?:\?v=[0-9a-f]+)?"')
-new = f'href="/assets/site.css?v={h}"'
 n = 0
-for f in glob.glob('**/*.html', recursive=True):
-    s = open(f, encoding='utf-8').read()
-    s2, c = pat.subn(new, s)
-    if c and s2 != s:
-        open(f, 'w', encoding='utf-8').write(s2)
-        n += 1
+for path, rx, tpl in ASSETS:
+    ah = hashlib.md5(open(path, 'rb').read()).hexdigest()[:10]
+    if path.endswith('site.css'):
+        h = ah
+    pat = re.compile(rx)
+    new = tpl.format(h=ah)
+    for f in glob.glob('**/*.html', recursive=True):
+        s = open(f, encoding='utf-8').read()
+        s2, c = pat.subn(new, s)
+        if c and s2 != s:
+            open(f, 'w', encoding='utf-8').write(s2)
+            n += 1
 missing = [f for f in glob.glob('**/*.html', recursive=True)
            if 'site.css' in open(f, encoding='utf-8').read()
            and f'site.css?v={h}' not in open(f, encoding='utf-8').read()]
