@@ -94,8 +94,8 @@
           '<small>GTA Junk and Property Cleanout</small>' +
         '</div>' +
         '<div id="rk-tools">' +
-          (canSpeak ? '<button type="button" id="rk-spk" aria-pressed="false" title="Read answers aloud" aria-label="Read answers aloud">' +
-            '<svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><path d="M4 9v6h3l5 4V5L7 9H4zm11.5 3a3.5 3.5 0 0 0-2-3.16v6.32A3.5 3.5 0 0 0 15.5 12zM14 3.2v2.06A6.75 6.75 0 0 1 14 18.74v2.06A8.75 8.75 0 0 0 14 3.2z"/></svg></button>' : '') +
+          ('<button type="button" id="rk-spk" aria-pressed="false" title="Read answers aloud" aria-label="Read answers aloud">' +
+            '<svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><path d="M4 9v6h3l5 4V5L7 9H4zm11.5 3a3.5 3.5 0 0 0-2-3.16v6.32A3.5 3.5 0 0 0 15.5 12zM14 3.2v2.06A6.75 6.75 0 0 1 14 18.74v2.06A8.75 8.75 0 0 0 14 3.2z"/></svg></button>') +
           '<button type="button" id="rk-close" title="Close" aria-label="Close Rocky">' +
             '<svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z"/></svg></button>' +
         '</div>' +
@@ -213,10 +213,13 @@
   /* ----------------------------------------------------------------- *
    * Voice
    * ----------------------------------------------------------------- */
-  function speak(text) {
-    // ElevenLabs swap-in point: replace this body with a fetch to a /api/tts
-    // function and play the returned audio. Nothing else needs to change.
-    if (!canSpeak || !speakOn) return;
+  var ttsAvailable = true;   // flips false after one 503, so we stop asking
+  var audio = null;
+
+  /* Browser speech. Free, no account, and the fallback whenever the
+     ElevenLabs voice is unavailable or not configured. */
+  function speakBuiltIn(text) {
+    if (!canSpeak) return;
     try {
       window.speechSynthesis.cancel();
       var u = new SpeechSynthesisUtterance(text.replace(/\s+/g, ' ').slice(0, 600));
@@ -227,11 +230,44 @@
     } catch (e) {}
   }
 
+  function stopSpeaking() {
+    if (audio) { try { audio.pause(); audio.src = ''; } catch (e) {} audio = null; }
+    if (canSpeak) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+  }
+
+  /* Fabian's cloned voice, served through our own endpoint so the ElevenLabs
+     key never reaches the browser. Falls straight back to the built-in voice
+     on any failure — a concierge that goes silent is worse than one that
+     sounds synthetic. */
+  function speak(text) {
+    if (!speakOn || !text) return;
+    stopSpeaking();
+    if (!ttsAvailable) return speakBuiltIn(text);
+
+    fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text.replace(/\s+/g, ' ').slice(0, 700) })
+    })
+      .then(function (r) {
+        if (r.status === 503) { ttsAvailable = false; throw new Error('not configured'); }
+        if (!r.ok) throw new Error('tts ' + r.status);
+        return r.blob();
+      })
+      .then(function (b) {
+        var url = URL.createObjectURL(b);
+        audio = new Audio(url);
+        audio.onended = function () { URL.revokeObjectURL(url); };
+        return audio.play();
+      })
+      .catch(function () { speakBuiltIn(text); });
+  }
+
   if (elSpk) elSpk.addEventListener('click', function () {
     speakOn = !speakOn;
     elSpk.setAttribute('aria-pressed', String(speakOn));
     elSpk.classList.toggle('on', speakOn);
-    if (!speakOn && canSpeak) try { window.speechSynthesis.cancel(); } catch (e) {}
+    if (!speakOn) stopSpeaking();
     ga('rocky_voice_toggle', { state: speakOn ? 'on' : 'off' });
   });
 
@@ -406,7 +442,7 @@
       ga('rocky_open', { page: location.pathname });
     } else {
       stopListening();
-      if (canSpeak) try { window.speechSynthesis.cancel(); } catch (e) {}
+      stopSpeaking();
     }
   }
   elLaunch.addEventListener('click', function () { setOpen(!open); });

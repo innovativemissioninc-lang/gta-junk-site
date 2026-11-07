@@ -7,6 +7,10 @@
   node_bundler = "esbuild"
 
 # Rocky is a short, chatty endpoint; it needs no bundled extras.
+# Rocky's voice. Returns audio, so it needs no bundled extras either.
+[functions."tts"]
+  included_files = []
+
 [functions."rocky"]
   included_files = []
 

@@ -86,3 +86,4 @@
 
 # --- Rocky AI concierge endpoint -----------------------------------
 /api/rocky   /.netlify/functions/rocky   200
+/api/tts     /.netlify/functions/tts     200
