@@ -310,10 +310,15 @@ footer{background:var(--navy-deep);color:#9FB0C2;padding:56px 0 0;font-size:14px
 @media(prefers-reduced-motion:reduce){#rocky.rk-peek #rk-launch{animation:none}}
 #rocky.rk-open #rk-launch{display:none}
 
-/* --- Panel --- */
+/* --- Panel ---
+   padding:0 is load-bearing, not tidiness. The panel is a <section>, and this
+   stylesheet sets `section{padding:76px 0}` for page layout, which pushed 76px
+   of white space above Rocky's header and stole 152px of conversation height.
+   Any bare element selector added to this stylesheet later can reach into the
+   widget the same way, so the widget sets what it depends on explicitly. */
 #rk-panel{display:flex;flex-direction:column;width:min(94vw,402px);height:min(76vh,610px);
- background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 26px 70px rgba(11,21,36,.46);
- border:1px solid #D9E1EA}
+ padding:0;margin:0;background:#fff;border-radius:18px;overflow:hidden;
+ box-shadow:0 26px 70px rgba(11,21,36,.46);border:1px solid #D9E1EA}
 #rk-head{display:flex;align-items:center;gap:11px;padding:13px 14px;background:var(--navy-deep);color:#fff;flex:0 0 auto}
 #rk-av{border-radius:10px;flex:0 0 38px}
 #rk-id{display:flex;flex-direction:column;flex:1 1 auto;min-width:0;line-height:1.25}
