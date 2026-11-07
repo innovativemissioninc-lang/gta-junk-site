@@ -84,6 +84,7 @@
     '</button>' +
 
     '<section id="rk-panel" role="dialog" aria-modal="false" aria-labelledby="rk-title" hidden>' +
+      '<div id="rk-grab" aria-hidden="true"><span></span></div>' +
       '<header id="rk-head">' +
         '<img src="' + AVATAR + '" alt="" width="38" height="38" id="rk-av">' +
         '<div id="rk-id">' +
@@ -121,6 +122,30 @@
   var elIn = root.querySelector('#rk-in');
   var elMic = root.querySelector('#rk-mic');
   var elSpk = root.querySelector('#rk-spk');
+
+  /* ----------------------------------------------------------------- *
+   * Slim strip inside the sticky nav.
+   *
+   * The brief asked for top-of-fold prominence. The first attempt did that
+   * with a large floating pill, which on a narrow window became a slab
+   * parked over the hero headline. A one-line bar in the nav gets the same
+   * attention for a fraction of the screen, and it scrolls with the sticky
+   * header rather than floating over the content.
+   * ----------------------------------------------------------------- */
+  var nav = document.querySelector('nav');
+  if (nav) {
+    var bar = document.createElement('div');
+    bar.className = 'rk-bar';
+    bar.innerHTML = '<button type="button" aria-label="Ask Rocky, our AI guide, for a quick answer">' +
+      '<span class="w" aria-hidden="true">\uD83D\uDC4B</span>' +
+      '<span><b>Need a quick answer?</b> <span class="x">Ask Rocky for a price range in seconds.</span></span>' +
+      '<span class="go">Ask now</span></button>';
+    bar.querySelector('button').addEventListener('click', function () {
+      ga('rocky_bar_click', { page: location.pathname });
+      setOpen(true);
+    });
+    nav.appendChild(bar);
+  }
 
   /* ----------------------------------------------------------------- *
    * Bottom-edge arithmetic — stay clear of the call bar and cookie bar
@@ -367,6 +392,7 @@
   /* ----------------------------------------------------------------- *
    * Open / close
    * ----------------------------------------------------------------- */
+  /* Hoisted: the nav strip above binds to this before it appears in source. */
   function setOpen(v) {
     open = v;
     elPanel.hidden = !v;

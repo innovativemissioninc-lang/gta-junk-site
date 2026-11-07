@@ -73,9 +73,9 @@ const SERVICES = [
   {
     key: 'estate',
     name: 'Estate complete clearance',
-    low: 2000, high: 4500,
-    range: '$2,000 to $4,500',
-    note: 'A standard clear starts at $2,000; the Signature finish is $3,200; larger properties reach about $4,500.',
+    low: 2000, high: 7000,
+    range: '$2,000 to $7,000+',
+    note: 'A standard clear starts at $2,000 and the Signature finish is $3,200. Large or multi-level properties, full basements, garages and outbuildings run to $7,000 and beyond.',
     url: '/estate-cleanouts/',
     drivers: ['property size and number of levels', 'how full it is', 'basement, attic and garage access', 'how much needs itemising for the estate file', 'finish level'],
     match: ['estate', 'probate', 'executor', 'passed away', 'passed', 'deceased', 'inherit', 'mother', 'father', 'parent']
