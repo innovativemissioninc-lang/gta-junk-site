@@ -4,7 +4,10 @@
   --grey:#AEB9C4; --cream:#F5F1E8; --slate:#475569; --light:#F1F5F9;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;overflow-x:clip}
+/* Safety net only. Every known overflow source is fixed at its root; this
+   keeps one stray wide element from making the whole page draggable. */
+body{overflow-x:clip}
 body{font-family:Arial,Helvetica,sans-serif;color:var(--navy);background:#fff;line-height:1.6}
 h1,h2,h3{font-family:'Arial Black',Arial,sans-serif;line-height:1.15}
 img{max-width:100%}
@@ -163,6 +166,13 @@ nav{position:sticky;top:0;z-index:50;background:var(--navy-deep);box-shadow:0 2p
 .banner .small a{color:#fff;font-weight:900}
 footer{background:var(--navy-deep);color:#9FB0C2;padding:56px 0 0;font-size:14px}
 .foot-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1.1fr;gap:36px;padding-bottom:40px}
+/* The footer was the one grid on the site with no mobile breakpoint, and a
+   fifth column was added to it later for Popular Searches. On a 375px screen
+   its four tracks measured 489px, making the whole document 617px wide — the
+   dead zone to the right that forced horizontal dragging on every page. */
+@media(max-width:860px){.foot-grid{grid-template-columns:1fr 1fr;gap:28px}}
+@media(max-width:520px){.foot-grid{grid-template-columns:1fr;gap:22px;padding-bottom:28px}
+ .foot-grid h4{margin-bottom:10px}.foot-grid a{margin-bottom:7px}}
 .foot-grid img{height:52px;margin-bottom:14px}
 .foot-grid h4{color:#fff;font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
 .foot-grid a{color:#9FB0C2;text-decoration:none;display:block;margin-bottom:9px;font-size:13.5px}
@@ -342,6 +352,12 @@ footer{background:var(--navy-deep);color:#9FB0C2;padding:56px 0 0;font-size:14px
    padding:0 is load-bearing. The panel is a <section>, and this stylesheet
    sets section{padding:76px 0} for page layout, which otherwise puts 76px of
    white space above Rocky's header. */
+/* [hidden] must win. An author rule setting display on #rk-panel beats the
+   browser's own [hidden]{display:none}, regardless of specificity, because
+   author styles outrank the user-agent origin. Without the rule below the
+   panel was permanently open on every page and every device from the moment
+   the widget shipped — the single biggest thing wrong with it. */
+#rk-panel[hidden]{display:none!important}
 #rk-panel{display:flex;flex-direction:column;
  width:min(92vw,352px);
  height:470px;
@@ -349,6 +365,14 @@ footer{background:var(--navy-deep);color:#9FB0C2;padding:56px 0 0;font-size:14px
  padding:0;margin:0;background:#fff;border-radius:16px;overflow:hidden;
  box-shadow:0 20px 56px rgba(11,21,36,.42);border:1px solid #D9E1EA}
 #rk-grab{display:none}
+/* Scrim: on a phone the panel is a sheet, and people expect to dismiss a
+   sheet by tapping beside it rather than hunting for a close icon. */
+#rk-scrim{display:none}
+@media(max-width:620px){
+  #rocky.rk-open #rk-scrim{display:block;position:fixed;inset:0;background:rgba(11,21,36,.45);
+   z-index:-1;animation:rk-fade .18s ease-out}
+  @keyframes rk-fade{from{opacity:0}to{opacity:1}}
+}
 
 #rk-head{display:flex;align-items:center;gap:10px;padding:11px 12px;background:var(--navy-deep);color:#fff;flex:0 0 auto}
 #rk-av{border-radius:9px;flex:0 0 32px;width:32px;height:32px}
@@ -418,7 +442,7 @@ a.rk-cta:hover{background:var(--orange-dark)}
 @media(max-width:620px){
   #rocky{right:0;left:0;bottom:0}
   #rocky:not(.rk-open){right:14px;left:auto;bottom:var(--rk-bottom)}
-  #rk-panel{width:100vw;height:82vh;max-height:82vh;border-radius:18px 18px 0 0;border-bottom:0}
+  #rk-panel{width:100%;height:82vh;max-height:82vh;border-radius:18px 18px 0 0;border-bottom:0}
   #rk-grab{display:block;flex:0 0 auto;background:var(--navy-deep);padding:7px 0 0;text-align:center}
   #rk-grab span{display:inline-block;width:38px;height:4px;border-radius:2px;background:rgba(255,255,255,.3)}
   #rk-tools button{width:40px;height:40px}

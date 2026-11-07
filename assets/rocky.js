@@ -83,6 +83,7 @@
       '<span id="rk-dot" aria-hidden="true"></span>' +
     '</button>' +
 
+    '<div id="rk-scrim" aria-hidden="true"></div>' +
     '<section id="rk-panel" role="dialog" aria-modal="false" aria-labelledby="rk-title" hidden>' +
       '<div id="rk-grab" aria-hidden="true"><span></span></div>' +
       '<header id="rk-head">' +
@@ -409,6 +410,7 @@
     }
   }
   elLaunch.addEventListener('click', function () { setOpen(!open); });
+  root.querySelector('#rk-scrim').addEventListener('click', function () { setOpen(false); });
   root.querySelector('#rk-close').addEventListener('click', function () { setOpen(false); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && open) setOpen(false); });
 
