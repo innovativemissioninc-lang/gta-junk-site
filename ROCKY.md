@@ -16,8 +16,13 @@ give him the full conversational intelligence, add one environment variable:
 3. Scope it to **All deploy contexts**, save, then **Deploys → Trigger deploy →
    Clear cache and deploy site**
 
-That key is the same one the `/see-your-price/` video estimate already uses, so
-if that feature is working, Rocky is already live and intelligent.
+That key is the same one the `/see-your-price/` video estimate uses.
+
+**Checked on 7 November 2026: there are no environment variables on this
+project at all**, at either project or team level. So the key has never been
+set, which means the video estimator has also been returning *"Our estimator
+is offline right now"* to every visitor since it shipped — while being linked
+from all 65 pages and listed in the sitemap. One key fixes both features.
 
 **Until the key is set**, Rocky falls back to a deterministic script: he still
 identifies the service from what the customer types, states the published
