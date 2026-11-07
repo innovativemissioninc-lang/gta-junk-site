@@ -49,11 +49,26 @@ function rateLimited(ip) {
   return arr.length > RATE_LIMIT.max;
 }
 
+/* Spoken replies are a different medium, not the same text read aloud.
+   Ninety words is a comfortable paragraph on screen and an eternity in the
+   ear, and a customer cannot scroll back to catch a number they missed. */
+const VOICE_RULES = `YOU ARE BEING SPOKEN ALOUD RIGHT NOW. THIS CHANGES HOW YOU WRITE.
+Two or three sentences. Under 55 words. Then stop and let them talk.
+Say the range once, in words a person would say out loud: "about two thousand to seven thousand dollars" rather than "$2,000-$7,000+". Never read out punctuation or symbols.
+No lists, no bullet points, no headings, no markdown, no asterisks, no URLs, no email addresses. If a page would help, say you can text them the link.
+Ask exactly ONE question and stop. Never stack two questions in one turn.
+No long preamble. Lead with the answer.
+If they interrupt or change subject, follow them rather than finishing your point.
+Spell the phone number as "six four seven, two oh four, oh six three two" only if they ask for it out loud.
+Still identify yourself as an AI guide the first time it comes up, and never claim to be Fabian.
+
+`;
+
 /* ------------------------------------------------------------------ *
  * The system prompt. Built from _pricing.js so it can never disagree
  * with the table the guard screens against.
  * ------------------------------------------------------------------ */
-function buildSystemPrompt(page) {
+function buildSystemPrompt(page, voice) {
   const table = P.SERVICES.map(s =>
     `- ${s.name} [${s.key}] — ${s.range}. ${s.note}\n  What moves the price: ${s.drivers.join('; ')}.\n  Page: ${s.url}`
   ).join('\n');
@@ -106,7 +121,7 @@ WHAT THE NEXT STEP IS
 A free on-site assessment, booked by phone at ${P.PHONE} or through the form. Same-day and next-day slots exist across the GTA subject to crew availability. For hoarding work, say plainly that arrival is in an unmarked vehicle with nothing staged outside, because that is usually the real question behind the question.
 If someone sounds ready, offer to take their name, phone and postal code so Fabian can call back — but only after you have answered what they asked.
 
-THE PAGE THEY ARE READING RIGHT NOW: ${page || '/'}
+${voice ? VOICE_RULES : ''}THE PAGE THEY ARE READING RIGHT NOW: ${page || '/'}
 Use it. Someone on /estate-cleanouts/ has probably just lost a parent; lead with that reality, not with a price list.
 
 If you do not know something, say so and point to the phone number. Never guess at permits, municipal rules, dates, availability, or anything about a specific property you have not been told.`;
@@ -207,11 +222,12 @@ exports.handler = async function (event) {
   // --- No key configured: deterministic concierge, still useful ----------
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return json(200, fallbackReply(matched));
+    return json(200, fallbackReply(matched, payload.mode === 'voice'));
   }
 
   // --- Model call, screened --------------------------------------------
-  const system = buildSystemPrompt(page);
+  const voice = payload.mode === 'voice';
+  const system = buildSystemPrompt(page, voice);
   let reply;
   try {
     reply = await callClaude(apiKey, system, messages);
@@ -250,7 +266,15 @@ exports.handler = async function (event) {
  * model is unreachable. Built entirely from the published table, so it
  * is incapable of being wrong about price.
  * ------------------------------------------------------------------ */
-function fallbackReply(svc) {
+function fallbackReply(svc, voice) {
+  if (svc && voice) {
+    // Spoken fallback: one breath, one question.
+    return {
+      reply: svc.name + ' runs ' + svc.range + '. Fabian fixes the firm number in writing at a free on-site visit. ' +
+             'What is the property like?',
+      service: svc.key, url: svc.url, suggestions: suggestionsFor(svc)
+    };
+  }
   if (!svc) {
     return {
       reply: 'Happy to help. Tell me what you are looking at — an estate property, a hoarding situation, a garage, a commercial unit, a shed or garage coming down, a pool, or a hot tub — and I will give you the range we publish for it.\n\nOr skip ahead: Fabian is on ' + P.PHONE + '.',

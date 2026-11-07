@@ -388,6 +388,30 @@ footer{background:var(--navy-deep);color:#9FB0C2;padding:56px 0 0;font-size:14px
 #rk-tools button:hover{background:rgba(255,255,255,.14);color:#fff}
 #rk-spk.on{background:var(--orange);color:#fff}
 
+/* --- Voice mode: the panel becomes a call, not a transcript --- */
+#rk-stage{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
+ gap:16px;padding:26px 20px;background:var(--navy-deep);color:#fff;text-align:center}
+#rk-orb{display:flex;align-items:flex-end;gap:7px;height:56px}
+#rk-orb span{width:11px;height:14px;border-radius:6px;background:#3E5572;transition:background .2s}
+#rk-orb.listening span{background:var(--orange);animation:rk-bars 1s ease-in-out infinite}
+#rk-orb.listening span:nth-child(2){animation-delay:.16s}
+#rk-orb.listening span:nth-child(3){animation-delay:.32s}
+#rk-orb.speaking span{background:#38BDF8;animation:rk-bars .62s ease-in-out infinite}
+#rk-orb.speaking span:nth-child(2){animation-delay:.1s}
+#rk-orb.speaking span:nth-child(3){animation-delay:.2s}
+#rk-orb.thinking span{background:#94A3B8;animation:rk-bars 1.7s ease-in-out infinite}
+#rk-orb.thinking span:nth-child(2){animation-delay:.25s}
+#rk-orb.thinking span:nth-child(3){animation-delay:.5s}
+@keyframes rk-bars{0%,100%{height:14px}50%{height:50px}}
+@media(prefers-reduced-motion:reduce){#rk-orb span{animation:none!important;height:26px}}
+#rk-state{font:900 15px 'Arial Black',Arial,sans-serif;margin:0}
+#rk-heard{font-size:13.5px;color:#9FB0C4;min-height:19px;margin:0;line-height:1.45;max-width:270px}
+#rk-endvoice{margin-top:4px;background:transparent;color:#FDBA74;border:1.5px solid rgba(249,115,22,.55);
+ border-radius:999px;padding:9px 18px;font:900 12.5px Arial,sans-serif;cursor:pointer}
+#rk-endvoice:hover{background:rgba(249,115,22,.14);color:#fff}
+#rk-voice.on{background:var(--orange);color:#fff}
+/* In voice mode the transcript, chips and typing row step aside. */
+#rocky.rk-voice #rk-log,#rocky.rk-voice #rk-chips,#rocky.rk-voice #rk-form{display:none}
 #rk-log{flex:1 1 auto;overflow-y:auto;padding:14px 12px 4px;background:#F7F9FB;
  display:flex;flex-direction:column;gap:10px;overscroll-behavior:contain}
 .rk-msg{max-width:90%;font-size:14px;line-height:1.55}

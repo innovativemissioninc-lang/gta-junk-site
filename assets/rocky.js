@@ -94,12 +94,20 @@
           '<small>GTA Junk and Property Cleanout</small>' +
         '</div>' +
         '<div id="rk-tools">' +
+          (canListen ? '<button type="button" id="rk-voice" title="Talk to Rocky" aria-label="Talk to Rocky">' +
+            '<svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V22h2v-3.08A7 7 0 0 0 19 12h-2z"/></svg></button>' : '') +
           ('<button type="button" id="rk-spk" aria-pressed="false" title="Read answers aloud" aria-label="Read answers aloud">' +
             '<svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><path d="M4 9v6h3l5 4V5L7 9H4zm11.5 3a3.5 3.5 0 0 0-2-3.16v6.32A3.5 3.5 0 0 0 15.5 12zM14 3.2v2.06A6.75 6.75 0 0 1 14 18.74v2.06A8.75 8.75 0 0 0 14 3.2z"/></svg></button>') +
           '<button type="button" id="rk-close" title="Close" aria-label="Close Rocky">' +
             '<svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z"/></svg></button>' +
         '</div>' +
       '</header>' +
+      '<div id="rk-stage" hidden>' +
+        '<div id="rk-orb"><span></span><span></span><span></span></div>' +
+        '<p id="rk-state">Starting…</p>' +
+        '<p id="rk-heard"></p>' +
+        '<button type="button" id="rk-endvoice">End voice chat</button>' +
+      '</div>' +
       '<div id="rk-log" role="log" aria-live="polite" aria-atomic="false"></div>' +
       '<div id="rk-chips"></div>' +
       '<form id="rk-form" autocomplete="off">' +
@@ -307,6 +315,172 @@
   });
 
   /* ----------------------------------------------------------------- *
+   * Voice mode — a hands-free conversation, not a dictation box.
+   *
+   * The loop is: greet aloud -> listen -> answer aloud -> listen again.
+   * Listening never starts until speech has finished playing, because the
+   * microphone would otherwise hear Rocky and transcribe him as the customer.
+   * That single ordering rule is most of what makes this work.
+   *
+   * Autoplay policy requires a user gesture before audio can start, which the
+   * click on the voice button provides. Everything after that is chained off
+   * that same gesture.
+   * ----------------------------------------------------------------- */
+  var voiceMode = false;
+  var vRecog = null;
+
+  function vState(txt, cls) {
+    var el = root.querySelector('#rk-state');
+    if (el) el.textContent = txt;
+    var orb = root.querySelector('#rk-orb');
+    if (orb) orb.className = cls || '';
+  }
+
+  /* Speak, then run the callback when the audio has actually finished. */
+  function speakThen(text, done) {
+    stopSpeaking();
+    var finished = false;
+    function once() { if (!finished) { finished = true; done && done(); } }
+
+    function builtIn() {
+      if (!canSpeak) return once();
+      try {
+        var u = new SpeechSynthesisUtterance(text.replace(/\s+/g, ' ').slice(0, 600));
+        u.lang = 'en-CA'; u.rate = 1.02; u.pitch = 0.95;
+        u.onend = once; u.onerror = once;
+        window.speechSynthesis.speak(u);
+        // Safety: some browsers never fire onend on a long utterance.
+        setTimeout(once, Math.min(22000, 2200 + text.length * 70));
+      } catch (e) { once(); }
+    }
+
+    if (!ttsAvailable) return builtIn();
+
+    fetch('/api/tts', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text.replace(/\s+/g, ' ').slice(0, 700) })
+    })
+      .then(function (r) {
+        if (r.status === 503) { ttsAvailable = false; throw new Error('not configured'); }
+        if (!r.ok) throw new Error('tts ' + r.status);
+        return r.blob();
+      })
+      .then(function (b) {
+        var url = URL.createObjectURL(b);
+        audio = new Audio(url);
+        audio.onended = function () { URL.revokeObjectURL(url); once(); };
+        audio.onerror = function () { URL.revokeObjectURL(url); builtIn(); };
+        return audio.play();
+      })
+      .catch(builtIn);
+  }
+
+  function vListen() {
+    if (!voiceMode) return;
+    vState('Listening…', 'listening');
+    try {
+      vRecog = new SR();
+      vRecog.lang = 'en-CA';
+      vRecog.interimResults = true;
+      vRecog.continuous = false;
+      var heard = '';
+      vRecog.onresult = function (e) {
+        var t = '';
+        for (var i = 0; i < e.results.length; i++) t += e.results[i][0].transcript;
+        heard = t;
+        var h = root.querySelector('#rk-heard');
+        if (h) h.textContent = t;
+      };
+      vRecog.onerror = function (e) {
+        if (!voiceMode) return;
+        if (e && (e.error === 'not-allowed' || e.error === 'service-not-allowed')) {
+          vState('Microphone blocked. Allow it in the padlock menu, or type instead.', '');
+          endVoice(true);
+          return;
+        }
+        if (e && e.error === 'no-speech') { vListen(); return; }   // just silence; keep waiting
+      };
+      vRecog.onend = function () {
+        if (!voiceMode) return;
+        var said = heard.trim();
+        var h = root.querySelector('#rk-heard');
+        if (!said) { vListen(); return; }
+        if (h) h.textContent = '';
+        vAsk(said);
+      };
+      vRecog.start();
+    } catch (err) { vState('Could not start the microphone.', ''); }
+  }
+
+  function vAsk(said) {
+    if (!voiceMode) return;
+    vState('Thinking…', 'thinking');
+    bubble('user', format(said));
+    messages.push({ role: 'user', content: said });
+    ga('rocky_voice_turn', { page: location.pathname });
+
+    fetch(ENDPOINT, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: messages.slice(-24), page: location.pathname, mode: 'voice' })
+    })
+      .then(function (r) { return r.json().catch(function () { return {}; }); })
+      .then(function (data) {
+        var reply = data.reply || 'Sorry, I missed that. Could you say it again?';
+        bubble('rocky', format(reply));
+        messages.push({ role: 'assistant', content: reply });
+        lastService = data.service || lastService;
+        answered = true;
+        save();
+        vState('Rocky is speaking…', 'speaking');
+        speakThen(reply, vListen);
+      })
+      .catch(function () {
+        var m = 'My connection dropped. Call Fabian on ' + PHONE + '.';
+        bubble('rocky', format(m));
+        vState('Connection lost.', '');
+        speakThen(m, function () { endVoice(true); });
+      });
+  }
+
+  function startVoice() {
+    if (!canListen || voiceMode) return;
+    voiceMode = true;
+    root.classList.add('rk-voice');
+    if (elVoice) elVoice.classList.add('on');
+    root.querySelector('#rk-stage').hidden = false;
+    elLaunch.setAttribute('aria-expanded', 'true');
+    ga('rocky_voice_start', { page: location.pathname });
+
+    var hello = 'Hi, I am Rocky, the AI guide for GTA Junk and Property Cleanout. ' +
+      'Tell me about the job and I will give you a price range in seconds.';
+    bubble('rocky', format(hello));
+    messages.push({ role: 'assistant', content: hello });
+    vState('Rocky is speaking…', 'speaking');
+    speakThen(hello, vListen);
+  }
+
+  function endVoice(keepPanel) {
+    voiceMode = false;
+    try { if (vRecog) vRecog.abort(); } catch (e) {}
+    vRecog = null;
+    stopSpeaking();
+    root.classList.remove('rk-voice');
+    if (elVoice) elVoice.classList.remove('on');
+    var st = root.querySelector('#rk-stage');
+    if (st) st.hidden = true;
+    var h = root.querySelector('#rk-heard');
+    if (h) h.textContent = '';
+    if (!keepPanel) setOpen(true);
+  }
+
+  var elVoice = root.querySelector('#rk-voice');
+  if (elVoice) elVoice.addEventListener('click', function () {
+    if (voiceMode) endVoice(); else startVoice();
+  });
+  var elEnd = root.querySelector('#rk-endvoice');
+  if (elEnd) elEnd.addEventListener('click', function () { endVoice(); });
+
+  /* ----------------------------------------------------------------- *
    * Lead capture — only once Rocky has been useful
    * ----------------------------------------------------------------- */
   function showLead() {
@@ -442,6 +616,7 @@
       ga('rocky_open', { page: location.pathname });
     } else {
       stopListening();
+      if (voiceMode) endVoice(true);
       stopSpeaking();
     }
   }
