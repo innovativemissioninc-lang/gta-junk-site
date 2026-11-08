@@ -352,12 +352,15 @@ footer{background:var(--navy-deep);color:#9FB0C2;padding:56px 0 0;font-size:14px
    padding:0 is load-bearing. The panel is a <section>, and this stylesheet
    sets section{padding:76px 0} for page layout, which otherwise puts 76px of
    white space above Rocky's header. */
-/* [hidden] must win. An author rule setting display on #rk-panel beats the
-   browser's own [hidden]{display:none}, regardless of specificity, because
-   author styles outrank the user-agent origin. Without the rule below the
-   panel was permanently open on every page and every device from the moment
-   the widget shipped — the single biggest thing wrong with it. */
-#rk-panel[hidden]{display:none!important}
+/* [hidden] must win, for EVERY element in this widget.
+   An author rule setting display beats the browser's own [hidden]{display:none}
+   regardless of specificity, because author styles outrank the user-agent
+   origin. This bit twice: first #rk-panel, which left the chat permanently
+   open on every page from the day it shipped, and then #rk-stage, which put
+   the voice screen on top of the chat before voice mode had even started.
+   Scoping the rule to #rocky means the next element given a display value and
+   a hidden attribute is covered without anyone having to remember. */
+#rocky [hidden]{display:none!important}
 #rk-panel{display:flex;flex-direction:column;
  width:min(92vw,352px);
  height:470px;
