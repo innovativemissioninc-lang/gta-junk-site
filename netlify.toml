@@ -24,7 +24,11 @@
     X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(self), microphone=(self), geolocation=()"
+    # microphone must name elevenlabs.io explicitly. "microphone=(self)" permits
+    # only our own origin, so the ElevenLabs agent was refused the microphone and
+    # the widget reported "Permission denied" the moment a call started. Verified
+    # on the live page: allowsFeature("microphone","https://elevenlabs.io") was false.
+    Permissions-Policy = "camera=(self), microphone=(self \"https://elevenlabs.io\"), geolocation=()"
 
 [[headers]]
   for = "/assets/*"
