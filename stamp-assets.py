@@ -12,7 +12,7 @@ import hashlib, glob, os, re, sys
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 ASSETS = [
     ('assets/site.css', r'href="/assets/site\.css(?:\?v=[0-9a-f]+)?"', 'href="/assets/site.css?v={h}"'),
-    ('assets/rocky.js', r'src="/assets/rocky\.js(?:\?v=[0-9a-f]+)?"', 'src="/assets/rocky.js?v={h}"'),
+    ('assets/concierge.js', r'src="/assets/concierge\.js(?:\?v=[0-9a-f]+)?"', 'src="/assets/concierge.js?v={h}"'),
 ]
 h = hashlib.md5(open('assets/site.css', 'rb').read()).hexdigest()[:10]
 n = 0
