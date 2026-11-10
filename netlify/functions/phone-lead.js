@@ -88,7 +88,7 @@ async function emailFabian(lead) {
 
 async function textCaller(to, name) {
   const sid = process.env.TWILIO_ACCOUNT_SID || process.env.TwilioSSID;
-  const token = process.env.TWILIO_AUTH_TOKEN;
+  const token = process.env.TWILIO_AUTH_TOKEN || process.env.TwilioAUTHToken;
   if (!sid || !token) return 'skipped: Twilio keys not set';
   const hello = name ? `Hi ${name}, thanks` : 'Thanks';
   const message =
