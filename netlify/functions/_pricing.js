@@ -28,8 +28,8 @@
 
 const MINIMUM = 1500;
 const DEPOSIT_PCT = 30;
-const PHONE = '(647) 204-0632';
-const PHONE_E164 = '+16472040632';
+const PHONE = '(416) 659-5401';
+const PHONE_E164 = '+14166595401';
 const EMAIL = 'gtajunkandpropertycleanout@gmail.com';
 const MECP = 'R-004-5477911257';
 const LIABILITY = '$2 million';

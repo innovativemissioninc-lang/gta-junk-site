@@ -38,8 +38,8 @@
   window.__rockyLoaded = true;
 
   var ENDPOINT = '/api/rocky';
-  var PHONE = '(647) 204-0632';
-  var PHONE_HREF = 'tel:+16472040632';
+  var PHONE = '(416) 659-5401';
+  var PHONE_HREF = 'tel:+14166595401';
   var AVATAR = '/assets/logo-icon.svg';
   var STORE = 'gtajunk_rocky_v1';
 

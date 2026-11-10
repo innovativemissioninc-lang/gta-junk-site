@@ -50,7 +50,7 @@
                          root.querySelector("button"));
       if (btn) { btn.click(); return; }
     } catch (e) {}
-    location.href = "tel:+16472040632";
+    location.href = "tel:+14166595401";
   }
 
   /* The nav strip, shown only once the agent has actually rendered — a bar

@@ -31,5 +31,5 @@ tool gets scraped or abused, add rate limiting by `client_ip_hash`.
 
 ## 5. Booking flow — ACTION REQUIRED
 Result screens currently point at `/contact/` (your Netlify quote form) and
-`tel:+16472040632`. If you move to Jobber, Workiz, or a calendar link, update
+`tel:+14166595401`. If you move to Jobber, Workiz, or a calendar link, update
 `actions.book_url` in `buildClientResponse()` — three places.

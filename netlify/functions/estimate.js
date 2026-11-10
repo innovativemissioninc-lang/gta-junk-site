@@ -150,7 +150,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         ok: false,
         error_code: 'not_configured',
-        message: "Our estimator is offline right now. Give us a call at (647) 204-0632 and we'll sort you out directly."
+        message: "Our estimator is offline right now. Give us a call at (416) 659-5401 and we'll sort you out directly."
       })
     };
   }
@@ -207,7 +207,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         ok: false,
         error_code: 'analysis_failed',
-        message: "Something went wrong reading your walkthrough. Give us a call at (647) 204-0632 — we'll get you a number the quick way."
+        message: "Something went wrong reading your walkthrough. Give us a call at (416) 659-5401 — we'll get you a number the quick way."
       })
     };
   }
@@ -404,8 +404,8 @@ function buildClientResponse(estimateId, a, d) {
         retry_label: 'Try another walkthrough',
         book_label: 'Book a free on-site valuation',
         book_url: '/contact/',
-        phone_label: 'Or call (647) 204-0632',
-        phone_href: 'tel:+16472040632'
+        phone_label: 'Or call (416) 659-5401',
+        phone_href: 'tel:+14166595401'
       }
     };
   }
@@ -435,8 +435,8 @@ function buildClientResponse(estimateId, a, d) {
       actions: {
         book_label: 'Book my free on-site valuation',
         book_url: '/contact/',
-        phone_label: 'Or call (647) 204-0632',
-        phone_href: 'tel:+16472040632'
+        phone_label: 'Or call (416) 659-5401',
+        phone_href: 'tel:+14166595401'
       }
     };
   }
@@ -460,8 +460,8 @@ function buildClientResponse(estimateId, a, d) {
     actions: {
       book_label: 'Book this cleanout',
       book_url: '/contact/',
-      phone_label: 'Or call (647) 204-0632',
-      phone_href: 'tel:+16472040632'
+      phone_label: 'Or call (416) 659-5401',
+      phone_href: 'tel:+14166595401'
     }
   };
 }
