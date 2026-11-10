@@ -13,6 +13,7 @@
  * ENVIRONMENT VARIABLES (Netlify → Site configuration → Environment variables)
  *   ELEVENLABS_WEBHOOK_SECRET  HMAC secret shown when the webhook is created
  *   TWILIO_ACCOUNT_SID         Twilio account that owns +1 365 536 5494
+ *                              (also read from TwilioSSID, the name first used)
  *   TWILIO_AUTH_TOKEN          its auth token
  * Without the Twilio pair the email still goes out; the text is skipped.
  * Without the webhook secret every request is refused.
@@ -86,7 +87,7 @@ async function emailFabian(lead) {
 }
 
 async function textCaller(to, name) {
-  const sid = process.env.TWILIO_ACCOUNT_SID;
+  const sid = process.env.TWILIO_ACCOUNT_SID || process.env.TwilioSSID;
   const token = process.env.TWILIO_AUTH_TOKEN;
   if (!sid || !token) return 'skipped: Twilio keys not set';
   const hello = name ? `Hi ${name}, thanks` : 'Thanks';
