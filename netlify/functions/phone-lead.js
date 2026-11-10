@@ -47,11 +47,56 @@ function verifySignature(rawBody, header, secret) {
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
-// Data collection fields come back as { value, rationale } objects.
+// Data collection fields come back as { value, rationale, ... } objects. The
+// agent's fields are shared workspace items, so ElevenLabs may key them by an
+// internal id rather than by the name (gtj_caller_name). Find each one by its
+// key, by any name/id property, by its name appearing anywhere in the entry,
+// or by the opening words of the description written for it.
+const DESCRIPTION_STARTS = {
+  gtj_caller_name: /^The caller's first name/i,
+  gtj_callback_number: /callback number|best number|phone number|number to call/i,
+  gtj_job: /^What needs to be removed/i,
+  gtj_town: /^The town or neighbourhood/i,
+  gtj_timing: /^When the customer needs/i,
+  gtj_summary: /summary of the call/i,
+  gtj_text_ok: /^True only if the caller clearly said yes/i
+};
+
+function entries(results) {
+  if (!results) return [];
+  if (Array.isArray(results)) return results.map((r, i) => [String(i), r]);
+  return Object.entries(results);
+}
+
+function findEntry(results, name) {
+  const list = entries(results);
+  const byKey = list.find(([k]) => k === name);
+  if (byKey) return byKey[1];
+  const byProp = list.find(([, r]) => r && [r.data_collection_id, r.name, r.identifier, r.json_schema && r.json_schema.name].includes(name));
+  if (byProp) return byProp[1];
+  const byText = list.find(([, r]) => r && JSON.stringify(r).includes(`"${name}"`));
+  if (byText) return byText[1];
+  const re = DESCRIPTION_STARTS[name];
+  const byDesc = re && list.find(([, r]) => {
+    const desc = r && ((r.json_schema && r.json_schema.description) || r.description || '');
+    return desc && re.test(desc);
+  });
+  return byDesc ? byDesc[1] : null;
+}
+
 function field(results, name) {
-  const r = results && results[name];
+  const r = findEntry(results, name);
   if (!r || r.value === null || r.value === undefined) return '';
   return String(r.value).trim();
+}
+
+// Shape of the results without any caller details, for the function log.
+function describeShape(results) {
+  return entries(results).map(([k, r]) => {
+    const props = r && typeof r === 'object' ? Object.keys(r).join('/') : typeof r;
+    const desc = r && r.json_schema && r.json_schema.description ? r.json_schema.description.slice(0, 30) : '';
+    return `${k}{${props}}${desc ? ' "' + desc + '"' : ''}`;
+  }).join(' | ');
 }
 
 function yes(value) {
@@ -137,6 +182,7 @@ exports.handler = async (event) => {
   } catch (e) { store = null; }
 
   const results = (data.analysis && data.analysis.data_collection_results) || {};
+  console.log('phone-lead', convId, 'fields:', describeShape(results));
   const phoneMeta = (data.metadata && data.metadata.phone_call) || {};
   const dyn = (data.conversation_initiation_client_data && data.conversation_initiation_client_data.dynamic_variables) || {};
   const callerId = toE164(phoneMeta.external_number || dyn.system__caller_id);
