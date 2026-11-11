@@ -18,6 +18,13 @@
  * Without the Twilio pair the email still goes out; the text is skipped.
  * Without the webhook secret every request is refused.
  *
+ * CPS HOT TUB MOVERS — Sam (website AI guide, agent_6001m6vxt0rhfja8m6wfkh8s0zps)
+ * The same webhook also handles Sam: every conversation where the visitor said
+ * something is emailed to Fabian through the CPS site's "ai-lead" form, and the
+ * visitor is texted from the CPS Twilio number (env CPS_SMS_FROM, e.g.
+ * +1XXXXXXXXXX) if they gave a number and agreed to a text. Never from the
+ * GTA Junk number: each business texts from its own number.
+ *
  * Retries: ElevenLabs may resend a webhook. Each conversation id is recorded
  * in Netlify Blobs so a caller is never texted twice for one call.
  */
@@ -59,8 +66,20 @@ const DESCRIPTION_STARTS = {
   gtj_town: /^The town or neighbourhood/i,
   gtj_timing: /^When the customer needs/i,
   gtj_summary: /summary of the call/i,
-  gtj_text_ok: /^True only if the caller clearly said yes/i
+  gtj_text_ok: /^True only if the caller clearly said yes/i,
+  cps_name: /^CPS: the visitor's first name/i,
+  cps_phone: /^CPS: the visitor's phone number/i,
+  cps_job: /^CPS: the hot tub job/i,
+  cps_town: /^CPS: the town/i,
+  cps_timing: /^CPS: when the visitor/i,
+  cps_text_ok: /^CPS: true only if the visitor clearly said yes/i,
+  cps_summary: /^CPS: a 2-3 sentence summary/i
 };
+
+const SAM_AGENT_ID = 'agent_6001m6vxt0rhfja8m6wfkh8s0zps';
+const CPS_SITE_URL = 'https://cpshottubmovers.ca';
+const CPS_PHOTO_NUMBER = '647-204-0632';
+const CPS_QUOTE_URL = 'https://cpshottubmovers.ca/#quote';
 
 function entries(results) {
   if (!results) return [];
@@ -131,12 +150,14 @@ async function emailFabian(lead) {
   return res.ok;
 }
 
-async function textCaller(to, name) {
+async function textCaller(to, name, opts = {}) {
+  const from = opts.from || SMS_FROM;
+  if (!from) return 'skipped: no texting number set for this business';
   const sid = process.env.TWILIO_ACCOUNT_SID || process.env.TwilioSSID;
   const token = process.env.TWILIO_AUTH_TOKEN || process.env.TwilioAUTHToken;
   if (!sid || !token) return 'skipped: Twilio keys not set';
   const hello = name ? `Hi ${name}, thanks` : 'Thanks';
-  const message =
+  const message = opts.message ? opts.message(hello) :
     `${hello} for calling GTA Junk and Property Cleanout. Fabian will call you back soon. ` +
     `To get your price faster, text photos or a short video of the job to ${PHOTO_NUMBER}, ` +
     `or upload them here: ${UPLOAD_URL} Reply STOP to opt out.`;
@@ -146,11 +167,57 @@ async function textCaller(to, name) {
       Authorization: 'Basic ' + Buffer.from(`${sid}:${token}`).toString('base64'),
       'Content-Type': 'application/x-www-form-urlencoded'
     },
-    body: new URLSearchParams({ To: to, From: SMS_FROM, Body: message }).toString()
+    body: new URLSearchParams({ To: to, From: from, Body: message }).toString()
   });
   if (res.ok) return 'sent';
   const err = await res.json().catch(() => ({}));
   return `failed: ${err.code || res.status} ${err.message || ''}`.trim();
+}
+
+// Sam (CPS website guide): email every real conversation, text if agreed.
+async function handleSam(data, results, convId) {
+  const turns = Array.isArray(data.transcript) ? data.transcript : [];
+  const userTurns = turns.filter((t) => t && t.role === 'user' && String(t.message || '').trim()).length;
+  if (turns.length && userTurns === 0) return { emailed: false, text: 'skipped: visitor said nothing' };
+
+  const name = field(results, 'cps_name');
+  const phone = toE164(field(results, 'cps_phone'));
+  const summary = field(results, 'cps_summary') || (data.analysis && data.analysis.transcript_summary) || '';
+  const job = field(results, 'cps_job');
+  const town = field(results, 'cps_town');
+
+  let text = 'skipped: no number given';
+  if (phone && yes(field(results, 'cps_text_ok'))) {
+    text = await textCaller(phone, firstName(name), {
+      from: process.env.CPS_SMS_FROM,
+      message: (hello) =>
+        `${hello} for chatting with CPS Hot Tub Movers. Fabian will be in touch soon. ` +
+        `For a flat-rate quote, text photos of your hot tub and the path to it to ${CPS_PHOTO_NUMBER}, ` +
+        `or send them here: ${CPS_QUOTE_URL} Reply STOP to opt out.`
+    });
+  } else if (phone) {
+    text = 'skipped: visitor did not agree to a text';
+  }
+
+  const subjectBits = [name || 'Visitor', town, job].filter(Boolean).join(', ');
+  const form = {
+    'form-name': 'ai-lead',
+    subject: `[CPS] Sam conversation: ${subjectBits}`.slice(0, 140),
+    name: name || '(not given)',
+    phone: phone ? pretty(phone) : '(not given)',
+    town,
+    job_type: job,
+    preferred_time: field(results, 'cps_timing'),
+    details: `Text to customer: ${text}`,
+    conversation_summary: summary,
+    page: convId ? `https://elevenlabs.io/app/agents/history/${convId}` : 'Sam conversation'
+  };
+  const res = await fetch(`${CPS_SITE_URL}/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams(form).toString()
+  });
+  return { emailed: res.ok, text };
 }
 
 exports.handler = async (event) => {
@@ -168,7 +235,7 @@ exports.handler = async (event) => {
   // Only full transcripts from the GTA Junk phone agent. Everything else
   // (Sam, Rocky, audio or failure events) is acknowledged and ignored.
   const data = payload.data || {};
-  if (payload.type !== 'post_call_transcription' || data.agent_id !== PHONE_AGENT_ID) {
+  if (payload.type !== 'post_call_transcription' || ![PHONE_AGENT_ID, SAM_AGENT_ID].includes(data.agent_id)) {
     return { statusCode: 200, body: 'ignored' };
   }
 
@@ -182,7 +249,15 @@ exports.handler = async (event) => {
   } catch (e) { store = null; }
 
   const results = (data.analysis && data.analysis.data_collection_results) || {};
-  console.log('phone-lead', convId, 'fields:', describeShape(results));
+  console.log('phone-lead', data.agent_id, convId, 'fields:', describeShape(results));
+
+  if (data.agent_id === SAM_AGENT_ID) {
+    const res = await handleSam(data, results, convId);
+    if (store && convId) {
+      try { await store.set(convId, JSON.stringify({ at: new Date().toISOString(), ...res })); } catch (e) {}
+    }
+    return { statusCode: 200, body: JSON.stringify(res) };
+  }
   const phoneMeta = (data.metadata && data.metadata.phone_call) || {};
   const dyn = (data.conversation_initiation_client_data && data.conversation_initiation_client_data.dynamic_variables) || {};
   const callerId = toE164(phoneMeta.external_number || dyn.system__caller_id);
