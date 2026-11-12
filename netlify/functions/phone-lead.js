@@ -73,13 +73,23 @@ const DESCRIPTION_STARTS = {
   cps_town: /^CPS: the town/i,
   cps_timing: /^CPS: when the visitor/i,
   cps_text_ok: /^CPS: true only if the visitor clearly said yes/i,
-  cps_summary: /^CPS: a 2-3 sentence summary/i
+  cps_summary: /^CPS: a 2-3 sentence summary/i,
+  pa_name: /^PA: the caller's name/i,
+  pa_phone: /^PA: a different callback number/i,
+  pa_caller_type: /^PA: who is calling/i,
+  pa_reason: /^PA: the message for Fabian/i,
+  pa_callback: /^PA: when the caller would like/i,
+  pa_urgent: /^PA: true only if the caller said it is urgent/i
 };
 
 const SAM_AGENT_ID = 'agent_6001m6vxt0rhfja8m6wfkh8s0zps';
 const CPS_SITE_URL = 'https://cpshottubmovers.ca';
 const CPS_PHOTO_NUMBER = '647-204-0632';
 const CPS_QUOTE_URL = 'https://cpshottubmovers.ca/#quote';
+
+// Fabian's personal assistant: answers his 647 cell after 3 rings.
+const PA_AGENT_ID = 'agent_1101m77r6zt5f8fa8zshse39tjyv';
+const FABIAN_CELL = '+16472040632';
 
 function entries(results) {
   if (!results) return [];
@@ -220,6 +230,54 @@ async function handleSam(data, results, convId) {
   return { emailed: res.ok, text };
 }
 
+// Personal assistant: email Fabian and text his cell after every real call.
+async function handleAssistant(data, results, convId) {
+  const turns = Array.isArray(data.transcript) ? data.transcript : [];
+  const userTurns = turns.filter((t) => t && t.role === 'user' && String(t.message || '').trim()).length;
+  const phoneMeta = (data.metadata && data.metadata.phone_call) || {};
+  const dyn = (data.conversation_initiation_client_data && data.conversation_initiation_client_data.dynamic_variables) || {};
+  const callerId = toE164(phoneMeta.external_number || dyn.system__caller_id);
+  const callback = toE164(field(results, 'pa_phone')) || callerId;
+  const name = field(results, 'pa_name');
+  const type = field(results, 'pa_caller_type');
+  const reason = field(results, 'pa_reason');
+  const when = field(results, 'pa_callback');
+  const urgent = yes(field(results, 'pa_urgent'));
+  const summary = (data.analysis && data.analysis.transcript_summary) || '';
+  const silent = turns.length && userTurns === 0;
+  const spam = /sales|spam/i.test(type);
+
+  const who = [name || 'Caller', callback ? pretty(callback) : 'no number'].join(', ');
+  let text = 'skipped';
+  if (!spam) {
+    const msg = silent
+      ? `Missed call from ${callerId ? pretty(callerId) : 'a hidden number'}. They hung up without talking to your assistant.`
+      : `${urgent ? 'URGENT. ' : ''}Missed call: ${who}${type ? ' (' + type + ')' : ''}. ` +
+        `${reason || summary}`.trim() + (when ? ` Call back: ${when}.` : '');
+    text = await textCaller(FABIAN_CELL, '', { from: process.env.PA_SMS_FROM, message: () => msg.slice(0, 600) });
+  }
+
+  if (silent && !callerId) return { emailed: false, text };
+  const form = {
+    'form-name': 'ai-lead',
+    subject: `${urgent ? '[URGENT] ' : ''}[Assistant] Missed call: ${who}${type ? ' - ' + type : ''}`.slice(0, 140),
+    name: name || '(not given)',
+    phone: callback ? pretty(callback) : '(not given)',
+    town: '',
+    job_type: type,
+    preferred_time: when,
+    details: [reason, `Caller ID: ${callerId ? pretty(callerId) : 'hidden'}`, `Urgent: ${urgent ? 'yes' : 'no'}`, `Text to you: ${text}`].filter(Boolean).join('\n'),
+    conversation_summary: silent ? 'Caller hung up without speaking.' : summary,
+    page: convId ? `https://elevenlabs.io/app/agents/history/${convId}` : 'Assistant call'
+  };
+  const res = await fetch(`${CPS_SITE_URL}/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams(form).toString()
+  });
+  return { emailed: res.ok, text };
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'POST only' };
 
@@ -235,7 +293,7 @@ exports.handler = async (event) => {
   // Only full transcripts from the GTA Junk phone agent. Everything else
   // (Sam, Rocky, audio or failure events) is acknowledged and ignored.
   const data = payload.data || {};
-  if (payload.type !== 'post_call_transcription' || ![PHONE_AGENT_ID, SAM_AGENT_ID].includes(data.agent_id)) {
+  if (payload.type !== 'post_call_transcription' || ![PHONE_AGENT_ID, SAM_AGENT_ID, PA_AGENT_ID].includes(data.agent_id)) {
     return { statusCode: 200, body: 'ignored' };
   }
 
@@ -251,8 +309,8 @@ exports.handler = async (event) => {
   const results = (data.analysis && data.analysis.data_collection_results) || {};
   console.log('phone-lead', data.agent_id, convId, 'fields:', describeShape(results));
 
-  if (data.agent_id === SAM_AGENT_ID) {
-    const res = await handleSam(data, results, convId);
+  if (data.agent_id === SAM_AGENT_ID || data.agent_id === PA_AGENT_ID) {
+    const res = data.agent_id === SAM_AGENT_ID ? await handleSam(data, results, convId) : await handleAssistant(data, results, convId);
     if (store && convId) {
       try { await store.set(convId, JSON.stringify({ at: new Date().toISOString(), ...res })); } catch (e) {}
     }
