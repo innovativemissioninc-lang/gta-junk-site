@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>GTA Junk and Property Cleanout</title>
+<link rel="icon" href="/assets/logo-icon.svg">
+<style>
+:root{--navy:#0F1A2E;--orange:#F47C20;--ink:#101A2D;--muted:#5D6B7E;--line:#E3DED3;--bg:#F4F1EA}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink)}
+.page{max-width:780px;margin:24px auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px}
+.head{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:3px solid var(--orange);padding-bottom:16px;margin-bottom:18px}
+.head img{height:44px}.biz{font-size:14px;color:var(--muted);text-align:right}
+h1{margin:0 0 4px;font-size:26px;color:var(--navy)}.meta{color:var(--muted);font-size:14px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.lbl{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+table{width:100%;border-collapse:collapse;margin:8px 0 4px}th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}td.n,th.n{text-align:right;white-space:nowrap}
+.tot{margin-left:auto;max-width:320px}.tot div{display:flex;justify-content:space-between;padding:4px 0}.tot .big{font-size:20px;font-weight:800;border-top:2px solid var(--navy);margin-top:6px;padding-top:8px}
+.box{background:#FBF8F2;border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:16px;font-size:14px;white-space:pre-wrap}
+.status{display:inline-block;padding:4px 10px;border-radius:999px;font-size:13px;font-weight:700;background:#EEF1F5}
+.status.Paid,.status.Accepted{background:#E3F5EA;color:#146C3A}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.btn{background:var(--orange);color:#fff;border:0;border-radius:12px;padding:13px 18px;font-weight:700;font-size:16px;cursor:pointer;text-decoration:none}
+.btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--line)}
+input{font:inherit;padding:12px;border:1px solid #CFC9BC;border-radius:10px;min-width:220px}
+.err{max-width:560px;margin:80px auto;text-align:center;color:var(--muted)}
+@media (max-width:600px){.page{margin:0;border-radius:0;border:0;padding:20px 16px}.cols{grid-template-columns:1fr}.biz{text-align:left}}
+@media print{body{background:#fff}.page{border:0;margin:0}.actions{display:none}}
+</style>
+</head>
+<body>
+<div id="root"><p class="err">Loading…</p></div>
+<script>
+(async function () {
+  const root = document.getElementById('root');
+  const q = new URLSearchParams(location.search);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const $ = (n) => '$' + Number(n || 0).toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const day = (d) => d ? new Date(d.length === 10 ? d + 'T12:00:00' : d).toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+  async function call(action, extra) {
+    const r = await fetch('/api/crm', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, id: q.get('id'), t: q.get('t'), ...extra }) });
+    const o = await r.json().catch(() => ({})); if (!r.ok) throw new Error(o.error || 'This link is not valid.'); return o.doc;
+  }
+  function render(d) {
+    const b = d.business, isQ = d.type === 'quote';
+    document.title = `${isQ ? 'Quote' : 'Invoice'} ${d.id} · ${b.name}`;
+    root.innerHTML = `<div class="page">
+      <div class="head"><div><img src="/assets/logo-horizontal-light.svg" alt="${esc(b.name)}"></div>
+        <div class="biz">${esc(b.name)}<br>${esc(b.phone)} · ${esc(b.email)}<br>${esc(b.website)}${b.hstNumber ? '<br>HST # ' + esc(b.hstNumber) : ''}</div></div>
+      <h1>${isQ ? 'Quote' : 'Invoice'} ${esc(d.id)}</h1>
+      <div class="meta">Issued ${day(d.created)}${isQ && d.validUntil ? ' · Valid until ' + day(d.validUntil) : ''} · <span class="status ${esc(d.status)}">${esc(d.status === 'Sent' || d.status === 'Draft' ? (isQ ? 'Awaiting approval' : 'Due') : d.status)}</span></div>
+      <div class="cols"><div><div class="lbl">${isQ ? 'Prepared for' : 'Bill to'}</div>${esc(d.customerName)}<br>${esc(d.customerAddress || '')}</div>
+        <div>${d.jobDate ? `<div class="lbl">Job date</div>${day(d.jobDate)}` : ''}</div></div>
+      <table><thead><tr><th>Description</th><th class="n">Qty</th><th class="n">Price</th><th class="n">Amount</th></tr></thead><tbody>
+        ${(d.items || []).map((it) => `<tr><td>${esc(it.desc)}</td><td class="n">${esc(it.qty)}</td><td class="n">${$(it.price)}</td><td class="n">${$(it.qty * it.price)}</td></tr>`).join('')}
+      </tbody></table>
+      <div class="tot"><div><span>Subtotal</span><span>${$(d.subtotal)}</span></div>
+        ${d.discount ? `<div><span>Discount</span><span>−${$(d.discount)}</span></div>` : ''}
+        ${d.tax ? `<div><span>HST (${d.taxRate}%)</span><span>${$(d.tax)}</span></div>` : ''}
+        <div class="big"><span>Total</span><span>${$(d.total)}</span></div>
+        ${isQ ? `<div><span>Deposit to book (${b.depositPct}%)</span><span>${$(d.deposit)}</span></div>` : ''}
+        ${!isQ && d.paid ? `<div><span>Paid</span><span>−${$(d.paid)}</span></div><div class="big"><span>Balance due</span><span>${$(d.balance)}</span></div>` : ''}</div>
+      ${d.notes ? `<div class="box"><b>${isQ ? 'Scope of work' : 'Notes'}</b>\n${esc(d.notes)}</div>` : ''}
+      ${!isQ || d.status !== 'Paid' ? `<div class="box"><b>How to pay</b>\n${esc(b.payment)}</div>` : ''}
+      <div class="box"><b>Terms</b>\n${esc(b.terms)}</div>
+      <div class="actions" id="act">
+        ${isQ && d.status !== 'Accepted' ? `<input id="nm" placeholder="Your name" autocomplete="name"><button class="btn" id="acc">Accept this quote</button>` : ''}
+        ${isQ && d.status === 'Accepted' ? `<div class="status Accepted">Accepted ${day(d.acceptedAt)}${d.acceptedName ? ' by ' + esc(d.acceptedName) : ''}. We'll be in touch to book your date.</div>` : ''}
+        <button class="btn ghost" onclick="print()">Print / Save PDF</button>
+        <a class="btn ghost" href="tel:${esc(String(b.phone).replace(/[^0-9+]/g, ''))}">Call us</a></div>
+    </div>`;
+    const acc = document.getElementById('acc');
+    if (acc) acc.onclick = async () => { acc.disabled = true; try { render(await call('acceptQuote', { name: document.getElementById('nm').value })); } catch (e) { alert(e.message); acc.disabled = false; } };
+  }
+  try { render(await call('publicDoc')); } catch (e) { root.innerHTML = `<p class="err">${esc(e.message)}<br>Please contact GTA Junk and Property Cleanout at (416) 659-5401.</p>`; }
+})();
+</script>
+</body>
+</html>

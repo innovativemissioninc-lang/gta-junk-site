@@ -9,6 +9,8 @@
  */
 const crypto = require('crypto');
 const { STATUSES, newId, clean, prettyPhone, listRecords } = require('./crm-lib');
+const docs = require('./crm-docs');
+const { runAssistant } = require('./crm-assistant');
 
 const SETUP_HASH = 'c3851e25789d1e0f7c66a6cca6c814805c8d54da71111caf6dbcaaa7c6e9d69b';
 const TOKEN_DAYS = 60;
@@ -79,6 +81,23 @@ exports.handle = async (event, store) => {
       await store.setJSON(userKey(name), user, { onlyIfNew: true });
       return json(200, { token: await sign(store, user), user: publicUser(user) });
     }
+    if (a === 'publicDoc' || a === 'acceptQuote') {
+      const d = await store.get(`doc/${clean(body.id, 60)}`, { type: 'json' });
+      if (!d || !body.t || d.token !== String(body.t) || d.status === 'Void') return json(404, { error: 'This link is not valid.' });
+      const settings = await docs.getSettings(store);
+      if (a === 'acceptQuote') {
+        if (d.type !== 'quote') return json(400, { error: 'Not a quote' });
+        if (d.status !== 'Accepted') {
+          d.status = 'Accepted'; d.acceptedAt = new Date().toISOString(); d.acceptedName = clean(body.name, 80);
+          await store.setJSON(`doc/${d.id}`, d);
+          const l = d.leadId && await store.get(`lead/${d.leadId}`, { type: 'json' });
+          if (l) { l.notes = [{ at: d.acceptedAt, by: 'Customer', text: `Accepted quote ${d.id} online${d.acceptedName ? ' (' + d.acceptedName + ')' : ''}. Book the job and collect the deposit.` }, ...(l.notes || [])]; l.unread = true; l.followUp = d.acceptedAt.slice(0, 10); l.updated = d.acceptedAt; await store.setJSON(`lead/${l.id}`, l); }
+        }
+      } else if (d.status === 'Sent' && !d.viewedAt) {
+        d.viewedAt = new Date().toISOString(); await store.setJSON(`doc/${d.id}`, d);
+      }
+      return json(200, { doc: docs.publicDoc(d, settings) });
+    }
     if (a === 'login') {
       const user = await store.get(userKey(body.name || ''), { type: 'json', consistency: 'strong' });
       if (!user) return json(401, { error: 'Name or PIN is wrong.' });
@@ -100,8 +119,55 @@ exports.handle = async (event, store) => {
     const now = new Date().toISOString();
 
     if (a === 'load') {
-      const [leads, partners, users] = await Promise.all([listRecords(store, 'lead/'), listRecords(store, 'partner/'), listRecords(store, 'user/')]);
-      return json(200, { me: publicUser(me), leads, partners, users: users.map(publicUser), statuses: STATUSES, partnerStages: PARTNER_STAGES });
+      const [leads, partners, users, allDocs, settings] = await Promise.all([listRecords(store, 'lead/'), listRecords(store, 'partner/'), listRecords(store, 'user/'), listRecords(store, 'doc/'), docs.getSettings(store)]);
+      return json(200, { me: publicUser(me), leads, partners, users: users.map(publicUser), statuses: STATUSES, partnerStages: PARTNER_STAGES,
+        docs: allDocs.map((d) => ({ ...d, url: docs.docUrl(d) })), settings });
+    }
+
+    if (a === 'assistant') {
+      const out = await runAssistant({ store, me, history: body.history });
+      return json(200, out);
+    }
+    if (a === 'sendSms') {
+      const to = '+1' + String(body.to || '').replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '');
+      const text = clean(body.body, 1200);
+      if (to.length !== 12 || !text) return json(400, { error: 'Need a 10-digit number and a message.' });
+      const settings = await docs.getSettings(store);
+      const r = await docs.sendSms(to, text, settings.smsFrom);
+      if (!r.ok) return json(502, { error: r.error });
+      const note = { at: now, by: me.name, text: `Texted from ${prettyPhone(settings.smsFrom)}: "${text}"` };
+      for (const [kind, id] of [['lead', body.leadId], ['partner', body.partnerId]]) {
+        if (!id) continue;
+        const rec = await store.get(`${kind}/${id}`, { type: 'json' });
+        if (!rec) continue;
+        rec.notes = [note, ...(rec.notes || [])]; rec.updated = now;
+        if (kind === 'lead') {
+          if (body.purpose === 'review') rec.reviewAsked = now.slice(0, 10);
+          if (body.purpose === 'reply' && rec.status === 'New') rec.status = 'Contacted';
+        } else rec.lastTouch = now.slice(0, 10);
+        await store.setJSON(`${kind}/${id}`, rec);
+      }
+      // A quote/invoice link inside the text marks that document Sent.
+      const m = text.match(/\/crm\/doc\/\?id=([A-Z0-9-]+)/);
+      if (m) { const d = await store.get(`doc/${m[1]}`, { type: 'json' }); if (d && d.status === 'Draft') { d.status = 'Sent'; d.sentAt = now; await store.setJSON(`doc/${d.id}`, d); } }
+      return json(200, { ok: true });
+    }
+    if (a === 'saveDoc') {
+      const input = body.doc || {};
+      if (input.leadId && !input.id) {
+        const l = await store.get(`lead/${input.leadId}`, { type: 'json' });
+        if (l) Object.assign(input, { customerName: l.name, customerPhone: l.phone, customerEmail: l.email, customerAddress: [l.address, l.town].filter(Boolean).join(', '), jobDate: input.jobDate || l.jobDate });
+      }
+      const d = await docs.saveDoc(store, input, me.name);
+      return json(200, { doc: { ...d, url: docs.docUrl(d) } });
+    }
+    if (a === 'saveSettings') {
+      if (me.role !== 'owner') return json(403, { error: 'Only the owner can change business settings.' });
+      const cur = await docs.getSettings(store);
+      const next = { ...cur };
+      for (const k of Object.keys(docs.DEFAULT_SETTINGS)) if (k in (body.settings || {})) next[k] = ['hstRate', 'depositPct', 'quoteValidDays'].includes(k) ? docs.num(body.settings[k]) : clean(body.settings[k], 1500);
+      await store.setJSON('config/settings', next);
+      return json(200, { settings: next });
     }
 
     if (a === 'saveLead') {

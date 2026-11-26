@@ -73,3 +73,28 @@ textarea.in{min-height:84px;resize:vertical}
 details.more{margin-top:6px}
 details.more summary{cursor:pointer;color:var(--blue);font-size:14px}
 @media (min-width:700px){.stats{grid-template-columns:repeat(4,1fr)}}
+/* v2: assistant, calendar, documents */
+header.top .gear{background:none;border:0;color:#fff;font-size:20px;cursor:pointer;padding:0 0 0 6px}
+nav.tabs .mic-tab{color:var(--navy);font-weight:700}
+nav.tabs .mic-ic{display:grid;place-items:center;width:46px;height:46px;margin-top:-22px;border-radius:50%;background:var(--orange);color:#fff;font-size:22px;box-shadow:0 4px 14px rgba(244,124,32,.45);border:3px solid #fff}
+nav.tabs .mic-tab.on .mic-ic{background:var(--navy)}
+.chat{display:flex;flex-direction:column;gap:8px;padding-bottom:8px}
+.bub{max-width:88%;padding:10px 13px;border-radius:16px;white-space:pre-wrap;word-wrap:break-word}
+.bub.me{align-self:flex-end;background:var(--navy);color:#fff;border-bottom-right-radius:4px}
+.bub.bot{align-self:flex-start;background:#fff;border:1px solid var(--line);border-bottom-left-radius:4px}
+.bub.typing{color:var(--muted);font-style:italic}
+.pcard{align-self:stretch;background:#FFF8F1;border:1px solid #F5C9A3;border-radius:14px;padding:10px 12px}
+.pcard.done{background:#EEF6F0;border-color:#BFE0CB;color:var(--green);font-weight:600}
+.composer{position:sticky;bottom:calc(66px + env(safe-area-inset-bottom));display:flex;gap:8px;align-items:flex-end;background:var(--bg);padding:8px 0}
+.composer textarea{min-height:46px;max-height:140px}
+.micbtn{flex:none;width:52px;height:52px;border-radius:50%;border:0;background:var(--orange);color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 12px rgba(244,124,32,.4)}
+.micbtn.on{background:var(--red);animation:pulse 1.2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(192,57,43,.5)}70%{box-shadow:0 0 0 14px rgba(192,57,43,0)}100%{box-shadow:0 0 0 0 rgba(192,57,43,0)}}
+.linkbtn{background:none;border:0;color:var(--blue);cursor:pointer;padding:6px 2px;font-size:14px}
+.small-btn{padding:8px 12px;font-size:14px}
+.sheet-bg{position:fixed;inset:0;background:rgba(15,26,46,.45);z-index:30;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:#fff;width:100%;max-width:560px;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom))}
+.sheet textarea{margin-top:10px}
+.itemrow{display:grid;grid-template-columns:1fr 54px 90px 26px;gap:6px;margin-bottom:6px;align-items:center}
+.totals{margin-top:12px}
+.empty .chip{margin:4px 2px}
