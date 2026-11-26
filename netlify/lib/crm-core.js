@@ -8,7 +8,6 @@
  * Data lives in Netlify Blobs (store "crm"); see netlify/lib/crm-lib.js.
  */
 const crypto = require('crypto');
-const blobs = require('@netlify/blobs');
 const { STATUSES, newId, clean, prettyPhone, listRecords } = require('./crm-lib');
 
 const SETUP_HASH = 'c3851e25789d1e0f7c66a6cca6c814805c8d54da71111caf6dbcaaa7c6e9d69b';
@@ -57,9 +56,8 @@ async function verify(store, token) {
 }
 const publicUser = (u) => ({ name: u.name, role: u.role });
 
-exports.handle = async (event) => {
+exports.handle = async (event, store) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'POST only' });
-  const store = blobs.getStore({ name: 'crm', consistency: 'strong' });
   let body;
   try { body = JSON.parse(event.body || '{}'); } catch (e) { return json(400, { error: 'bad json' }); }
   const a = body.action;

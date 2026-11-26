@@ -9,7 +9,6 @@
  * mapped below. Errors are logged and swallowed: a CRM problem must never
  * break the form email Fabian already gets.
  */
-const blobs = require('@netlify/blobs');
 const { addInboundLead, newId, clean, prettyPhone } = require('./crm-lib');
 
 const SOURCES = {
@@ -31,12 +30,11 @@ function pick(d, ...keys) {
   return '';
 }
 
-exports.handle = async (body) => {
+exports.handle = async (body, store) => {
   try {
     const p = body.payload || {};
     const form = p.form_name || (p.data && p.data['form-name']) || '';
     const d = p.data || {};
-    const store = blobs.getStore({ name: 'crm', consistency: 'strong' });
 
     if (form === 'partner-enquiry') {
       const now = new Date().toISOString();
