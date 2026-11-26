@@ -1,5 +1,5 @@
 /**
- * Netlify event function: runs automatically after every VERIFIED form
+ * CRM intake (wrapped by netlify/functions/submission-created.mjs). Runs automatically after every VERIFIED form
  * submission on this site (spam-filtered submissions never reach it).
  * Turns each GTA Junk enquiry into a CRM lead (store "crm").
  *
@@ -10,7 +10,7 @@
  * break the form email Fabian already gets.
  */
 const blobs = require('@netlify/blobs');
-const { addInboundLead, newId, clean, prettyPhone } = require('../lib/crm-lib');
+const { addInboundLead, newId, clean, prettyPhone } = require('./crm-lib');
 
 const SOURCES = {
   'quote-request': 'Website form',
@@ -31,13 +31,11 @@ function pick(d, ...keys) {
   return '';
 }
 
-exports.handler = async (event) => {
+exports.handle = async (body) => {
   try {
-    const body = JSON.parse(event.body || '{}');
     const p = body.payload || {};
     const form = p.form_name || (p.data && p.data['form-name']) || '';
     const d = p.data || {};
-    if (blobs.connectLambda) blobs.connectLambda(event);
     const store = blobs.getStore({ name: 'crm', consistency: 'strong' });
 
     if (form === 'partner-enquiry') {

@@ -1,5 +1,3 @@
-# GTA Junk CRM API (phone app at /crm/)
-/api/crm  /.netlify/functions/crm  200
 
 # 301 redirects — Netlify format: /old-path  /new-path  301
 # The site was never deployed under the old "GTA Junk & Garage Cleanouts" name,
