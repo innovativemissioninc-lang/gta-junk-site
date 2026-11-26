@@ -20,7 +20,9 @@ const DEFAULT_SETTINGS = {
   quoteTerms: 'Price is fixed for the scope described. A 30% deposit confirms the booking and comes off the final invoice. Balance due on completion after you walk the site with us. Heavy materials (soil, concrete, shingles, tile) are billed by the tonne with scale tickets.',
   invoiceTerms: 'Due on receipt. Thank you for choosing GTA Junk and Property Cleanout.',
   reviewUrl: 'https://g.page/r/CWUHyrYovKM_EAI/review',
-  smsFrom: '+13655365494'
+  smsFrom: '+13655365494',
+  ownerMobile: '+16472040632', // customer replies are forwarded here; daily brief goes here
+  dailyBrief: 'on'
 };
 
 async function getSettings(store) {

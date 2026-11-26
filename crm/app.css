@@ -101,3 +101,17 @@ nav.tabs .mic-tab.on .mic-ic{background:var(--navy)}
 .thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:10px}
 .thumbs img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px}
 label.btn input[hidden]{display:none}
+/* v4: playbook */
+.task{padding:12px}
+.task.urgent{border-left:4px solid var(--orange)}
+.checklist{padding:6px 12px}
+.checklist .stage{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:10px 0 2px}
+.ck{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #F0ECE3;cursor:pointer;font-size:15px}
+.ck:last-child{border-bottom:0}
+.ck .box{width:22px;height:22px;border-radius:6px;border:2px solid #CFC9BC;display:grid;place-items:center;font-size:14px;font-weight:800;color:#fff;flex:none}
+.ck.done .box{background:var(--green);border-color:var(--green)}
+.ck.done .grow{color:var(--muted)}
+.pth{aspect-ratio:1;border-radius:6px;background:#E6E1D6 center/cover;position:relative;cursor:pointer}
+.pth span{position:absolute;left:4px;bottom:4px;background:rgba(15,26,46,.7);color:#fff;font-size:11px;padding:1px 6px;border-radius:999px}
+.note.msg-in{border-left-color:var(--orange);background:#FFF8F1;border-radius:0 10px 10px 0}
+.note.msg-out{border-left-color:var(--blue)}

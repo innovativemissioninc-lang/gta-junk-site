@@ -70,7 +70,7 @@ function priceFrom(read, est) {
   return { lines, subtotal: rounded, buffer: est.confidenceBuffer[conf] || 1.12, confidence: conf };
 }
 
-async function analyze({ store, me, leadId, frames, notes }) {
+async function analyze({ store, me, leadId, frames, notes, checklist }) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return { error: 'The Anthropic API key is missing on Netlify.' };
   const imgs = (frames || []).filter((f) => typeof f === 'string' && f.startsWith('data:image/jpeg;base64,')).slice(0, MAX_FRAMES);
@@ -85,7 +85,7 @@ async function analyze({ store, me, leadId, frames, notes }) {
     content.push({ type: 'text', text: `Frame ${i + 1} of ${imgs.length}` });
     content.push({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: d.split(',')[1] } });
   });
-  content.push({ type: 'text', text: `Owner's notes: ${clean(notes, 3000) || '(none)'}\nCustomer: ${lead ? `${lead.name}, ${[lead.address, lead.town].filter(Boolean).join(', ')}. Lead details: ${clean(lead.details, 800)}` : 'not linked'}` });
+  content.push({ type: 'text', text: `Owner's notes: ${clean(notes, 3000) || '(none)'}\nWalkthrough checklist the owner confirmed: ${clean(checklist, 600) || '(none)'}\nCustomer: ${lead ? `${lead.name}, ${[lead.address, lead.town].filter(Boolean).join(', ')}. Lead details: ${clean(lead.details, 800)}` : 'not linked'}` });
 
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -104,13 +104,16 @@ async function analyze({ store, me, leadId, frames, notes }) {
   // Keep up to 6 frames as a record for the crew (small JPEGs).
   const keep = imgs.filter((_, i) => i % Math.ceil(imgs.length / 6) === 0).slice(0, 6);
   for (let i = 0; i < keep.length; i++) await store.set(`media/${id}/${i}.jpg`, Buffer.from(keep[i].split(',')[1], 'base64'));
-  const walk = { id, created: now, by: me.name, leadId: leadId || '', notes: clean(notes, 3000), read, price, frames: keep.length, token: crypto.randomBytes(8).toString('hex') };
+  const walk = { id, created: now, by: me.name, leadId: leadId || '', notes: clean(notes, 3000), checklist: clean(checklist, 600), read, price, frames: keep.length, token: crypto.randomBytes(8).toString('hex') };
   await store.setJSON(`walk/${id}`, walk);
 
   if (lead) {
     const hz = (read.hazards || []).length ? ` Hazards: ${read.hazards.join(', ')}.` : '';
     lead.notes = [{ at: now, by: `${me.name} (video estimate)`, text: `Video walkthrough: ${read.summary_for_owner || ''} ~${Math.round(num(read.cubic_yards))} cu yd, ${read.crew_size || 3} crew ~${read.onsite_hours || '?'} h. Suggested $${price.subtotal} before HST (${price.confidence} confidence).${hz}` }, ...(lead.notes || [])];
     if (!lead.job && read.job_type) lead.job = read.job_type;
+    lead.checks = { ...(lead.checks || {}), walkthrough: now.slice(0, 10) };
+    if (lead.status === 'New') lead.status = 'Contacted';
+    lead.walkDoc = clean(checklist, 600);
     lead.updated = now;
     await store.setJSON(`lead/${lead.id}`, lead);
   }

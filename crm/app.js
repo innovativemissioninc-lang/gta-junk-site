@@ -75,6 +75,36 @@
   }
 
   // ---------- views ----------
+  // ---------- playbook (crm/playbook.js) ----------
+  const PB = window.GTJPlaybook;
+  const docsWithUrl = () => S.docs;
+  const pbCtx = () => ({ today: today(), settings: S.settings, me: S.me.name, nowMs: Date.now() });
+  const allTasks = () => PB.tasks(S.leads, docsWithUrl(), S.partners, pbCtx());
+  function pbText(purpose, l) { return PB.message(purpose, l, PB.stateOf(l, docsWithUrl()), pbCtx()); }
+  async function setCheck(l, key, value, extra) {
+    const r = await api('saveLead', { lead: { id: l.id, checks: { [key]: value === undefined ? today() : value }, ...(extra || {}) } });
+    upsert(S.leads, r.lead); return r.lead;
+  }
+  async function doTask(t) {
+    const l = lead(t.leadId); const a = t.action;
+    if (a.kind === 'go') return go(a.href);
+    if (a.kind === 'sms') { if (!l.phone) { toast('Add a phone number first'); return go('#/lead/' + l.id); } return confirmSend({ to: l.phone, who: l.name, leadId: l.id, purpose: a.purpose, body: pbText(a.purpose, l) }, () => render()); }
+    if (a.kind === 'check') {
+      if (a.key === 'deposit') return depositPrompt(l);
+      if (a.key === 'paid') { const inv = PB.stateOf(l, S.docs).invoice; if (inv) return go('#/doc/' + inv.id); }
+      await setCheck(l, a.key); toast('Done ✓'); render();
+    }
+  }
+  async function depositPrompt(l) {
+    const q = PB.stateOf(l, S.docs).quote;
+    const v = prompt(`Deposit received from ${l.name}? Amount ($):`, q ? q.deposit.toFixed(2) : '');
+    if (v === null) return;
+    await setCheck(l, 'deposit', today(), { depositPaid: v });
+    toast('Deposit recorded ✓'); render();
+  }
+  const taskCard = (t) => `<div class="card task ${t.pri === 0 || t.overdue ? 'urgent' : ''}"><div class="row"><div class="grow"><div class="title" style="white-space:normal">${esc(t.title)}</div><div class="muted small">${t.overdue ? '<span class="overdue">Overdue · </span>' : ''}${esc(t.why || (t.due ? fmtDay(t.due) : ''))}</div></div>
+    <button class="btn small-btn" data-task="${esc(t.id)}">${t.action.kind === 'sms' ? '💬 Text' : t.action.kind === 'check' ? '✓ ' + esc(t.action.label) : esc(t.action.label || 'Open')}</button></div></div>`;
+
   function viewToday() {
     const t = today();
     const newL = S.leads.filter((l) => l.status === 'New');
@@ -96,14 +126,10 @@
         <div class="stat"><b>${money(revenue) || '$0'}</b><span>Done this month (${won.length})</span></div>
       </div>
       <button class="btn full" data-go="#/walk" data-newwalk style="margin-bottom:6px">🎥 New video estimate</button>
-      ${sec('New — reply fast', newL, leadCard)}
+      ${(() => { const ts = allTasks(); S.tasks = ts; return ts.length ? `<h2>To do now (${ts.length})</h2><div class="list">${ts.slice(0, 25).map(taskCard).join('')}</div>` : '<div class="empty">Nothing waiting. Every customer is up to date ✓</div>'; })()}
       ${sec('Jobs today', jobsT, leadCard)}
       ${sec('Jobs tomorrow', jobsTm, leadCard)}
-      ${sec('Follow-ups due', due, leadCard)}
-      ${sec('Quotes waiting on customer', quoted.filter((l) => !due.includes(l)), leadCard)}
-      ${sec('Partners to visit or call', pDue, partnerCard)}
-      ${sec('Ask for a review', doneNoReview.slice(0, 10), leadCard)}
-      ${!newL.length && !due.length && !jobsT.length && !pDue.length ? '<div class="empty">All caught up. Time to drop off some cards 🤝</div>' : ''}
+      ${sec('Quotes waiting on customer', quoted, leadCard)}
     `, { tab: 'today', fab: '#/lead/new' });
   }
 
@@ -257,6 +283,7 @@
     URL.revokeObjectURL(url); return { frames: out, seconds: Math.round(dur) };
   }
   async function frameFromPhoto(file) { const img = new Image(); img.src = URL.createObjectURL(file); await once(img, 'load'); const d = toJpeg(img, img.naturalWidth, img.naturalHeight); URL.revokeObjectURL(img.src); return d; }
+  const WALK_CHECKS = ['Filmed every room/area, inside closets and corners', 'Customer showed what STAYS (marked or set aside)', 'Stairs, elevator, door widths, carry distance to the truck', 'Where the truck and trailer can park', 'Heavy items: concrete, soil, appliances, pianos, hot tub', 'Asked about paint, chemicals, propane, anything hazardous', 'Timing: when they need it done, deadlines (closing, move-out)', 'Who decides and who will be home on the day'];
   function viewWalk() {
     const qs = new URLSearchParams((location.hash.split('?')[1] || ''));
     const W = S.walk || (S.walk = { leadId: qs.get('lead') || '', frames: [], notes: '', result: null, busy: '' });
@@ -272,7 +299,9 @@
       <div class="btns"><label class="btn dark">🎥 Choose video<input type="file" accept="video/*" id="wvid" hidden></label><label class="btn ghost">📷 Add photos<input type="file" accept="image/*" multiple id="wpic" hidden></label>${W.frames.length ? '<button class="btn ghost" id="wclear">Clear</button>' : ''}</div>
       ${W.busy ? `<div class="card muted">${esc(W.busy)}</div>` : ''}
       ${W.frames.length ? `<div class="thumbs">${W.frames.map((f) => `<img src="${f}" alt="">`).join('')}</div><div class="muted small">${W.frames.length} frames ready</div>` : ''}
-      <h2>2 · Notes</h2>
+      <h2>2 · Make sure you covered</h2>
+      <div class="card checklist">${WALK_CHECKS.map((c, i) => `<label class="ck ${(W.checks || {})[i] ? 'done' : ''}"><input type="checkbox" data-wc="${i}" ${(W.checks || {})[i] ? 'checked' : ''} hidden><span class="box">${(W.checks || {})[i] ? '✓' : ''}</span><span class="grow">${c}</span></label>`).join('')}</div>
+      <h2>3 · Notes</h2>
       <div class="composer" style="position:static;padding:0"><button class="micbtn" id="wmic" aria-label="Talk">🎙️</button><textarea class="in grow" id="wnotes" rows="3" placeholder="What the customer said: what goes, what stays, stairs, parking, timing, anything the camera missed">${esc(W.notes)}</textarea></div>
       <div class="btns"><button class="btn full" id="wgo" ${W.frames.length < 2 || W.busy ? 'disabled' : ''}>⚡ Get estimate</button></div>
       ${r ? walkResult(r, l) : ''}
@@ -280,6 +309,7 @@
     const sel = document.getElementById('wlead');
     sel.onchange = () => { W.leadId = sel.value; W.result = null; viewWalk(); };
     const notes = document.getElementById('wnotes'); notes.oninput = () => { W.notes = notes.value; };
+    $app.querySelectorAll('[data-wc]').forEach((cb) => cb.onchange = () => { W.checks = W.checks || {}; W.checks[cb.dataset.wc] = cb.checked; const row = cb.closest('.ck'); row.classList.toggle('done', cb.checked); row.querySelector('.box').textContent = cb.checked ? '✓' : ''; });
     $app.querySelectorAll('[data-nc]').forEach((i) => i.oninput = () => { W.nc = W.nc || {}; W.nc[i.dataset.nc] = i.value; });
     document.getElementById('wmic').onclick = () => listen(notes, (t) => { W.notes = t; });
     const clr = document.getElementById('wclear'); if (clr) clr.onclick = () => { W.frames = []; W.result = null; viewWalk(); };
@@ -303,8 +333,10 @@
           const x = await api('saveLead', { lead: { name, phone: document.getElementById('nc_phone').value, address: document.getElementById('nc_addr').value, source: 'Site visit / walkthrough', status: 'Contacted' } });
           upsert(S.leads, x.lead); W.leadId = x.lead.id;
         }
+        const missed = WALK_CHECKS.filter((c, i) => !(W.checks || {})[i]);
+        if (missed.length && !confirm(`Not covered yet:\n• ${missed.join('\n• ')}\n\nGet the estimate anyway?`)) return;
         W.busy = 'Looking at the job… (about 20 seconds)'; viewWalk();
-        const out = await api('walkthrough', { leadId: W.leadId, frames: W.frames, notes: W.notes });
+        const out = await api('walkthrough', { leadId: W.leadId, frames: W.frames, notes: W.notes, checklist: WALK_CHECKS.map((c, i) => ((W.checks || {})[i] ? '✓ ' : '✗ ') + c).join('; ') });
         W.result = out.walk; W.busy = ''; load(true).catch(() => {}); viewWalk();
         say(`About ${Math.round(out.walk.read.cubic_yards)} cubic yards. Suggested price ${out.walk.price.subtotal} dollars before HST.`);
       } catch (err) { W.busy = ''; toast(err.message); viewWalk(); }
@@ -314,7 +346,7 @@
   function walkResult(w, l) {
     const rd = w.read, p = w.price;
     const list = (arr) => (arr || []).map((x) => `<li>${esc(typeof x === 'string' ? x : `${x.quantity > 1 ? x.quantity + ' × ' : ''}${x.label}`)}</li>`).join('');
-    return `<h2>3 · Estimate</h2>
+    return `<h2>4 · Estimate</h2>
       <div class="card"><div class="title">$${p.subtotal.toLocaleString('en-CA')} <span class="muted small">before HST · ${esc(p.confidence)} confidence</span></div>
         <p class="small" style="margin:6px 0">${esc(rd.summary_for_owner || '')}</p>
         <dl class="kv"><dt>Job</dt><dd>${esc(rd.job_type || '')}</dd><dt>Volume</dt><dd>~${Math.round(rd.cubic_yards)} cu yd${rd.heavy_tonnes ? ' + ' + rd.heavy_tonnes + ' t heavy' : ''}</dd><dt>Crew</dt><dd>${esc(rd.crew_size)} people · ~${esc(rd.onsite_hours)} h on site</dd><dt>Access</dt><dd>${rd.stairs_flights ? rd.stairs_flights + ' flight(s) of stairs' : 'No stairs'}${rd.long_carry ? ', long carry' : ''}</dd></dl>
@@ -365,6 +397,7 @@
     if (isNew && d.type === 'invoice' && l0) {
       const q = S.docs.find((x) => x.leadId === l0.id && x.type === 'quote' && x.status !== 'Void');
       if (q) { d.items = q.items.map((x) => ({ ...x })); d.discount = q.discount || 0; d.notes = q.notes || ''; }
+      if (l0.depositPaid) d.paid = l0.depositPaid;
       else if (l0.price || l0.quote) d.items = [{ desc: l0.job || 'Junk removal and cleanout', qty: 1, price: parseFloat(String(l0.price || l0.quote).replace(/[^0-9.]/g, '')) || 0 }];
     }
     if (isNew && d.type === 'quote' && l0 && !d.items.length) d.items = [{ desc: l0.job || 'Junk removal and cleanout', qty: 1, price: parseFloat(String(l0.quote).replace(/[^0-9.]/g, '')) || '' }];
@@ -460,15 +493,22 @@
         <div class="btns"><button class="btn full" type="submit">${isNew ? 'Add lead' : 'Save'}</button></div>
       </form>
       ${isNew ? '' : `
-      <h2>Quick texts</h2>
-      <div class="btns">${tpl('reply', 'First reply')}${tpl('quote', 'Send quote')}${tpl('booked', 'Booking confirmed')}${tpl('followup', 'Follow-up')}${tpl('review', '⭐ Ask for review')}</div>
-      <div class="muted small" style="margin-top:6px">${l.reviewAsked ? 'Review asked ' + fmtDay(l.reviewAsked) + '.' : 'Ask every customer for a review after the job.'} These open your phone's messages. To text from the business number, use the 🎙️ Assistant.</div>
+      ${(() => { const mine = (S.tasks || allTasks()).filter((t) => t.leadId === l.id); return mine.length ? `<h2>Next step</h2><div class="list">${mine.map(taskCard).join('')}</div>` : ''; })()}
+      <h2>Job checklist</h2>
+      <div class="card checklist">${(() => { const st = PB.stateOf(l, S.docs); let stage = ''; return PB.STEPS.map(([k, sg, label]) => { const done = st.c[k]; const h = sg !== stage ? `<div class="stage">${sg}</div>` : ''; stage = sg; return `${h}<div class="ck ${done ? 'done' : ''}" data-ck="${k}"><span class="box">${done ? '✓' : ''}</span><span class="grow">${label}${k === 'deposit' && l.depositPaid ? ' ($' + l.depositPaid + ')' : ''}</span><span class="muted small">${done ? fmtDay(done) : ''}</span></div>`; }).join(''); })()}</div>
+      <div class="muted small">Tap a step to tick it off (or untick it). Texts, quotes and invoices tick themselves.</div>
+      <h2>Photos</h2>
+      <div class="btns"><label class="btn ghost">📷 Before<input type="file" accept="image/*" capture="environment" multiple data-photo="before" hidden></label><label class="btn ghost">📷 After<input type="file" accept="image/*" capture="environment" multiple data-photo="after" hidden></label><label class="btn ghost">📎 Other<input type="file" accept="image/*" multiple data-photo="other" hidden></label></div>
+      <div class="thumbs" id="pthumbs">${(l.photos || []).slice(-16).map((p) => `<div class="pth" data-key="${esc(p.key)}"><span>${esc(p.kind)}</span></div>`).join('')}</div>
+      <h2>Text ${esc(first(l.name))} from the business number</h2>
+      <div class="btns">${[['reply', 'First reply'], ['quote', 'Quote'], ['deposit', 'Deposit'], ['booking', 'Booking'], ['reminder', 'Reminder'], ['onway', 'On the way'], ['invoice', 'Invoice'], ['payReminder', 'Payment reminder'], ['review', '⭐ Review'], ['thanks', 'Thanks + referral']].filter(([k]) => pbText(k, l)).map(([k, t]) => `<button class="btn ghost small-btn" data-pb="${k}">${t}</button>`).join('')}<button class="btn ghost small-btn" data-pb="">✏️ Write your own</button></div>
+      ${(l.checks || {}).optOut ? '<div class="overdue small">This customer replied STOP. Don\'t text them again.</div>' : ''}
       <h2>Quotes & invoices</h2>
       <div class="list">${docsFor(l).map((d) => `<div class="card" data-go="#/doc/${d.id}"><div class="row"><div class="grow"><div class="title">${d.type === 'quote' ? '📄 Quote' : '🧾 Invoice'} ${esc(d.id)}</div><div class="muted small">${fmtDay(d.created.slice(0, 10))}${d.viewedAt ? ' · viewed' : ''}</div></div><div style="text-align:right"><b>${money(d.total)}</b><div><span class="pill">${esc(d.status)}</span></div></div></div></div>`).join('')}</div>
       <div class="btns"><button class="btn" data-go="#/walk?lead=${l.id}" data-newwalk>🎥 Video estimate</button><button class="btn dark" data-go="#/doc/new?lead=${l.id}&type=quote">📄 New quote</button><button class="btn dark" data-go="#/doc/new?lead=${l.id}&type=invoice">🧾 New invoice</button></div>
       <h2>Notes & history</h2>
       <div class="card"><textarea class="in" id="nt" placeholder="Add a note (what they said, access, items, etc.)"></textarea><div class="btns"><button class="btn dark" id="addnote">Add note</button></div></div>
-      ${(l.notes || []).map((n) => `<div class="note ${n.auto ? 'auto' : ''}"><div class="meta">${esc(n.by)} · ${new Date(n.at).toLocaleString('en-CA', { dateStyle: 'medium', timeStyle: 'short' })}</div><p>${esc(n.text)}</p></div>`).join('')}`}
+      ${(l.notes || []).map((n) => `<div class="note ${n.auto ? 'auto' : ''} ${n.in ? 'msg-in' : ''} ${n.out ? 'msg-out' : ''}"><div class="meta">${n.in ? '📩 ' : n.out ? '📤 ' : ''}${esc(n.by)} · ${new Date(n.at).toLocaleString('en-CA', { dateStyle: 'medium', timeStyle: 'short' })}</div><p>${esc(n.text)}</p></div>`).join('')}`}
     `, { tab: 'leads', back: true });
 
     const form = document.getElementById('lf');
@@ -492,12 +532,25 @@
       const t = document.getElementById('nt').value.trim(); if (!t) return;
       try { const r = await api('note', { id: l.id, text: t }); upsert(S.leads, r.record); viewLead(l.id); } catch (err) { toast(err.message); }
     });
-    $app.querySelectorAll('[data-tpl]').forEach((a) => a.addEventListener('click', (e) => {
-      if (!ph) { e.preventDefault(); return toast('No phone number on this lead'); }
-      const key = a.dataset.tpl;
-      const patch = key === 'review' ? { reviewAsked: today() } : key === 'quote' && ['New', 'Contacted'].includes(l.status) ? { status: 'Quoted', followUp: addDays(today(), 2) } : key === 'reply' && l.status === 'New' ? { status: 'Contacted', followUp: addDays(today(), 1) } : null;
-      if (patch) api('saveLead', { lead: { id: l.id, ...patch } }).then((r) => upsert(S.leads, r.lead)).catch(() => {});
-    }));
+    $app.querySelectorAll('[data-pb]').forEach((b) => b.onclick = () => {
+      if (!ph) return toast('Add a phone number first');
+      if ((l.checks || {}).optOut && !confirm(l.name + ' opted out of texts. Send anyway?')) return;
+      confirmSend({ to: l.phone, who: l.name, leadId: l.id, purpose: b.dataset.pb || 'other', body: b.dataset.pb ? pbText(b.dataset.pb, l) : '' }, () => viewLead(l.id));
+    });
+    $app.querySelectorAll('[data-ck]').forEach((row) => row.onclick = async () => {
+      const k = row.dataset.ck, st = PB.stateOf(l, S.docs);
+      if (k === 'deposit' && !st.c.deposit) return depositPrompt(l).then(() => viewLead(l.id));
+      if (['quoteSent', 'accepted', 'invoiceSent', 'paid'].includes(k) && !(l.checks || {})[k] && st.c[k]) return toast('Set by the quote/invoice');
+      try { await setCheck(l, k, st.c[k] ? '' : today()); viewLead(l.id); } catch (err) { toast(err.message); }
+    });
+    $app.querySelectorAll('[data-photo]').forEach((inp) => inp.onchange = async () => {
+      const files = [...inp.files].slice(0, 12); if (!files.length) return;
+      toast(`Saving ${files.length} photo${files.length > 1 ? 's' : ''}…`);
+      for (const f of files) { try { const data = await frameFromPhoto(f); const r = await api('addPhoto', { leadId: l.id, kind: inp.dataset.photo, data }); upsert(S.leads, r.lead); } catch (err) { toast(err.message); } }
+      toast('Photos saved ✓'); viewLead(l.id);
+    });
+    const thumbs = [...$app.querySelectorAll('.pth')];
+    (async () => { for (const t of thumbs) { try { const r = (S.mediaCache && S.mediaCache[t.dataset.key]) || (await api('media', { key: t.dataset.key })).src; (S.mediaCache = S.mediaCache || {})[t.dataset.key] = r; t.style.backgroundImage = `url(${r})`; t.onclick = () => { const w = window.open(); if (w) w.document.write(`<img src="${r}" style="max-width:100%">`); }; } catch (e) {} } })();
   }
 
   function viewPartners() {
@@ -594,6 +647,7 @@
         <label class="f">How customers pay (shown on invoices)</label><textarea class="in" name="paymentInstructions">${esc(S.settings.paymentInstructions || '')}</textarea>
         <label class="f">Quote terms</label><textarea class="in" name="quoteTerms">${esc(S.settings.quoteTerms || '')}</textarea>
         <label class="f">Invoice terms</label><textarea class="in" name="invoiceTerms">${esc(S.settings.invoiceTerms || '')}</textarea>
+        <div class="two"><div><label class="f">Your cell (replies forwarded + morning brief)</label><input class="in" name="ownerMobile" type="tel" value="${esc(S.settings.ownerMobile || '')}"></div><div><label class="f">Morning to-do text</label><select class="in" name="dailyBrief"><option value="on" ${S.settings.dailyBrief === 'on' ? 'selected' : ''}>On (7:30 AM)</option><option value="off" ${S.settings.dailyBrief !== 'on' ? 'selected' : ''}>Off</option></select></div></div>
         <label class="f">Google review link</label><input class="in" name="reviewUrl" value="${esc(S.settings.reviewUrl || '')}">
         <div class="btns"><button class="btn dark" type="submit">Save business settings</button></div></form>
       <h2>Estimating rates (video estimates)</h2>
@@ -676,6 +730,7 @@
     const g = e.target.closest('[data-go]'); if (g) { e.preventDefault(); if (g.hasAttribute('data-newwalk')) S.walk = null; return go(g.dataset.go); }
     if (e.target.closest('[data-back]')) return history.length > 1 ? history.back() : go('#/today');
     const fl = e.target.closest('[data-filter]'); if (fl) { S.filter = fl.dataset.filter; return location.hash === '#/leads' ? viewLeads() : go('#/leads'); }
+    const tk = e.target.closest('[data-task]'); if (tk) { const t = (S.tasks || allTasks()).find((x) => x.id === tk.dataset.task); if (t) doTask(t).catch((err) => toast(err.message)); return; }
     const pf = e.target.closest('[data-pfilter]'); if (pf) { S.pfilter = pf.dataset.pfilter; return viewPartners(); }
   });
   window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); S.installEvt = e; });

@@ -12,6 +12,8 @@ const { STATUSES, newId, clean, prettyPhone, listRecords } = require('./crm-lib'
 const docs = require('./crm-docs');
 const { runAssistant } = require('./crm-assistant');
 const walkthrough = require('./crm-walkthrough');
+const playbook = require('../../crm/playbook.js');
+const CHECK_KEYS = new Set([...playbook.STEPS.map((x) => x[0]), 'photosAsked', 'depositAsked', 'followup1', 'followup2', 'followup3', 'payReminders', 'optOut']);
 
 const SETUP_HASH = 'c3851e25789d1e0f7c66a6cca6c814805c8d54da71111caf6dbcaaa7c6e9d69b';
 const TOKEN_DAYS = 60;
@@ -143,8 +145,15 @@ exports.handle = async (event, store) => {
         if (!rec) continue;
         rec.notes = [note, ...(rec.notes || [])]; rec.updated = now;
         if (kind === 'lead') {
-          if (body.purpose === 'review') rec.reviewAsked = now.slice(0, 10);
-          if (body.purpose === 'reply' && rec.status === 'New') rec.status = 'Contacted';
+          const day = now.slice(0, 10); rec.checks = rec.checks || {};
+          const ck = playbook.PURPOSE_CHECK[body.purpose];
+          if (ck) rec.checks[ck] = day;
+          if (body.purpose === 'payReminder') rec.checks.payReminders = [rec.checks.payReminders, day].filter(Boolean).join(',');
+          if (body.purpose === 'review') rec.reviewAsked = day;
+          if (!rec.checks.replied) rec.checks.replied = day;
+          if (rec.status === 'New') rec.status = 'Contacted';
+          rec.unread = false; rec.unreadReply = false;
+          note.out = true;
         } else rec.lastTouch = now.slice(0, 10);
         await store.setJSON(`${kind}/${id}`, rec);
       }
@@ -154,12 +163,35 @@ exports.handle = async (event, store) => {
       return json(200, { ok: true });
     }
     if (a === 'walkthrough') {
-      const r = await walkthrough.analyze({ store, me, leadId: clean(body.leadId, 60), frames: body.frames, notes: body.notes });
+      const r = await walkthrough.analyze({ store, me, leadId: clean(body.leadId, 60), frames: body.frames, notes: body.notes, checklist: body.checklist });
       if (r.error) return json(400, { error: r.error });
       return json(200, r);
     }
     if (a === 'walkMedia') {
       const buf = await store.get(`media/${clean(body.id, 60)}/${parseInt(body.i, 10) || 0}.jpg`, { type: 'arrayBuffer' });
+      if (!buf) return json(404, { error: 'Not found' });
+      return json(200, { src: 'data:image/jpeg;base64,' + Buffer.from(buf).toString('base64') });
+    }
+    if (a === 'addPhoto') {
+      const l = await store.get(`lead/${clean(body.leadId, 60)}`, { type: 'json' });
+      if (!l) return json(404, { error: 'Lead not found' });
+      const kind = ['before', 'after', 'other'].includes(body.kind) ? body.kind : 'other';
+      const data = String(body.data || '');
+      if (!data.startsWith('data:image/jpeg;base64,') || data.length > 1500000) return json(400, { error: 'Photo too large or not a JPEG' });
+      const key = `media/lead/${l.id}/${kind}-${Date.now()}.jpg`;
+      await store.set(key, Buffer.from(data.split(',')[1], 'base64'));
+      l.photos = [...(l.photos || []), { key, kind, at: now, by: me.name }].slice(-60);
+      l.checks = l.checks || {};
+      if (kind === 'before' && !l.checks.beforePhotos) l.checks.beforePhotos = now.slice(0, 10);
+      if (kind === 'after' && !l.checks.afterPhotos) l.checks.afterPhotos = now.slice(0, 10);
+      l.updated = now;
+      await store.setJSON(`lead/${l.id}`, l);
+      return json(200, { lead: l });
+    }
+    if (a === 'media') {
+      const key = clean(body.key, 200);
+      if (!key.startsWith('media/')) return json(400, { error: 'bad key' });
+      const buf = await store.get(key, { type: 'arrayBuffer' });
       if (!buf) return json(404, { error: 'Not found' });
       return json(200, { src: 'data:image/jpeg;base64,' + Buffer.from(buf).toString('base64') });
     }
@@ -185,6 +217,7 @@ exports.handle = async (event, store) => {
         for (const k of ['minimum', 'perYard', 'trailerYards', 'stairsPerFlight', 'longCarry', 'dismantlePerHour', 'heavyPerTonne']) if (k in e) out[k] = docs.num(e[k]);
         next.estimator = { ...(cur.estimator || {}), ...out };
       }
+      if (body.settings && 'ownerMobile' in body.settings) { const d = String(body.settings.ownerMobile).replace(/\D/g, '').replace(/^1(?=\d{10}$)/, ''); body.settings.ownerMobile = d.length === 10 ? '+1' + d : ''; }
       for (const k of Object.keys(docs.DEFAULT_SETTINGS)) if (k in (body.settings || {})) next[k] = ['hstRate', 'depositPct', 'quoteValidDays'].includes(k) ? docs.num(body.settings[k]) : clean(body.settings[k], 1500);
       await store.setJSON('config/settings', next);
       return json(200, { settings: next });
@@ -204,7 +237,12 @@ exports.handle = async (event, store) => {
         if (!isNew && (lead[f] || '') !== v && ['status', 'quote', 'price', 'jobDate', 'crew'].includes(f)) changes.push(`${f}: ${lead[f] || '—'} → ${v || '—'}`);
         lead[f] = v;
       }
-      lead.unread = false;
+      if (input.checks && typeof input.checks === 'object') {
+        lead.checks = lead.checks || {};
+        for (const [k, v] of Object.entries(input.checks)) if (CHECK_KEYS.has(k)) { if (v) lead.checks[k] = clean(v, 200); else delete lead.checks[k]; changes.push(`${k}: ${v ? 'done' : 'cleared'}`); }
+      }
+      if ('depositPaid' in input) { lead.depositPaid = docs.num(input.depositPaid); changes.push(`deposit received: $${lead.depositPaid}`); }
+      lead.unread = false; lead.unreadReply = false;
       lead.updated = now;
       if (changes.length) lead.notes.unshift({ at: now, by: me.name, text: changes.join(' · '), auto: true });
       if (isNew) lead.notes.unshift({ at: now, by: me.name, text: 'Lead added.', auto: true });
@@ -224,7 +262,7 @@ exports.handle = async (event, store) => {
     }
     if (a === 'markRead') {
       const rec = await store.get(`lead/${body.id}`, { type: 'json' });
-      if (rec && rec.unread) { rec.unread = false; await store.setJSON(`lead/${body.id}`, rec); }
+      if (rec && (rec.unread || rec.unreadReply)) { rec.unread = false; rec.unreadReply = false; await store.setJSON(`lead/${body.id}`, rec); }
       return json(200, { ok: true });
     }
     if (a === 'savePartner') {
