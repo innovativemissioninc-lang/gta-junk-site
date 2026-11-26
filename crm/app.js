@@ -95,6 +95,7 @@
         <div class="stat" data-go="#/calendar"><b>${jobsT.length}</b><span>Jobs today</span></div>
         <div class="stat"><b>${money(revenue) || '$0'}</b><span>Done this month (${won.length})</span></div>
       </div>
+      <button class="btn full" data-go="#/walk" data-newwalk style="margin-bottom:6px">🎥 New video estimate</button>
       ${sec('New — reply fast', newL, leadCard)}
       ${sec('Jobs today', jobsT, leadCard)}
       ${sec('Jobs tomorrow', jobsTm, leadCard)}
@@ -193,7 +194,7 @@
     shell('Assistant', `
       <div id="chat" class="chat">${S.chat.length ? S.chat.map(bubble).join('') : `<div class="empty">Tap the mic and talk, like:<br><br>${tips.map((t) => `<button class="chip" data-tip="${esc(t)}">${esc(t)}</button>`).join(' ')}</div>`}
       ${S.busy ? '<div class="bub bot typing">Working on it…</div>' : ''}</div>
-      <div class="composer"><button class="micbtn ${S.listening ? 'on' : ''}" id="mic" aria-label="Talk">${S.listening ? '■' : '🎙️'}</button>
+      <div class="composer"><button class="btn ghost" data-go="#/walk" data-newwalk title="Video estimate" style="padding:12px">🎥</button><button class="micbtn ${S.listening ? 'on' : ''}" id="mic" aria-label="Talk">${S.listening ? '■' : '🎙️'}</button>
         <textarea class="in grow" id="say" rows="1" placeholder="${Rec ? 'Tap the mic or type…' : 'Type, or use your keyboard mic…'}"></textarea><button class="btn" id="go">➤</button></div>
       <div class="row small muted" style="justify-content:space-between;margin-top:6px"><label><input type="checkbox" id="spk" ${S.speak ? 'checked' : ''}> Read replies out loud</label>${S.chat.length ? '<button class="linkbtn" id="clr">New conversation</button>' : ''}</div>
     `, { tab: 'ask' });
@@ -213,17 +214,18 @@
     });
     $app.querySelectorAll('[data-pcancel]').forEach((b) => b.onclick = () => { const [i, j] = b.dataset.pcancel.split('-').map(Number); S.chat[i].pending[j].done = 'cancelled'; saveChat(); viewAssistant(); });
   }
-  function listen(box) {
+  function listen(box, onDone) {
     if (!Rec) return toast('Use the mic on your keyboard to talk');
     if (S.rec) { S.rec.stop(); return; }
     if (window.speechSynthesis) speechSynthesis.cancel();
     const r = new Rec(); S.rec = r; r.lang = 'en-CA'; r.interimResults = true; r.continuous = false;
     let finalText = '';
-    r.onresult = (e) => { let t = ''; for (const res of e.results) { t += res[0].transcript; if (res.isFinal) finalText = t; } box.value = t; };
     r.onerror = (e) => { if (e.error === 'not-allowed') toast('Allow the microphone for this app'); };
-    r.onend = () => { S.rec = null; S.listening = false; const t = (finalText || box.value).trim(); if (t) ask(t, true); else viewAssistant(); };
+    const base = onDone ? box.value.trim() : '';
+    r.onresult = (e) => { let t = ''; for (const res of e.results) { t += res[0].transcript; if (res.isFinal) finalText = t; } box.value = (base ? base + ' ' : '') + t; };
+    r.onend = () => { S.rec = null; S.listening = false; const t = (onDone ? box.value : (finalText || box.value)).trim(); if (onDone) { onDone(t); const m = document.getElementById('wmic'); if (m) { m.classList.remove('on'); m.textContent = '🎙️'; } return; } if (t) ask(t, true); else viewAssistant(); };
     S.listening = true; r.start();
-    const mic = document.getElementById('mic'); mic.classList.add('on'); mic.textContent = '■';
+    const mic = document.getElementById(onDone ? 'wmic' : 'mic'); if (mic) { mic.classList.add('on'); mic.textContent = '■'; }
   }
   async function ask(text, spoken) {
     text = String(text || '').trim(); if (!text || S.busy) return;
@@ -235,6 +237,121 @@
       if (r.changed && (r.changed.leads || r.changed.partners) || (r.docs || []).length) load(true).catch(() => {});
     } catch (err) { S.chat.push({ role: 'assistant', text: 'Sorry: ' + err.message }); }
     S.busy = false; saveChat(); if ((location.hash || '').startsWith('#/ask')) viewAssistant();
+  }
+
+  // ---------- video walkthrough estimate ----------
+  const once = (el, ev) => new Promise((res, rej) => { const ok = () => { cleanup(); res(); }; const bad = () => { cleanup(); rej(new Error('This video format could not be read on this phone.')); }; const cleanup = () => { el.removeEventListener(ev, ok); el.removeEventListener('error', bad); }; el.addEventListener(ev, ok); el.addEventListener('error', bad); });
+  function toJpeg(src, w, h) { const max = 1024, k = Math.min(1, max / Math.max(w, h)); const c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k); c.getContext('2d').drawImage(src, 0, 0, c.width, c.height); return c.toDataURL('image/jpeg', 0.66); }
+  async function framesFromVideo(file, n, onStep) {
+    const url = URL.createObjectURL(file); const v = document.createElement('video');
+    v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.src = url;
+    await once(v, 'loadedmetadata');
+    try { await v.play(); v.pause(); } catch (e) {}
+    const dur = v.duration && isFinite(v.duration) ? v.duration : 30; const out = [];
+    for (let i = 0; i < n; i++) {
+      v.currentTime = Math.min(dur - 0.1, dur * (i + 0.5) / n);
+      await once(v, 'seeked'); await new Promise((r) => setTimeout(r, 60));
+      if (v.videoWidth) out.push(toJpeg(v, v.videoWidth, v.videoHeight));
+      if (onStep) onStep(i + 1, n);
+    }
+    URL.revokeObjectURL(url); return { frames: out, seconds: Math.round(dur) };
+  }
+  async function frameFromPhoto(file) { const img = new Image(); img.src = URL.createObjectURL(file); await once(img, 'load'); const d = toJpeg(img, img.naturalWidth, img.naturalHeight); URL.revokeObjectURL(img.src); return d; }
+  function viewWalk() {
+    const qs = new URLSearchParams((location.hash.split('?')[1] || ''));
+    const W = S.walk || (S.walk = { leadId: qs.get('lead') || '', frames: [], notes: '', result: null, busy: '' });
+    if (qs.get('lead') && W.leadId !== qs.get('lead') && !W.frames.length) W.leadId = qs.get('lead');
+    const l = lead(W.leadId);
+    const opts = '<option value="">— choose customer —</option><option value="__new">+ New customer</option>' + S.leads.filter((x) => isOpen(x) || x.id === W.leadId).map((x) => `<option value="${x.id}" ${x.id === W.leadId ? 'selected' : ''}>${esc(x.name)}${x.town ? ' · ' + esc(x.town) : ''}</option>`).join('');
+    const r = W.result;
+    shell('Video estimate', `
+      <label class="f">Customer</label><select class="in" id="wlead">${opts}</select>
+      <div id="newc" style="display:${W.leadId === '__new' ? 'block' : 'none'}"><div class="two"><div><label class="f">Name</label><input class="in" id="nc_name" data-nc="name" value="${esc((W.nc || {}).name)}"></div><div><label class="f">Phone</label><input class="in" id="nc_phone" data-nc="phone" type="tel" value="${esc((W.nc || {}).phone)}"></div></div><label class="f">Address</label><input class="in" id="nc_addr" data-nc="addr" value="${esc((W.nc || {}).addr)}"></div>
+      <h2>1 · Walkthrough</h2>
+      <div class="muted small">Meta glasses: open the Meta AI app → import the video to your phone's gallery, then pick it here. Phone videos and photos work too. The video stays on your phone; only still frames are sent.</div>
+      <div class="btns"><label class="btn dark">🎥 Choose video<input type="file" accept="video/*" id="wvid" hidden></label><label class="btn ghost">📷 Add photos<input type="file" accept="image/*" multiple id="wpic" hidden></label>${W.frames.length ? '<button class="btn ghost" id="wclear">Clear</button>' : ''}</div>
+      ${W.busy ? `<div class="card muted">${esc(W.busy)}</div>` : ''}
+      ${W.frames.length ? `<div class="thumbs">${W.frames.map((f) => `<img src="${f}" alt="">`).join('')}</div><div class="muted small">${W.frames.length} frames ready</div>` : ''}
+      <h2>2 · Notes</h2>
+      <div class="composer" style="position:static;padding:0"><button class="micbtn" id="wmic" aria-label="Talk">🎙️</button><textarea class="in grow" id="wnotes" rows="3" placeholder="What the customer said: what goes, what stays, stairs, parking, timing, anything the camera missed">${esc(W.notes)}</textarea></div>
+      <div class="btns"><button class="btn full" id="wgo" ${W.frames.length < 2 || W.busy ? 'disabled' : ''}>⚡ Get estimate</button></div>
+      ${r ? walkResult(r, l) : ''}
+    `, { tab: 'leads', back: true });
+    const sel = document.getElementById('wlead');
+    sel.onchange = () => { W.leadId = sel.value; W.result = null; viewWalk(); };
+    const notes = document.getElementById('wnotes'); notes.oninput = () => { W.notes = notes.value; };
+    $app.querySelectorAll('[data-nc]').forEach((i) => i.oninput = () => { W.nc = W.nc || {}; W.nc[i.dataset.nc] = i.value; });
+    document.getElementById('wmic').onclick = () => listen(notes, (t) => { W.notes = t; });
+    const clr = document.getElementById('wclear'); if (clr) clr.onclick = () => { W.frames = []; W.result = null; viewWalk(); };
+    document.getElementById('wvid').onchange = async (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      W.busy = 'Reading video… 0%'; viewWalk();
+      try { const out = await framesFromVideo(f, 16, (i, n) => { W.busy = `Reading video… ${Math.round(i / n * 100)}%`; const c = $app.querySelector('.card.muted'); if (c) c.textContent = W.busy; }); W.frames = W.frames.concat(out.frames).slice(-16); W.notes = W.notes || ''; }
+      catch (err) { toast(err.message); }
+      W.busy = ''; W.result = null; viewWalk();
+    };
+    document.getElementById('wpic').onchange = async (e) => {
+      W.busy = 'Adding photos…'; viewWalk();
+      for (const f of [...e.target.files].slice(0, 10)) { try { W.frames.push(await frameFromPhoto(f)); } catch (err) {} }
+      W.frames = W.frames.slice(-16); W.busy = ''; W.result = null; viewWalk();
+    };
+    document.getElementById('wgo').onclick = async () => {
+      W.notes = notes.value;
+      try {
+        if (W.leadId === '__new') {
+          const name = document.getElementById('nc_name').value.trim(); if (!name) return toast('Add the customer name');
+          const x = await api('saveLead', { lead: { name, phone: document.getElementById('nc_phone').value, address: document.getElementById('nc_addr').value, source: 'Site visit / walkthrough', status: 'Contacted' } });
+          upsert(S.leads, x.lead); W.leadId = x.lead.id;
+        }
+        W.busy = 'Looking at the job… (about 20 seconds)'; viewWalk();
+        const out = await api('walkthrough', { leadId: W.leadId, frames: W.frames, notes: W.notes });
+        W.result = out.walk; W.busy = ''; load(true).catch(() => {}); viewWalk();
+        say(`About ${Math.round(out.walk.read.cubic_yards)} cubic yards. Suggested price ${out.walk.price.subtotal} dollars before HST.`);
+      } catch (err) { W.busy = ''; toast(err.message); viewWalk(); }
+    };
+    if (r) bindWalkResult(r, l);
+  }
+  function walkResult(w, l) {
+    const rd = w.read, p = w.price;
+    const list = (arr) => (arr || []).map((x) => `<li>${esc(typeof x === 'string' ? x : `${x.quantity > 1 ? x.quantity + ' × ' : ''}${x.label}`)}</li>`).join('');
+    return `<h2>3 · Estimate</h2>
+      <div class="card"><div class="title">$${p.subtotal.toLocaleString('en-CA')} <span class="muted small">before HST · ${esc(p.confidence)} confidence</span></div>
+        <p class="small" style="margin:6px 0">${esc(rd.summary_for_owner || '')}</p>
+        <dl class="kv"><dt>Job</dt><dd>${esc(rd.job_type || '')}</dd><dt>Volume</dt><dd>~${Math.round(rd.cubic_yards)} cu yd${rd.heavy_tonnes ? ' + ' + rd.heavy_tonnes + ' t heavy' : ''}</dd><dt>Crew</dt><dd>${esc(rd.crew_size)} people · ~${esc(rd.onsite_hours)} h on site</dd><dt>Access</dt><dd>${rd.stairs_flights ? rd.stairs_flights + ' flight(s) of stairs' : 'No stairs'}${rd.long_carry ? ', long carry' : ''}</dd></dl>
+        ${(rd.hazards || []).length ? `<div class="overdue small" style="margin-top:8px">⚠️ ${esc(rd.hazards.join(', '))}</div>` : ''}
+        ${(rd.missing || []).length ? `<details class="more"><summary>Confirm before sending (${rd.missing.length})</summary><ul class="small">${list(rd.missing)}</ul></details>` : ''}
+        <details class="more"><summary>Items seen (${(rd.items || []).length})</summary><ul class="small">${list(rd.items)}</ul></details></div>
+      <label class="f">Quote lines (before HST) — change anything</label>
+      <div id="wrows">${p.lines.map((it, i) => `<div class="itemrow" data-row="${i}"><input class="in" data-k="desc" value="${esc(it.desc)}"><input class="in qty" data-k="qty" inputmode="decimal" value="${esc(it.qty)}"><input class="in price" data-k="price" inputmode="decimal" value="${esc(it.price)}"><span></span></div>`).join('')}</div>
+      <div class="muted small" id="wtot"></div>
+      <label class="f">Scope on the quote</label><textarea class="in" id="wscope" rows="5">${esc(rd.scope_for_quote || '')}</textarea>
+      <div class="btns"><button class="btn full" id="wsend" ${l ? '' : 'disabled'}>📄 Create quote & text ${esc(l ? first(l.name) : 'customer')}</button>
+        <button class="btn ghost" id="wask">🎙️ Talk it over with the assistant</button>
+        ${l ? `<button class="btn ghost" data-go="#/lead/${l.id}">Open lead</button>` : ''}</div>
+      <div class="muted small">Suggested from your estimating rates (⚙️ → Estimating rates). Check the price before sending.</div>`;
+  }
+  function bindWalkResult(w, l) {
+    const n = (v) => parseFloat(String(v).replace(/[^0-9.]/g, '')) || 0;
+    const rows = () => [...$app.querySelectorAll('#wrows .itemrow')].map((r) => ({ desc: r.querySelector('[data-k=desc]').value, qty: n(r.querySelector('[data-k=qty]').value) || 1, price: n(r.querySelector('[data-k=price]').value) }));
+    const tot = () => { const s = rows().reduce((a, it) => a + it.qty * it.price, 0); const h = S.settings.hstNumber ? +S.settings.hstRate || 13 : 0; document.getElementById('wtot').textContent = `Subtotal ${money(s)}${h ? ` · with HST $${(s * (1 + h / 100)).toFixed(2)}` : ''} · deposit ${S.settings.depositPct || 30}% = ${money(s * (1 + h / 100) * (S.settings.depositPct || 30) / 100)}`; };
+    tot(); $app.querySelector('#wrows').addEventListener('input', tot);
+    document.getElementById('wask').onclick = () => {
+      S.chat.push({ role: 'user', text: `I just did a video walkthrough${l ? ' for ' + l.name + ' (lead ' + l.id + ')' : ''}. The read: ${w.read.summary_for_owner} About ${Math.round(w.read.cubic_yards)} cu yd, ${w.read.crew_size} crew, ${w.read.onsite_hours} h. Suggested lines: ${rows().map((r) => r.desc + ' $' + r.qty * r.price).join('; ')}. Help me finalize the price and quote.` });
+      saveChat(); go('#/ask'); ask(S.chat.pop().text);
+    };
+    const btn = document.getElementById('wsend');
+    if (btn && l) btn.onclick = async () => {
+      const items = rows().filter((it) => it.desc && it.price);
+      if (!items.length) return toast('Add a price');
+      btn.disabled = true;
+      try {
+        const r = await api('saveDoc', { doc: { type: 'quote', leadId: l.id, items, notes: document.getElementById('wscope').value } });
+        upsert(S.docs, r.doc);
+        api('saveLead', { lead: { id: l.id, quote: String(r.doc.subtotal), ...(['New', 'Contacted'].includes(l.status) ? { status: 'Quoted', followUp: addDays(today(), 1) } : {}) } }).then((x) => upsert(S.leads, x.lead)).catch(() => {});
+        confirmSend({ to: l.phone, who: l.name, leadId: l.id, purpose: 'quote', body: `Hi ${first(l.name)}, thanks for walking us through the job. Your fixed price is ${money(r.doc.total)}${r.doc.tax ? ' including HST' : ' plus HST'}, all-in: labour, loading, haul-away and disposal. A ${S.settings.depositPct || 30}% deposit locks in your date. Review and accept here: ${r.doc.url}` }, () => { S.walk = null; go('#/doc/' + r.doc.id); });
+      } catch (err) { toast(err.message); }
+      btn.disabled = false;
+    };
   }
 
   // ---------- quotes & invoices ----------
@@ -348,7 +465,7 @@
       <div class="muted small" style="margin-top:6px">${l.reviewAsked ? 'Review asked ' + fmtDay(l.reviewAsked) + '.' : 'Ask every customer for a review after the job.'} These open your phone's messages. To text from the business number, use the 🎙️ Assistant.</div>
       <h2>Quotes & invoices</h2>
       <div class="list">${docsFor(l).map((d) => `<div class="card" data-go="#/doc/${d.id}"><div class="row"><div class="grow"><div class="title">${d.type === 'quote' ? '📄 Quote' : '🧾 Invoice'} ${esc(d.id)}</div><div class="muted small">${fmtDay(d.created.slice(0, 10))}${d.viewedAt ? ' · viewed' : ''}</div></div><div style="text-align:right"><b>${money(d.total)}</b><div><span class="pill">${esc(d.status)}</span></div></div></div></div>`).join('')}</div>
-      <div class="btns"><button class="btn dark" data-go="#/doc/new?lead=${l.id}&type=quote">📄 New quote</button><button class="btn dark" data-go="#/doc/new?lead=${l.id}&type=invoice">🧾 New invoice</button></div>
+      <div class="btns"><button class="btn" data-go="#/walk?lead=${l.id}" data-newwalk>🎥 Video estimate</button><button class="btn dark" data-go="#/doc/new?lead=${l.id}&type=quote">📄 New quote</button><button class="btn dark" data-go="#/doc/new?lead=${l.id}&type=invoice">🧾 New invoice</button></div>
       <h2>Notes & history</h2>
       <div class="card"><textarea class="in" id="nt" placeholder="Add a note (what they said, access, items, etc.)"></textarea><div class="btns"><button class="btn dark" id="addnote">Add note</button></div></div>
       ${(l.notes || []).map((n) => `<div class="note ${n.auto ? 'auto' : ''}"><div class="meta">${esc(n.by)} · ${new Date(n.at).toLocaleString('en-CA', { dateStyle: 'medium', timeStyle: 'short' })}</div><p>${esc(n.text)}</p></div>`).join('')}`}
@@ -478,7 +595,11 @@
         <label class="f">Quote terms</label><textarea class="in" name="quoteTerms">${esc(S.settings.quoteTerms || '')}</textarea>
         <label class="f">Invoice terms</label><textarea class="in" name="invoiceTerms">${esc(S.settings.invoiceTerms || '')}</textarea>
         <label class="f">Google review link</label><input class="in" name="reviewUrl" value="${esc(S.settings.reviewUrl || '')}">
-        <div class="btns"><button class="btn dark" type="submit">Save business settings</button></div></form>` : ''}
+        <div class="btns"><button class="btn dark" type="submit">Save business settings</button></div></form>
+      <h2>Estimating rates (video estimates)</h2>
+      <form id="er" class="card"><div class="two">${[['minimum', 'Project minimum $'], ['perYard', '$ per cubic yard'], ['stairsPerFlight', 'Stairs $ per flight'], ['longCarry', 'Long carry $'], ['dismantlePerHour', 'Dismantle/demo $ per crew-hour'], ['heavyPerTonne', 'Heavy materials $ per tonne'], ['trailerYards', 'Trailer size (cu yd)']].map(([k, t]) => `<div><label class="f">${t}</label><input class="in" name="${k}" inputmode="decimal" value="${esc((S.settings.estimator || {})[k])}"></div>`).join('')}</div>
+        <div class="muted small">The AI measures the job; these rates turn it into a price. Starting values are placeholders, so set them to your real numbers.</div>
+        <div class="btns"><button class="btn dark" type="submit">Save rates</button></div></form>` : ''}
       <h2>Change my PIN</h2>
       <form id="cp" class="card"><div class="two"><div><label class="f">Current PIN</label><input class="in" name="oldPin" type="password" inputmode="numeric" required></div><div><label class="f">New PIN</label><input class="in" name="newPin" type="password" inputmode="numeric" pattern="\\d{4,8}" required></div></div><div class="btns"><button class="btn dark" type="submit">Change PIN</button></div></form>
       <p class="muted small">Leads arrive automatically from the website forms, Rocky, and the AI phone line. Last sync ${ago(new Date(S.loaded).toISOString())}.</p>
@@ -492,6 +613,8 @@
     if (uf) uf.onsubmit = async (e) => { e.preventDefault(); try { await api('addUser', Object.fromEntries(new FormData(uf))); toast('Team member saved'); await load(true); viewMore(); } catch (err) { toast(err.message); } };
     const bs = document.getElementById('bs');
     if (bs) bs.onsubmit = async (e) => { e.preventDefault(); try { const r = await api('saveSettings', { settings: Object.fromEntries(new FormData(bs)) }); S.settings = r.settings; toast('Settings saved'); } catch (err) { toast(err.message); } };
+    const er = document.getElementById('er');
+    if (er) er.onsubmit = async (e) => { e.preventDefault(); try { const r = await api('saveSettings', { settings: { estimator: Object.fromEntries(new FormData(er)) } }); S.settings = { ...S.settings, ...r.settings, estimator: { ...S.settings.estimator, ...(r.settings.estimator || {}) } }; toast('Rates saved'); } catch (err) { toast(err.message); } };
     const cp = document.getElementById('cp');
     cp.onsubmit = async (e) => { e.preventDefault(); try { const r = await api('changePin', Object.fromEntries(new FormData(cp))); S.token = r.token; try { localStorage.setItem('gtjcrm_token', r.token); } catch (x) {} toast('PIN changed'); cp.reset(); } catch (err) { toast(err.message); } };
   }
@@ -537,6 +660,7 @@
     if (view === 'jobs' || view === 'calendar') return viewCalendar();
     if (view === 'ask') return viewAssistant();
     if (view === 'doc') return viewDoc(id);
+    if ((view || '').startsWith('walk')) return viewWalk();
     if (view === 'partners') return viewPartners();
     if (view === 'partner') return viewPartner(id);
     if (view === 'more') return viewMore();
@@ -549,7 +673,7 @@
   }
   window.addEventListener('hashchange', render);
   document.addEventListener('click', (e) => {
-    const g = e.target.closest('[data-go]'); if (g) { e.preventDefault(); return go(g.dataset.go); }
+    const g = e.target.closest('[data-go]'); if (g) { e.preventDefault(); if (g.hasAttribute('data-newwalk')) S.walk = null; return go(g.dataset.go); }
     if (e.target.closest('[data-back]')) return history.length > 1 ? history.back() : go('#/today');
     const fl = e.target.closest('[data-filter]'); if (fl) { S.filter = fl.dataset.filter; return location.hash === '#/leads' ? viewLeads() : go('#/leads'); }
     const pf = e.target.closest('[data-pfilter]'); if (pf) { S.pfilter = pf.dataset.pfilter; return viewPartners(); }

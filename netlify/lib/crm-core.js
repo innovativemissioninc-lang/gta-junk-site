@@ -11,6 +11,7 @@ const crypto = require('crypto');
 const { STATUSES, newId, clean, prettyPhone, listRecords } = require('./crm-lib');
 const docs = require('./crm-docs');
 const { runAssistant } = require('./crm-assistant');
+const walkthrough = require('./crm-walkthrough');
 
 const SETUP_HASH = 'c3851e25789d1e0f7c66a6cca6c814805c8d54da71111caf6dbcaaa7c6e9d69b';
 const TOKEN_DAYS = 60;
@@ -121,7 +122,7 @@ exports.handle = async (event, store) => {
     if (a === 'load') {
       const [leads, partners, users, allDocs, settings] = await Promise.all([listRecords(store, 'lead/'), listRecords(store, 'partner/'), listRecords(store, 'user/'), listRecords(store, 'doc/'), docs.getSettings(store)]);
       return json(200, { me: publicUser(me), leads, partners, users: users.map(publicUser), statuses: STATUSES, partnerStages: PARTNER_STAGES,
-        docs: allDocs.map((d) => ({ ...d, url: docs.docUrl(d) })), settings });
+        docs: allDocs.map((d) => ({ ...d, url: docs.docUrl(d) })), settings: { ...settings, estimator: { ...walkthrough.ESTIMATOR_DEFAULTS, ...(settings.estimator || {}) } } });
     }
 
     if (a === 'assistant') {
@@ -152,6 +153,20 @@ exports.handle = async (event, store) => {
       if (m) { const d = await store.get(`doc/${m[1]}`, { type: 'json' }); if (d && d.status === 'Draft') { d.status = 'Sent'; d.sentAt = now; await store.setJSON(`doc/${d.id}`, d); } }
       return json(200, { ok: true });
     }
+    if (a === 'walkthrough') {
+      const r = await walkthrough.analyze({ store, me, leadId: clean(body.leadId, 60), frames: body.frames, notes: body.notes });
+      if (r.error) return json(400, { error: r.error });
+      return json(200, r);
+    }
+    if (a === 'walkMedia') {
+      const buf = await store.get(`media/${clean(body.id, 60)}/${parseInt(body.i, 10) || 0}.jpg`, { type: 'arrayBuffer' });
+      if (!buf) return json(404, { error: 'Not found' });
+      return json(200, { src: 'data:image/jpeg;base64,' + Buffer.from(buf).toString('base64') });
+    }
+    if (a === 'walks') {
+      const all = await listRecords(store, 'walk/');
+      return json(200, { walks: all.filter((w) => !body.leadId || w.leadId === body.leadId).sort((x, y) => y.created.localeCompare(x.created)).slice(0, 20) });
+    }
     if (a === 'saveDoc') {
       const input = body.doc || {};
       if (input.leadId && !input.id) {
@@ -165,6 +180,11 @@ exports.handle = async (event, store) => {
       if (me.role !== 'owner') return json(403, { error: 'Only the owner can change business settings.' });
       const cur = await docs.getSettings(store);
       const next = { ...cur };
+      if (body.settings && body.settings.estimator) {
+        const e = body.settings.estimator, out = {};
+        for (const k of ['minimum', 'perYard', 'trailerYards', 'stairsPerFlight', 'longCarry', 'dismantlePerHour', 'heavyPerTonne']) if (k in e) out[k] = docs.num(e[k]);
+        next.estimator = { ...(cur.estimator || {}), ...out };
+      }
       for (const k of Object.keys(docs.DEFAULT_SETTINGS)) if (k in (body.settings || {})) next[k] = ['hstRate', 'depositPct', 'quoteValidDays'].includes(k) ? docs.num(body.settings[k]) : clean(body.settings[k], 1500);
       await store.setJSON('config/settings', next);
       return json(200, { settings: next });

@@ -98,3 +98,6 @@ nav.tabs .mic-tab.on .mic-ic{background:var(--navy)}
 .itemrow{display:grid;grid-template-columns:1fr 54px 90px 26px;gap:6px;margin-bottom:6px;align-items:center}
 .totals{margin-top:12px}
 .empty .chip{margin:4px 2px}
+.thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:10px}
+.thumbs img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px}
+label.btn input[hidden]{display:none}
