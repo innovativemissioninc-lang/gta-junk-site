@@ -1,0 +1,13 @@
+{
+  "name": "GTA Junk CRM",
+  "short_name": "GTJ CRM",
+  "start_url": "/crm/",
+  "scope": "/crm/",
+  "display": "standalone",
+  "background_color": "#0F1A2E",
+  "theme_color": "#0F1A2E",
+  "icons": [
+    { "src": "/crm/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/crm/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
