@@ -16,7 +16,7 @@ const MAX_FRAMES = 20;
 const ESTIMATOR_DEFAULTS = {
   minimum: 1500,        // published project minimum
   perYard: 85,          // $ per loose cubic yard removed (labour + loading + haul + disposal)
-  trailerYards: 45,     // 20 ft dump trailer
+  trailerYards: 16.5,   // 12 ft x 8 ft trailer, 56 in sides (~448 cu ft level-full)
   stairsPerFlight: 150, // per flight carried, applied once per job
   longCarry: 150,       // carry over ~75 ft / no close parking
   dismantlePerHour: 120,// dismantling / light demo per crew-hour beyond simple removal
@@ -44,7 +44,7 @@ Return ONLY one JSON object, no markdown:
   "scope_for_quote": "3-6 short lines in plain English for the customer's written quote: what's being removed, from where, what's included (loading, haul-away, disposal/recycling/donation, broom sweep), and anything excluded (e.g. items they are keeping). No prices.",
   "summary_for_owner": "2-3 sentences for the owner: the job, volume in trailer loads, main time drivers, risks."
 }
-Volume reference: fridge ~0.7 yd³, 3-seat sofa ~1.5, queen mattress+box ~1, pickup bed heaped ~3, single-car garage packed to shoulder height ~15-20, our 20 ft dump trailer holds ~45 loose yd³. Report what is really there; don't pad (pricing adds its own buffer) and don't lowball. Trust the owner's notes over the frames when they conflict (e.g. "there's a second room just like this"). If biohazard, sharps, trauma or heavy pest waste is involved, list it in hazards: the company does not do that work.`;
+Volume reference: fridge ~0.7 yd³, 3-seat sofa ~1.5, queen mattress+box ~1, pickup bed heaped ~3, single-car garage packed to shoulder height ~15-20, our 12 ft x 8 ft trailer with 56-inch sides holds ~16.5 loose yd³ level-full. Report what is really there; don't pad (pricing adds its own buffer) and don't lowball. Trust the owner's notes over the frames when they conflict (e.g. "there's a second room just like this"). If biohazard, sharps, trauma or heavy pest waste is involved, list it in hazards: the company does not do that work.`;
 
 function priceFrom(read, est) {
   const conf = ['high', 'medium', 'low'].includes(read.confidence) ? read.confidence : 'medium';
