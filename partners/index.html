@@ -152,6 +152,7 @@
     <div class="book-box">
     <form name="partner-referral" method="POST" action="/thanks/" data-netlify="true" netlify-honeypot="bot-field">
       <input type="hidden" name="form-name" value="partner-referral">
+      <input type="hidden" name="ref" id="rf-ref" value="">
       <p style="display:none"><label>Leave this blank: <input name="bot-field"></label></p>
 
       <div class="form-row">
@@ -317,5 +318,18 @@
 })();
 </script>
   <script defer src="/assets/concierge.js?v=f9fef7b95b"></script>
+
+<script>
+/* Partner referral links from the GTA Junk CRM: /partners/?ref=<id>&rn=<name>&rf=<firm>&re=<email>&rp=<phone>#refer
+   pre-fill the referrer's details so they only enter their client's. */
+(function () {
+  try {
+    var q = new URLSearchParams(location.search);
+    var set = function (id, v) { var el = document.getElementById(id); if (el && v && !el.value) el.value = v; };
+    set('rf-ref', (q.get('ref') || '').replace(/[^A-Za-z0-9_]/g, '').slice(0, 40));
+    set('rf-you', q.get('rn')); set('rf-firm', q.get('rf')); set('rf-youremail', q.get('re')); set('rf-yourphone', q.get('rp'));
+  } catch (e) {}
+})();
+</script>
 </body>
 </html>

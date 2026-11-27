@@ -145,7 +145,12 @@
         else if (c.nurture30 && !c.nurture180 && days(doneDay) >= 180) add(l, 'nurture180', `6-month check-in: ${l.name}`, addDays(doneDay, 180), 3, { kind: 'sms', purpose: 'nurture180' });
       }
     }
-    for (const p of partners || []) if (p.nextTouch && p.nextTouch <= today) out.push({ id: p.id + ':visit', partnerId: p.id, name: p.name || p.company, key: 'visit', title: `Visit or call ${p.name || p.company}`, due: p.nextTouch, overdue: p.nextTouch < today, pri: 3, action: { kind: 'go', href: `#/partner/${p.id}`, label: 'Log visit' } });
+    for (const p of partners || []) {
+      const nm = p.name || p.company;
+      if (p.unreadReferral) out.push({ id: p.id + ':refThanks', partnerId: p.id, name: nm, key: 'refThanks', title: `${nm} sent you a referral. Say thank you`, due: today, overdue: false, pri: 0, action: { kind: 'go', href: `#/partner/${p.id}`, label: 'Thank them' } });
+      if (p.metAt && !p.thanked) out.push({ id: p.id + ':thanks', partnerId: p.id, name: nm, key: 'partnerThanks', title: `Send ${nm} a thank-you for meeting`, due: p.metAt, overdue: p.metAt < today, pri: 1, action: { kind: 'go', href: `#/partner/${p.id}?email=1`, label: 'Email' } });
+    }
+    for (const p of partners || []) if (p.nextTouch && p.nextTouch <= today && !p.unreadReferral) out.push({ id: p.id + ':visit', partnerId: p.id, name: p.name || p.company, key: 'visit', title: `Visit or call ${p.name || p.company}`, due: p.nextTouch, overdue: p.nextTouch < today, pri: 3, action: { kind: 'go', href: `#/partner/${p.id}`, label: 'Log visit' } });
     return out.sort((a, b) => (a.pri - b.pri) || String(a.due).localeCompare(String(b.due)));
   }
 

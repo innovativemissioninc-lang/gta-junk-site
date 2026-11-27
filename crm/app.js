@@ -553,11 +553,109 @@
     (async () => { for (const t of thumbs) { try { const r = (S.mediaCache && S.mediaCache[t.dataset.key]) || (await api('media', { key: t.dataset.key })).src; (S.mediaCache = S.mediaCache || {})[t.dataset.key] = r; t.style.backgroundImage = `url(${r})`; t.onclick = () => { const w = window.open(); if (w) w.document.write(`<img src="${r}" style="max-width:100%">`); }; } catch (e) {} } })();
   }
 
+  // ---------- partner outreach: thank-you emails, referral link, card scan ----------
+  const SITE = 'https://gtajunkandpropertycleanout.ca';
+  function referLink(p) {
+    const q = new URLSearchParams({ ref: p.id });
+    if (p.name) q.set('rn', p.name); if (p.company) q.set('rf', p.company); if (p.email) q.set('re', p.email); if (p.phone || p.mobile) q.set('rp', p.phone || p.mobile);
+    return `${SITE}/partners/?${q.toString()}#refer`;
+  }
+  function signature() {
+    const me = S.me || {};
+    return [`${me.name}${me.title ? ', ' + me.title : ''}`, BIZ, [me.phone && `Cell ${me.phone}`, 'Office (416) 659-5401'].filter(Boolean).join(' · '), [me.email, 'gtajunkandpropertycleanout.ca'].filter(Boolean).join(' · ')].join('\n');
+  }
+  const PITCH = {
+    'Storage facility': 'When a unit is abandoned or goes to lien sale, we can clear it quickly: everything loaded, hauled away, donated or recycled where possible, and the unit left broom-clean and ready to rent again. We also help tenants who are moving out and need a hand emptying their unit.',
+    'Estate lawyer': 'We help executors and families clear estate properties with care: we set aside documents, photos and valuables, donate what we can, and leave the home broom-clean and ready to list. Executors get a fixed written price up front and updates as we go, and we are fully insured.',
+    'Realtor': 'We clear homes before listing photos and after closing: furniture, garages, basements and sheds, done fast and on your timeline, with a fixed written price so there are no surprises for your clients.',
+    'Property manager': 'We handle tenant turnovers, abandoned belongings, storage lockers and common-area clean-outs, on short notice, with a fixed price and a clean invoice for your records.',
+    'Restoration company': 'We remove non-hazardous debris, contents and damaged materials after water or fire losses, quickly, so your crews can start sooner, with photos and invoices that work for insurance files.',
+    'Senior living / downsizing': 'We help families and residents through downsizing and move-outs with patience and respect: sorting, donating, and clearing the suite or home so it is ready on the date you need.',
+    'Contractor / builder': 'We handle light demolition and debris removal (decks, sheds, interiors) so your crews can focus on the build.',
+    'Other': 'We clear homes, garages, basements, estates and commercial spaces across the GTA, with a fixed written price and a white-glove crew.'
+  };
+  function thankYouEmail(p, kind) {
+    const n = first(p.name);
+    if (kind === 'referral') {
+      return { subject: `Thank you for the referral – ${BIZ}`, body: `Hi ${n},\n\nThank you for referring a client to us, we really appreciate your trust. We'll take good care of them and keep you posted.\n\nAny time someone else needs a hand, this link takes a minute: ${referLink(p)}\n\nThanks again,\n${signature()}` };
+    }
+    return {
+      subject: `Great meeting you today – ${BIZ}`,
+      body: `Hi ${n},\n\nThank you for taking a moment to meet with me today${p.company ? ' at ' + p.company : ''}. ${PITCH[p.type] || PITCH.Other}\n\nIf a client or tenant ever needs a property cleared, you can send them our way here (it takes a minute): ${referLink(p)}\nOr just call or text me directly.\n\nWe look forward to working with you.\n\n${signature()}\n\nIf you'd rather not hear from us, just reply and let me know.`
+    };
+  }
+  function emailSheet(p, kind, onDone) {
+    if (!p.email) return toast('No email for this contact. Add it first.');
+    const mine = (S.me || {}).email;
+    const d = thankYouEmail(p, kind);
+    const wrap = document.createElement('div'); wrap.className = 'sheet-bg';
+    wrap.innerHTML = `<div class="sheet"><div class="title">Email ${esc(p.name || p.company)}</div><div class="muted small">To ${esc(p.email)}${mine ? ' · from ' + esc(mine) : ''}</div>
+      <input class="in" id="emSub" style="margin-top:10px" value="${esc(d.subject)}"><textarea class="in" rows="11" id="emBody">${esc(d.body)}</textarea>
+      ${mine ? '' : '<div class="overdue small" style="margin-top:6px">Add your work email in ⚙️ → My profile so this sends from your address.</div>'}
+      <div class="btns">${mine ? `<button class="btn" id="emGmail">Send from ${esc(mine)}</button>` : ''}<button class="btn ghost" id="emMail">Open in mail app</button><button class="btn ghost" id="emX">Cancel</button></div></div>`;
+    document.body.appendChild(wrap);
+    const out = () => ({ su: wrap.querySelector('#emSub').value, body: wrap.querySelector('#emBody').value });
+    const done = async (via) => { try { const r = await api('partnerEmailed', { id: p.id, kind: 'email', what: kind === 'referral' ? 'a referral thank-you' : 'a thank-you for meeting', from: mine || via, subject: out().su }); upsert(S.partners, r.partner); } catch (e) {} wrap.remove(); toast('Logged ✓ Next follow-up in 14 days'); if (onDone) onDone(); };
+    wrap.querySelector('#emX').onclick = () => wrap.remove();
+    const g = wrap.querySelector('#emGmail');
+    if (g) g.onclick = () => { const o = out(); window.open(`https://mail.google.com/mail/?authuser=${encodeURIComponent(mine)}&view=cm&fs=1&to=${encodeURIComponent(p.email)}&su=${encodeURIComponent(o.su)}&body=${encodeURIComponent(o.body)}`, '_blank'); setTimeout(() => done('Gmail'), 400); };
+    wrap.querySelector('#emMail').onclick = () => { const o = out(); location.href = `mailto:${encodeURIComponent(p.email)}?subject=${encodeURIComponent(o.su)}&body=${encodeURIComponent(o.body)}`; setTimeout(() => done('mail app'), 400); };
+  }
+  function viewScan() {
+    const C = S.scan || (S.scan = { imgs: [], card: null, note: '', busy: '' });
+    const c = C.card;
+    const fld = (k, label, type = 'text') => `<label class="f">${label}</label><input class="in" data-cf="${k}" type="${type}" value="${esc((c || {})[k] || '')}">`;
+    shell('Scan business card', `
+      <div class="btns"><label class="btn dark">📷 ${C.imgs.length ? 'Retake front' : 'Photo of card'}<input type="file" accept="image/*" capture="environment" id="cfront" hidden></label>${C.imgs.length ? '<label class="btn ghost">📷 Add back<input type="file" accept="image/*" capture="environment" id="cback" hidden></label>' : ''}</div>
+      ${C.imgs.length ? `<div class="thumbs" style="grid-template-columns:repeat(2,1fr)">${C.imgs.map((s) => `<img src="${s}" alt="Business card photo" style="aspect-ratio:auto;object-fit:contain;background:#fff">`).join('')}</div>` : '<div class="muted small" style="margin-top:8px">Lay the card flat in good light and fill the frame.</div>'}
+      ${C.busy ? `<div class="card muted">${esc(C.busy)}</div>` : ''}
+      ${c ? `<h2>Check the details</h2>
+        <label class="f">Type</label><select class="in" data-cf="type">${PARTNER_TYPES.map((t) => `<option ${c.type === t ? 'selected' : ''}>${t}</option>`).join('')}</select>
+        <div class="two"><div>${fld('name', 'Name')}</div><div>${fld('title', 'Title')}</div></div>
+        ${fld('company', 'Company')}
+        <div class="two"><div>${fld('phone', 'Phone', 'tel')}</div><div>${fld('mobile', 'Cell', 'tel')}</div></div>
+        <div class="two"><div>${fld('email', 'Email', 'email')}</div><div>${fld('website', 'Website')}</div></div>
+        ${fld('address', 'Address')}
+        ${c.notes ? `<div class="muted small" style="margin-top:6px">Also on card: ${esc(c.notes)}</div>` : ''}
+        <h2>Notes from the visit</h2>
+        <div class="composer" style="position:static;padding:0"><button class="micbtn" id="wmic" aria-label="Talk">🎙️</button><textarea class="in grow" id="cnote" rows="3" placeholder="Who you met, what they said, how many units/estates a month…">${esc(C.note)}</textarea></div>
+        <div class="btns"><button class="btn full" id="csave">Save partner & write thank-you</button></div>` : ''}
+    `, { tab: 'partners', back: true });
+    const read = async (file, back) => {
+      try { const d = await frameFromPhoto(file); if (back) C.imgs[1] = d; else C.imgs = [d]; } catch (e) { return toast(e.message); }
+      C.busy = 'Reading the card…'; viewScan();
+      try { const r = await api('scanCard', { images: C.imgs }); C.card = { ...(C.card || {}), ...Object.fromEntries(Object.entries(r.card).filter(([, v]) => v)) }; if (r.card.confidence === 'low') toast('Hard to read: check every field'); }
+      catch (err) { toast(err.message); if (!C.card) C.card = { type: 'Other' }; }
+      C.busy = ''; viewScan();
+    };
+    const fr = document.getElementById('cfront'); if (fr) fr.onchange = () => fr.files[0] && read(fr.files[0], false);
+    const bk = document.getElementById('cback'); if (bk) bk.onchange = () => bk.files[0] && read(bk.files[0], true);
+    $app.querySelectorAll('[data-cf]').forEach((i) => i.oninput = i.onchange = () => { C.card[i.dataset.cf] = i.value; });
+    const note = document.getElementById('cnote'); if (note) note.oninput = () => { C.note = note.value; };
+    const mic = document.getElementById('wmic'); if (mic) mic.onclick = () => listen(note, (t) => { C.note = t; });
+    const sv = document.getElementById('csave');
+    if (sv) sv.onclick = async () => {
+      const card = C.card;
+      if (!card.name && !card.company) return toast('Add a name or company');
+      const dup = S.partners.find((x) => (card.email && x.email && x.email.toLowerCase() === card.email.toLowerCase()) || (card.phone && x.phone && digits(x.phone) === digits(card.phone) && digits(card.phone).length === 10));
+      if (dup && !confirm(`${dup.name || dup.company} is already in your partners. Add this card as a new partner anyway?`)) return go('#/partner/' + dup.id);
+      sv.disabled = true;
+      try {
+        const r = await api('savePartner', { partner: { ...card, stage: 'Talked', metBy: S.me.name, metAt: today(), lastTouch: today(), nextTouch: addDays(today(), 14), note: `Met in person by ${S.me.name}.${C.note ? ' ' + C.note : ''}`, cardImages: C.imgs } });
+        upsert(S.partners, r.partner); S.scan = null;
+        go('#/partner/' + r.partner.id, true);
+        if (r.partner.email) emailSheet(r.partner, 'meet', () => viewPartner(r.partner.id));
+        else if (r.partner.mobile || r.partner.phone) toast('Saved. No email on the card. Use "Text thank-you".');
+      } catch (err) { toast(err.message); sv.disabled = false; }
+    };
+  }
+
   function viewPartners() {
     const q = S.pq.toLowerCase();
     const list = S.partners.filter((p) => (S.pfilter === 'All' || p.stage === S.pfilter || p.type === S.pfilter || (S.pfilter === 'Due' && p.nextTouch && p.nextTouch <= today())) && (!q || [p.name, p.company, p.area, p.type, p.phone].join(' ').toLowerCase().includes(q)));
     const refCount = (p) => S.leads.filter((l) => l.partnerId === p.id).length;
     shell('Referral partners', `
+      <button class="btn full" data-go="#/scan" style="margin-bottom:10px">📇 Scan a business card</button>
       <input class="search" id="pq" placeholder="Search realtors, lawyers, property managers…" value="${esc(S.pq)}">
       <div class="chips">${['All', 'Due', ...S.stages, ...PARTNER_TYPES.slice(0, 3)].map((f) => `<button class="chip ${S.pfilter === f ? 'on' : ''}" data-pfilter="${f}">${f}</button>`).join('')}</div>
       <div class="muted small" style="margin:0 2px 10px">${S.partners.length} partners · ${S.partners.filter((p) => p.stage === 'Referring').length} referring · ${S.leads.filter((l) => l.partnerId).length} referred leads</div>
@@ -568,6 +666,7 @@
   }
 
   function viewPartner(id) {
+    id = String(id || '').split('?')[0];
     const isNew = id === 'new';
     const p = isNew ? { stage: 'To visit', type: 'Realtor', notes: [] } : partner(id);
     if (!p) return go('#/partners');
@@ -587,20 +686,27 @@
         <div class="seg">${S.stages.map((s) => `<button type="button" class="${p.stage === s ? 'on' : ''}" data-stage="${s}">${s}</button>`).join('')}</div>
         <input type="hidden" name="stage" value="${esc(p.stage)}">
         <label class="f">Type</label><select class="in" name="type">${PARTNER_TYPES.map((t) => `<option ${p.type === t ? 'selected' : ''}>${t}</option>`).join('')}</select>
-        <div class="two"><div>${f('name', 'Contact name')}</div><div>${f('company', 'Company / office')}</div></div>
-        <div class="two"><div>${f('phone', 'Phone', 'tel')}</div><div>${f('email', 'Email', 'email')}</div></div>
+        <div class="two"><div>${f('name', 'Contact name')}</div><div>${f('title', 'Title')}</div></div>
+        ${f('company', 'Company / office')}
+        <div class="two"><div>${f('phone', 'Phone', 'tel')}</div><div>${f('mobile', 'Cell', 'tel')}</div></div>
+        <div class="two"><div>${f('email', 'Email', 'email')}</div><div>${f('website', 'Website')}</div></div>
         ${f('address', 'Office address')}
         <div class="two"><div>${f('area', 'Area')}</div><div>${f('nextTouch', 'Next visit / call', 'date')}</div></div>
         <div class="btns"><button class="btn full" type="submit">${isNew ? 'Add partner' : 'Save'}</button></div>
       </form>
       ${isNew ? '' : `
+      ${p.unreadReferral ? `<div class="card task urgent"><div class="title" style="white-space:normal">🎉 ${esc(p.name || p.company)} sent you a referral</div><div class="btns"><button class="btn small-btn" data-pem="referral">✉️ Thank-you email</button><button class="btn ghost small-btn" data-ptext="referral">💬 Thank-you text</button><button class="btn ghost small-btn" id="refseen">Done</button></div></div>` : ''}
+      <h2>Stay in touch</h2>
+      <div class="btns"><button class="btn small-btn" data-pem="meet">✉️ Thank-you email</button><button class="btn ghost small-btn" data-ptext="meet">💬 Text from business number</button><button class="btn ghost small-btn" id="copyref">🔗 Copy their referral link</button></div>
+      <div class="muted small" style="margin-top:6px">${p.metBy ? `Met by ${esc(p.metBy)} ${p.metAt ? fmtDay(p.metAt) : ''}. ` : ''}${p.thanked ? 'Thank-you sent ' + fmtDay(p.thanked) + '.' : 'No thank-you sent yet.'}</div>
+      ${(p.cards || []).length ? `<div class="thumbs" style="grid-template-columns:repeat(2,1fr)">${p.cards.map((k) => `<div class="pth" data-key="${esc(k)}" style="aspect-ratio:1.75"><span>card</span></div>`).join('')}</div>` : ''}
       <h2>Log a visit or call</h2>
       <div class="card"><textarea class="in" id="pn" placeholder="e.g. Dropped 10 cards + Rocky flyer, met Sarah at front desk. Has 2 estates listing in spring."></textarea>
         <label class="f">Next touch</label><div class="seg">${[['+7 days', 7], ['+14 days', 14], ['+30 days', 30]].map(([t, n]) => `<button type="button" data-next="${n}">${t}</button>`).join('')}</div>
-        <div class="btns"><button class="btn dark" id="logtouch">Save visit/call</button><a class="btn ghost" href="${smsHref(p.phone, thanks)}">Send thank-you text</a></div></div>
+        <div class="btns"><button class="btn dark" id="logtouch">Save visit/call</button></div></div>
       ${refs.length ? `<h2>Referred leads (${refs.length})</h2><div class="list">${refs.map(leadCard).join('')}</div>` : ''}
       <h2>History</h2>
-      ${(p.notes || []).map((n) => `<div class="note ${n.auto ? 'auto' : ''}"><div class="meta">${esc(n.by)} · ${new Date(n.at).toLocaleString('en-CA', { dateStyle: 'medium', timeStyle: 'short' })}</div><p>${esc(n.text)}</p></div>`).join('')}`}
+      ${(p.notes || []).map((n) => `<div class="note ${n.auto ? 'auto' : ''} ${n.out ? 'msg-out' : ''}"><div class="meta">${esc(n.by)} · ${new Date(n.at).toLocaleString('en-CA', { dateStyle: 'medium', timeStyle: 'short' })}</div><p>${esc(n.text)}</p></div>`).join('')}`}
     `, { tab: 'partners', back: true });
     const form = document.getElementById('pf');
     form.querySelectorAll('[data-stage]').forEach((b) => b.addEventListener('click', () => { form.stage.value = b.dataset.stage; form.querySelectorAll('[data-stage]').forEach((x) => x.classList.toggle('on', x === b)); }));
@@ -612,6 +718,14 @@
       catch (err) { toast(err.message); }
     });
     if (isNew) return;
+    const textBody = (kind) => kind === 'referral' ? `Hi ${first(p.name)}, it's ${S.me.name} from ${BIZ}. Thank you so much for the referral, we really appreciate it and we'll take great care of them.` : `Hi ${first(p.name)}, it's ${S.me.name} from ${BIZ}. Great meeting you today! If a client or tenant ever needs a property cleared, send them our way: ${referLink(p)}`;
+    const clearRef = async () => { if (p.unreadReferral) { const r = await api('savePartner', { partner: { id: p.id, unreadReferral: false } }); upsert(S.partners, r.partner); } };
+    $app.querySelectorAll('[data-pem]').forEach((b) => b.onclick = () => emailSheet(p, b.dataset.pem, async () => { if (b.dataset.pem === 'referral') await clearRef().catch(() => {}); viewPartner(p.id); }));
+    $app.querySelectorAll('[data-ptext]').forEach((b) => b.onclick = () => { const to = p.mobile || p.phone; if (!to) return toast('No phone number'); confirmSend({ to, who: p.name || p.company, partnerId: p.id, purpose: 'partner', body: textBody(b.dataset.ptext) }, async () => { await api('partnerEmailed', { id: p.id, kind: 'text', what: b.dataset.ptext === 'referral' ? 'a referral thank-you' : 'a thank-you for meeting', from: 'business number' }).then((r) => upsert(S.partners, r.partner)).catch(() => {}); if (b.dataset.ptext === 'referral') await clearRef().catch(() => {}); viewPartner(p.id); }); });
+    document.getElementById('copyref').onclick = () => { const u = referLink(p); navigator.clipboard.writeText(u).then(() => toast('Referral link copied')).catch(() => toast(u)); };
+    const rs = document.getElementById('refseen'); if (rs) rs.onclick = () => clearRef().then(() => viewPartner(p.id));
+    (async () => { for (const t of $app.querySelectorAll('.pth')) { try { const r = (S.mediaCache && S.mediaCache[t.dataset.key]) || (await api('media', { key: t.dataset.key })).src; (S.mediaCache = S.mediaCache || {})[t.dataset.key] = r; t.style.backgroundImage = `url(${r})`; t.onclick = () => { const w = window.open(); if (w) w.document.write(`<img src="${r}" style="max-width:100%">`); }; } catch (e) {} } })();
+    if (/[?&]email=1/.test(location.hash) && p.email) { history.replaceState(null, '', '#/partner/' + p.id); emailSheet(p, 'meet', () => viewPartner(p.id)); }
     let nextDays = 14;
     $app.querySelectorAll('[data-next]').forEach((b) => b.addEventListener('click', () => { nextDays = +b.dataset.next; $app.querySelectorAll('[data-next]').forEach((x) => x.classList.toggle('on', x === b)); }));
     document.getElementById('logtouch').addEventListener('click', async () => {
@@ -635,8 +749,10 @@
       <h2>Export</h2>
       <div class="btns"><button class="btn ghost" data-csv="leads">Leads (CSV)</button><button class="btn ghost" data-csv="partners">Partners (CSV)</button></div>
       ${owner ? `<h2>Team</h2>
-      <div class="card">${S.users.map((u) => `<div class="row" style="padding:6px 0"><div class="grow">${esc(u.name)} <span class="muted small">${u.role}</span></div>${u.name !== S.me.name ? `<button class="btn ghost" data-rm="${esc(u.name)}">Remove</button>` : ''}</div>`).join('')}
+      <div class="card">${S.users.map((u) => `<div class="row" style="padding:6px 0"><div class="grow">${esc(u.name)} <span class="muted small">${u.role}${u.email ? ' · ' + esc(u.email) : ''}</span></div><button class="btn ghost small-btn" data-prof="${esc(u.name)}">Email/title</button>${u.name !== S.me.name ? `<button class="btn ghost small-btn" data-rm="${esc(u.name)}">Remove</button>` : ''}</div>`).join('')}
         <form id="uf"><div class="two"><div><label class="f">Name</label><input class="in" name="name" required></div><div><label class="f">PIN (4–8 digits)</label><input class="in" name="pin" inputmode="numeric" pattern="\\d{4,8}" required></div></div>
+        <div class="two"><div><label class="f">Work email</label><input class="in" name="email" type="email"></div><div><label class="f">Title</label><input class="in" name="title"></div></div>
+        <label class="f">Cell</label><input class="in" name="phone" type="tel">
         <label class="f">Role</label><select class="in" name="role"><option value="crew">Crew</option><option value="owner">Owner (can manage team)</option></select>
         <div class="btns"><button class="btn dark" type="submit">Add / reset team member</button></div></form></div>` : ''}
       ${owner ? `<h2>Business settings (quotes & invoices)</h2>
@@ -654,6 +770,10 @@
       <form id="er" class="card"><div class="two">${[['minimum', 'Project minimum $'], ['perYard', '$ per cubic yard'], ['stairsPerFlight', 'Stairs $ per flight'], ['longCarry', 'Long carry $'], ['dismantlePerHour', 'Dismantle/demo $ per crew-hour'], ['heavyPerTonne', 'Heavy materials $ per tonne'], ['trailerYards', 'Trailer size (cu yd)']].map(([k, t]) => `<div><label class="f">${t}</label><input class="in" name="${k}" inputmode="decimal" value="${esc((S.settings.estimator || {})[k])}"></div>`).join('')}</div>
         <div class="muted small">The AI measures the job; these rates turn it into a price. Starting values are placeholders, so set them to your real numbers.</div>
         <div class="btns"><button class="btn dark" type="submit">Save rates</button></div></form>` : ''}
+      <h2>My profile (email signature)</h2>
+      <form id="mp" class="card"><div class="two"><div><label class="f">Work email</label><input class="in" name="email" type="email" value="${esc(S.me.email || '')}" placeholder="you@gtajunkandpropertycleanout.ca"></div><div><label class="f">Title</label><input class="in" name="title" value="${esc(S.me.title || '')}" placeholder="Owner"></div></div>
+        <label class="f">Cell on your signature</label><input class="in" name="phone" type="tel" value="${esc(S.me.phone || '')}">
+        <div class="btns"><button class="btn dark" type="submit">Save profile</button></div></form>
       <h2>Change my PIN</h2>
       <form id="cp" class="card"><div class="two"><div><label class="f">Current PIN</label><input class="in" name="oldPin" type="password" inputmode="numeric" required></div><div><label class="f">New PIN</label><input class="in" name="newPin" type="password" inputmode="numeric" pattern="\\d{4,8}" required></div></div><div class="btns"><button class="btn dark" type="submit">Change PIN</button></div></form>
       <p class="muted small">Leads arrive automatically from the website forms, Rocky, and the AI phone line. Last sync ${ago(new Date(S.loaded).toISOString())}.</p>
@@ -662,6 +782,13 @@
     document.getElementById('logout').onclick = logout;
     const ib = document.getElementById('install'); if (ib) ib.onclick = () => { S.installEvt.prompt(); S.installEvt = null; };
     $app.querySelectorAll('[data-csv]').forEach((b) => b.onclick = () => csv(b.dataset.csv));
+    $app.querySelectorAll('[data-prof]').forEach((b) => b.onclick = async () => {
+      const u = S.users.find((x) => x.name === b.dataset.prof) || {};
+      const email = prompt(`${u.name}'s work email:`, u.email || ''); if (email === null) return;
+      const title = prompt(`${u.name}'s title (shown on emails):`, u.title || ''); if (title === null) return;
+      const phone = prompt(`${u.name}'s cell (shown on emails):`, u.phone || ''); if (phone === null) return;
+      try { const r = await api('saveProfile', { name: u.name, email, title, phone }); Object.assign(u, r.user); if (u.name === S.me.name) Object.assign(S.me, r.user); toast('Saved'); viewMore(); } catch (err) { toast(err.message); }
+    });
     $app.querySelectorAll('[data-rm]').forEach((b) => b.onclick = async () => { if (!confirm('Remove ' + b.dataset.rm + ' from the CRM?')) return; try { await api('removeUser', { name: b.dataset.rm }); await load(); } catch (e) { toast(e.message); } });
     const uf = document.getElementById('uf');
     if (uf) uf.onsubmit = async (e) => { e.preventDefault(); try { await api('addUser', Object.fromEntries(new FormData(uf))); toast('Team member saved'); await load(true); viewMore(); } catch (err) { toast(err.message); } };
@@ -669,6 +796,8 @@
     if (bs) bs.onsubmit = async (e) => { e.preventDefault(); try { const r = await api('saveSettings', { settings: Object.fromEntries(new FormData(bs)) }); S.settings = r.settings; toast('Settings saved'); } catch (err) { toast(err.message); } };
     const er = document.getElementById('er');
     if (er) er.onsubmit = async (e) => { e.preventDefault(); try { const r = await api('saveSettings', { settings: { estimator: Object.fromEntries(new FormData(er)) } }); S.settings = { ...S.settings, ...r.settings, estimator: { ...S.settings.estimator, ...(r.settings.estimator || {}) } }; toast('Rates saved'); } catch (err) { toast(err.message); } };
+    const mp = document.getElementById('mp');
+    mp.onsubmit = async (e) => { e.preventDefault(); try { const r = await api('saveProfile', Object.fromEntries(new FormData(mp))); Object.assign(S.me, r.user); const u = S.users.find((x) => x.name === r.user.name); if (u) Object.assign(u, r.user); toast('Profile saved'); } catch (err) { toast(err.message); } };
     const cp = document.getElementById('cp');
     cp.onsubmit = async (e) => { e.preventDefault(); try { const r = await api('changePin', Object.fromEntries(new FormData(cp))); S.token = r.token; try { localStorage.setItem('gtjcrm_token', r.token); } catch (x) {} toast('PIN changed'); cp.reset(); } catch (err) { toast(err.message); } };
   }
@@ -717,6 +846,7 @@
     if ((view || '').startsWith('walk')) return viewWalk();
     if (view === 'partners') return viewPartners();
     if (view === 'partner') return viewPartner(id);
+    if (view === 'scan') return viewScan();
     if (view === 'more') return viewMore();
     return viewToday();
   }

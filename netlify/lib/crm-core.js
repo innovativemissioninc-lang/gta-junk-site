@@ -12,6 +12,7 @@ const { STATUSES, newId, clean, prettyPhone, listRecords } = require('./crm-lib'
 const docs = require('./crm-docs');
 const { runAssistant } = require('./crm-assistant');
 const walkthrough = require('./crm-walkthrough');
+const cards = require('./crm-cards');
 const playbook = require('../../crm/playbook.js');
 const CHECK_KEYS = new Set([...playbook.STEPS.map((x) => x[0]), 'photosAsked', 'depositAsked', 'followup1', 'followup2', 'followup3', 'payReminders', 'optOut']);
 
@@ -20,7 +21,7 @@ const TOKEN_DAYS = 60;
 
 const LEAD_FIELDS = ['name', 'phone', 'email', 'address', 'town', 'job', 'details', 'timing', 'source', 'status',
   'quote', 'price', 'jobDate', 'jobTime', 'crew', 'followUp', 'partnerId', 'reviewAsked', 'lostReason'];
-const PARTNER_FIELDS = ['type', 'name', 'company', 'phone', 'email', 'address', 'area', 'stage', 'lastTouch', 'nextTouch', 'referrals'];
+const PARTNER_FIELDS = ['type', 'name', 'title', 'company', 'phone', 'mobile', 'email', 'website', 'address', 'area', 'stage', 'lastTouch', 'nextTouch', 'referrals', 'metBy', 'metAt', 'metWhere'];
 const PARTNER_STAGES = ['To visit', 'Card dropped', 'Talked', 'Interested', 'Referring', 'Not a fit'];
 
 const json = (status, obj) => ({ statusCode: status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }, body: JSON.stringify(obj) });
@@ -59,7 +60,7 @@ async function verify(store, token) {
   if (!user || (user.ver || 1) !== p.v) return null; // removed user or PIN changed
   return user;
 }
-const publicUser = (u) => ({ name: u.name, role: u.role });
+const publicUser = (u) => ({ name: u.name, role: u.role, email: u.email || '', title: u.title || '', phone: u.phone || '' });
 
 exports.handle = async (event, store) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'POST only' });
@@ -272,13 +273,49 @@ exports.handle = async (event, store) => {
       for (const f of PARTNER_FIELDS) {
         if (!(f in input)) continue;
         let v = f === 'referrals' ? Math.max(0, parseInt(input[f], 10) || 0) : clean(input[f], 300);
-        if (f === 'phone') v = prettyPhone(v);
+        if (f === 'phone' || f === 'mobile') v = prettyPhone(v);
         if (f === 'stage' && !PARTNER_STAGES.includes(v)) continue;
         p[f] = v;
       }
+      if (input.note) p.notes = [{ at: now, by: me.name, text: clean(input.note, 3000) }, ...(p.notes || [])];
+      for (const [i, img] of (input.cardImages || []).slice(0, 2).entries()) {
+        if (typeof img !== 'string' || !img.startsWith('data:image/jpeg;base64,') || img.length > 1500000) continue;
+        const key = `media/partner/${p.id}/card-${Date.now()}-${i}.jpg`;
+        await store.set(key, Buffer.from(img.split(',')[1], 'base64'));
+        p.cards = [...(p.cards || []), key].slice(-6);
+      }
+      if ('unreadReferral' in input) p.unreadReferral = !!input.unreadReferral;
       p.updated = now;
       await store.setJSON(`partner/${p.id}`, p);
       return json(200, { partner: p });
+    }
+
+    if (a === 'scanCard') {
+      const r = await cards.readCard(body.images);
+      if (r.error) return json(400, { error: r.error });
+      return json(200, r);
+    }
+    if (a === 'partnerEmailed') {
+      const p = await store.get(`partner/${clean(body.id, 60)}`, { type: 'json' });
+      if (!p) return json(404, { error: 'Partner not found' });
+      const day = now.slice(0, 10);
+      p.notes = [{ at: now, by: me.name, text: `${body.kind === 'text' ? 'Texted' : 'Emailed'} ${clean(body.what, 80) || 'a thank-you'} from ${clean(body.from, 120) || me.name}${body.subject ? ': "' + clean(body.subject, 160) + '"' : ''}`, out: true }, ...(p.notes || [])];
+      p.lastTouch = day; p.thanked = p.thanked || day;
+      if (!p.nextTouch || p.nextTouch <= day) { const x = new Date(day + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() + 14); p.nextTouch = x.toISOString().slice(0, 10); }
+      if (['To visit', 'Card dropped'].includes(p.stage)) p.stage = 'Talked';
+      p.updated = now;
+      await store.setJSON(`partner/${p.id}`, p);
+      return json(200, { partner: p });
+    }
+    if (a === 'saveProfile') {
+      // Your own email/title/phone for signatures; the owner can set anyone's.
+      const target = body.name && me.role === 'owner' ? await store.get(userKey(body.name), { type: 'json' }) : me;
+      if (!target) return json(404, { error: 'No such team member' });
+      if ('email' in body) { const e = clean(body.email, 120).toLowerCase(); if (e && !/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/.test(e)) return json(400, { error: 'That email looks wrong.' }); target.email = e; }
+      if ('title' in body) target.title = clean(body.title, 60);
+      if ('phone' in body) target.phone = prettyPhone(body.phone);
+      await store.setJSON(userKey(target.name), target);
+      return json(200, { user: publicUser(target) });
     }
 
     // ---------- team management (owner) ----------
@@ -296,7 +333,8 @@ exports.handle = async (event, store) => {
         if (!name || !/^\d{4,8}$/.test(String(body.pin || ''))) return json(400, { error: 'Enter a name and a 4–8 digit PIN.' });
         const role = body.role === 'owner' ? 'owner' : 'crew';
         const prev = await store.get(userKey(name), { type: 'json' });
-        const user = { name, role, ver: ((prev && prev.ver) || 0) + 1, ...hashPin(body.pin), fails: 0, lockUntil: 0, created: now };
+        const user = { name, role, ver: ((prev && prev.ver) || 0) + 1, ...hashPin(body.pin), fails: 0, lockUntil: 0, created: now,
+          email: clean(body.email, 120).toLowerCase() || (prev && prev.email) || '', title: clean(body.title, 60) || (prev && prev.title) || '', phone: prettyPhone(body.phone) || (prev && prev.phone) || '' };
         await store.setJSON(userKey(name), user);
         return json(200, { user: publicUser(user) });
       }

@@ -51,6 +51,7 @@ async function addInboundLead(store, data) {
     existing.notes.unshift({ ...note, text: `New ${data.source} enquiry. ${note.text}` });
     for (const k of ['email', 'town', 'address', 'job']) if (!existing[k] && data[k]) existing[k] = clean(data[k], 300);
     if (existing.status === 'New') existing.unread = true;
+    if (data.partnerId && !existing.partnerId) existing.partnerId = clean(data.partnerId, 60);
     existing.updated = now;
     await store.setJSON(`lead/${existing.id}`, existing);
     return { id: existing.id, merged: true };
@@ -70,7 +71,7 @@ async function addInboundLead(store, data) {
     job: clean(data.job, 300),
     details: clean(data.details, 6000),
     timing: clean(data.timing, 200),
-    quote: '', price: '', jobDate: '', jobTime: '', crew: '', followUp: '', partnerId: '',
+    quote: '', price: '', jobDate: '', jobTime: '', crew: '', followUp: '', partnerId: clean(data.partnerId, 60),
     reviewAsked: '',
     links: (data.links || []).filter(Boolean).slice(0, 10),
     notes: note.text ? [note] : []

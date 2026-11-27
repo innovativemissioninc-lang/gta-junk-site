@@ -9,7 +9,7 @@
  * mapped below. Errors are logged and swallowed: a CRM problem must never
  * break the form email Fabian already gets.
  */
-const { addInboundLead, newId, clean, prettyPhone } = require('./crm-lib');
+const { addInboundLead, newId, clean, prettyPhone, digits, listRecords } = require('./crm-lib');
 
 const SOURCES = {
   'quote-request': 'Website form',
@@ -49,6 +49,33 @@ exports.handle = async (body, store) => {
       };
       await store.setJSON(`partner/${partner.id}`, partner);
       return { statusCode: 200, body: 'partner saved' };
+    }
+
+    if (form === 'partner-referral') {
+      // A partner referring a client: the CLIENT becomes the lead; the referrer is
+      // matched to an existing partner (by ?ref= link id, email or phone) or added.
+      const now = new Date().toISOString();
+      const partners = await listRecords(store, 'partner/');
+      const rEmail = pick(d, 'referrer_email').toLowerCase(), rPhone = digits(pick(d, 'referrer_phone'));
+      let partner = (d.ref && partners.find((p) => p.id === String(d.ref).trim()))
+        || (rEmail && partners.find((p) => String(p.email || '').toLowerCase() === rEmail))
+        || (rPhone.length === 10 && partners.find((p) => digits(p.phone) === rPhone || digits(p.mobile) === rPhone));
+      if (!partner) {
+        partner = { id: newId('P'), created: now, type: 'Other', stage: 'Referring', referrals: 0, notes: [],
+          name: clean(pick(d, 'referrer_name'), 120), company: clean(pick(d, 'referrer_firm'), 120), phone: prettyPhone(pick(d, 'referrer_phone')), email: rEmail };
+        const t = pick(d, 'referrer_type').toLowerCase();
+        partner.type = /real estate|realtor/.test(t) ? 'Realtor' : /lawyer|trustee/.test(t) ? 'Estate lawyer' : /property manager|landlord/.test(t) ? 'Property manager' : /restoration/.test(t) ? 'Restoration company' : 'Other';
+      }
+      const details = [pick(d, 'notes') , pick(d, 'deadline') && `Fixed date: ${pick(d, 'deadline')}`,
+        `Referred by ${pick(d, 'referrer_name')}${pick(d, 'referrer_firm') ? ' (' + pick(d, 'referrer_firm') + ')' : ''}, ${pick(d, 'referrer_phone')} ${rEmail}`,
+        pick(d, 'referral_preference') && `Referral preference: ${pick(d, 'referral_preference')}`].filter(Boolean).join('\n');
+      const res = await addInboundLead(store, { source: 'Partner referral', name: pick(d, 'client_name'), phone: pick(d, 'client_phone'), town: pick(d, 'property'), address: pick(d, 'property'), job: pick(d, 'job_type'), timing: pick(d, 'deadline'), details, note: details, partnerId: partner.id });
+      partner.referrals = (partner.referrals || 0) + (res.merged ? 0 : 1);
+      partner.stage = 'Referring'; partner.lastTouch = now.slice(0, 10); partner.updated = now;
+      partner.notes = [{ at: now, by: 'Website', text: `Referred ${pick(d, 'client_name') || 'a client'} (${pick(d, 'job_type') || 'job'}). Thank them!` }, ...(partner.notes || [])];
+      partner.unreadReferral = true;
+      await store.setJSON(`partner/${partner.id}`, partner);
+      return { statusCode: 200, body: JSON.stringify(res) };
     }
 
     const source = SOURCES[form];
