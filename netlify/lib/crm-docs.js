@@ -9,14 +9,14 @@ const { clean } = require('./crm-lib');
 const DEFAULT_SETTINGS = {
   businessName: 'GTA Junk and Property Cleanout Inc.',
   phone: '(416) 659-5401',
-  email: 'gtajunkandpropertycleanout@gmail.com',
+  email: 'info@gtajunkandpropertycleanout.ca',
   website: 'gtajunkandpropertycleanout.ca',
   address: 'Toronto, ON',
   hstNumber: '',            // e.g. 123456789 RT0001 — HST is only charged when this is set
   hstRate: 13,
   depositPct: 30,
   quoteValidDays: 30,
-  paymentInstructions: 'Interac e-Transfer to gtajunkandpropertycleanout@gmail.com (auto-deposit), or cash/cheque on completion.',
+  paymentInstructions: 'Interac e-Transfer to info@gtajunkandpropertycleanout.ca (auto-deposit), or cash/cheque on completion.',
   quoteTerms: 'Price is fixed for the scope described. A 30% deposit confirms the booking and comes off the final invoice. Balance due on completion after you walk the site with us. Heavy materials (soil, concrete, shingles, tile) are billed by the tonne with scale tickets.',
   invoiceTerms: 'Due on receipt. Thank you for choosing GTA Junk and Property Cleanout.',
   reviewUrl: 'https://g.page/r/CWUHyrYovKM_EAI/review',

@@ -41,7 +41,7 @@ const TIERS = [
 const DEPOSIT_PCT = 30;
 const PHONE = '(416) 659-5401';
 const PHONE_E164 = '+14166595401';
-const EMAIL = 'gtajunkandpropertycleanout@gmail.com';
+const EMAIL = 'info@gtajunkandpropertycleanout.ca';
 const MECP = 'R-004-5477911257';
 const LIABILITY = '$2 million';
 
