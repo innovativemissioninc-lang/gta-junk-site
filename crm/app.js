@@ -767,7 +767,7 @@
         <label class="f">Google review link</label><input class="in" name="reviewUrl" value="${esc(S.settings.reviewUrl || '')}">
         <div class="btns"><button class="btn dark" type="submit">Save business settings</button></div></form>
       <h2>Estimating rates (video estimates)</h2>
-      <form id="er" class="card"><div class="two">${[['minimum', 'Project minimum $'], ['perYard', '$ per cubic yard'], ['stairsPerFlight', 'Stairs $ per flight'], ['longCarry', 'Long carry $'], ['dismantlePerHour', 'Dismantle/demo $ per crew-hour'], ['heavyPerTonne', 'Heavy materials $ per tonne'], ['trailerYards', 'Trailer size (cu yd)']].map(([k, t]) => `<div><label class="f">${t}</label><input class="in" name="${k}" inputmode="decimal" value="${esc((S.settings.estimator || {})[k])}"></div>`).join('')}</div>
+      <form id="er" class="card"><div class="two">${[['minimum', 'Junk/garage minimum $'], ['estateMinimum', 'Estate minimum $'], ['hotTubMinimum', 'Hot tub from $'], ['perYard', '$ per cubic yard'], ['stairsPerFlight', 'Stairs $ per flight'], ['longCarry', 'Long carry $'], ['dismantlePerHour', 'Dismantle/demo $ per crew-hour'], ['heavyPerTonne', 'Heavy materials $ per tonne'], ['trailerYards', 'Trailer size (cu yd)']].map(([k, t]) => `<div><label class="f">${t}</label><input class="in" name="${k}" inputmode="decimal" value="${esc((S.settings.estimator || {})[k])}"></div>`).join('')}</div>
         <div class="muted small">The AI measures the job; these rates turn it into a price. Starting values are placeholders, so set them to your real numbers.</div>
         <div class="btns"><button class="btn dark" type="submit">Save rates</button></div></form>` : ''}
       <h2>My profile (email signature)</h2>

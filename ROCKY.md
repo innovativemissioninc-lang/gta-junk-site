@@ -53,12 +53,12 @@ So Rocky physically cannot:
 - invent an hourly, per-item, per-yard or per-tonne rate (none are published)
 - average or split a range into a single number
 - offer a discount, a price match or a free add-on
-- quote below the $1,500 minimum, except the published $550 hot tub
+- quote below The Clear-Out's $495 starting price, or below the $1,500 estate minimum on an estate
 
 Every range Rocky gives carries the same caveat you use yourself: the firm
-number is fixed in writing at a free on-site assessment. He is also told to
-*lose* a job that falls under the minimum rather than quote it badly, and to
-say why.
+number is fixed in writing at a free on-site assessment. Small jobs (a single
+couch, a mattress, a few bags) are welcome under The Clear-Out from $495; the
+$1,500 minimum charge applies to estate cleanouts only.
 
 ### Where the prices live
 
@@ -74,14 +74,17 @@ independently and two of them were still on the pre-pivot numbers:
 | Where | Was saying | Now |
 |---|---|---|
 | Homepage `makesOffer` schema | $495 / $795 / $1,195 as live offers | the four current tiers |
-| `/see-your-price/` video estimate | $495–$620 and $795–$950 | $1,500–$2,200 and $2,000–$3,200 |
+| `/see-your-price/` video estimate | $495–$620 and $795–$950 | $495–$620 and $795–$950 (restored Nov 2026) |
 | `llms.txt` | video estimate gives "a rough price" | "an indicative project range" |
 
 The homepage case was the bad one: `makesOffer` said $495 in the *same*
 structured-data block whose `hasOfferCatalog` said the minimum was $1,500.
 Google and the AI answer engines were reading both and believing the cheaper
-one. A customer could also have filmed a garage, been shown "$495 to $620",
-and then been told $1,500 on the phone. All three now agree.
+one. **November 2026 update (owner decision):** the $1,500 minimum is for estate
+cleanouts only. Junk removal and garage cleanouts are priced by finish level —
+The Clear-Out from $495, The Standard Reset from $795, The Pristine
+Transformation from $1,195 — on every page, in the schema, in Rocky, in the
+video estimate and in the CRM.
 
 ---
 

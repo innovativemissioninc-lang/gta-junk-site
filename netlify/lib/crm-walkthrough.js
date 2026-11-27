@@ -14,7 +14,9 @@ const MODEL = 'claude-sonnet-5-5';
 const MAX_FRAMES = 20;
 
 const ESTIMATOR_DEFAULTS = {
-  minimum: 1500,        // published project minimum
+  minimum: 495,         // junk removal / garage: The Clear-Out starts at $495
+  estateMinimum: 1500,  // minimum charge for estate cleanouts only
+  hotTubMinimum: 550,   // hot tub removal from $550
   perYard: 85,          // $ per loose cubic yard removed (labour + loading + haul + disposal)
   trailerYards: 16.5,   // 12 ft x 8 ft trailer, 56 in sides (~448 cu ft level-full)
   stairsPerFlight: 150, // per flight carried, applied once per job
@@ -46,6 +48,17 @@ Return ONLY one JSON object, no markdown:
 }
 Volume reference: fridge ~0.7 yd³, 3-seat sofa ~1.5, queen mattress+box ~1, pickup bed heaped ~3, single-car garage packed to shoulder height ~15-20, our 12 ft x 8 ft trailer with 56-inch sides holds ~16.5 loose yd³ level-full. Report what is really there; don't pad (pricing adds its own buffer) and don't lowball. Trust the owner's notes over the frames when they conflict (e.g. "there's a second room just like this"). If biohazard, sharps, trauma or heavy pest waste is involved, list it in hazards: the company does not do that work.`;
 
+// Settings saved before Nov 2026 stored minimum = 1500 for every job. The
+// $1,500 minimum is now estate-only, so read an old saved 1500 as the estate
+// minimum and fall back to the $495 Clear-Out floor for everything else.
+function estimatorFrom(settings) {
+  const saved = { ...((settings && settings.estimator) || {}) };
+  if (Number(saved.minimum) === 1500 && saved.estateMinimum == null) { delete saved.minimum; saved.estateMinimum = 1500; }
+  const est = { ...ESTIMATOR_DEFAULTS, ...saved };
+  est.confidenceBuffer = { ...ESTIMATOR_DEFAULTS.confidenceBuffer, ...(saved.confidenceBuffer || {}) };
+  return est;
+}
+
 function priceFrom(read, est) {
   const conf = ['high', 'medium', 'low'].includes(read.confidence) ? read.confidence : 'medium';
   const yards = Math.max(0, num(read.cubic_yards));
@@ -60,12 +73,16 @@ function priceFrom(read, est) {
   const t = Math.max(0, num(read.heavy_tonnes));
   if (t) lines.push({ desc: 'Heavy materials by the tonne (scale tickets provided)', qty: Math.round(t * 10) / 10, price: est.heavyPerTonne, key: 'heavy' });
   let subtotal = lines.reduce((s, l) => s + l.qty * l.price, 0);
-  if (subtotal < est.minimum) {
-    lines[0].price += est.minimum - subtotal; lines[0].note = `raised to the $${est.minimum} project minimum`;
-    subtotal = est.minimum;
+  const jt = String(read.job_type || '').toLowerCase();
+  const floor = jt.includes('estate') ? [num(est.estateMinimum) || 1500, 'estate cleanout minimum']
+    : jt.includes('hot tub') ? [num(est.hotTubMinimum) || 550, 'hot tub removal starting price']
+    : [num(est.minimum) || 495, 'Clear-Out starting price'];
+  if (subtotal < floor[0]) {
+    lines[0].price += floor[0] - subtotal; lines[0].note = `raised to the $${floor[0]} ${floor[1]}`;
+    subtotal = floor[0];
   }
   // Round the headline to a clean number (nearest $25) by adjusting the main line.
-  const rounded = Math.ceil(subtotal / 25) * 25;
+  const rounded = subtotal === floor[0] ? subtotal : Math.ceil(subtotal / 25) * 25;
   lines[0].price += rounded - subtotal;
   return { lines, subtotal: rounded, buffer: est.confidenceBuffer[conf] || 1.12, confidence: conf };
 }
@@ -77,8 +94,7 @@ async function analyze({ store, me, leadId, frames, notes, checklist }) {
   if (imgs.length < 2) return { error: 'Need at least 2 frames from the video.' };
   const lead = leadId ? await store.get(`lead/${leadId}`, { type: 'json' }) : null;
   const settings = await getSettings(store);
-  const est = { ...ESTIMATOR_DEFAULTS, ...(settings.estimator || {}) };
-  est.confidenceBuffer = { ...ESTIMATOR_DEFAULTS.confidenceBuffer, ...((settings.estimator || {}).confidenceBuffer || {}) };
+  const est = estimatorFrom(settings);
 
   const content = [];
   imgs.forEach((d, i) => {
@@ -120,4 +136,4 @@ async function analyze({ store, me, leadId, frames, notes, checklist }) {
   return { walk };
 }
 
-module.exports = { analyze, priceFrom, ESTIMATOR_DEFAULTS };
+module.exports = { analyze, priceFrom, estimatorFrom, ESTIMATOR_DEFAULTS };

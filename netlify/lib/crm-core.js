@@ -125,7 +125,7 @@ exports.handle = async (event, store) => {
     if (a === 'load') {
       const [leads, partners, users, allDocs, settings] = await Promise.all([listRecords(store, 'lead/'), listRecords(store, 'partner/'), listRecords(store, 'user/'), listRecords(store, 'doc/'), docs.getSettings(store)]);
       return json(200, { me: publicUser(me), leads, partners, users: users.map(publicUser), statuses: STATUSES, partnerStages: PARTNER_STAGES,
-        docs: allDocs.map((d) => ({ ...d, url: docs.docUrl(d) })), settings: { ...settings, estimator: { ...walkthrough.ESTIMATOR_DEFAULTS, ...(settings.estimator || {}) } } });
+        docs: allDocs.map((d) => ({ ...d, url: docs.docUrl(d) })), settings: { ...settings, estimator: walkthrough.estimatorFrom(settings) } });
     }
 
     if (a === 'assistant') {
@@ -215,7 +215,7 @@ exports.handle = async (event, store) => {
       const next = { ...cur };
       if (body.settings && body.settings.estimator) {
         const e = body.settings.estimator, out = {};
-        for (const k of ['minimum', 'perYard', 'trailerYards', 'stairsPerFlight', 'longCarry', 'dismantlePerHour', 'heavyPerTonne']) if (k in e) out[k] = docs.num(e[k]);
+        for (const k of ['minimum', 'estateMinimum', 'hotTubMinimum', 'perYard', 'trailerYards', 'stairsPerFlight', 'longCarry', 'dismantlePerHour', 'heavyPerTonne']) if (k in e) out[k] = docs.num(e[k]);
         next.estimator = { ...(cur.estimator || {}), ...out };
       }
       if (body.settings && 'ownerMobile' in body.settings) { const d = String(body.settings.ownerMobile).replace(/\D/g, '').replace(/^1(?=\d{10}$)/, ''); body.settings.ownerMobile = d.length === 10 ? '+1' + d : ''; }

@@ -4,12 +4,17 @@
  * Every published price in the business lives here and nowhere else.
  *
  * WHY THIS FILE EXISTS
- *   Before this file, three places quoted prices independently: the homepage
- *   `makesOffer` schema ($495 / $795 / $1,195), the video-estimate function
- *   ($495-$620 / $795-$950), and the visible page copy ($1,500 minimum).
- *   A customer could film a garage, be shown "$495 to $620", then be told the
- *   minimum engagement is $1,500. That is the one thing this business says it
- *   will never do. Anything that quotes a price now imports from here.
+ *   Several places used to quote prices independently, and they drifted: a
+ *   customer could be shown "$495" on one page and "$1,500 minimum" on another.
+ *   Anything that quotes a price now imports from here.
+ *
+ * THE PRICING MODEL (owner-confirmed, November 2026)
+ *   - Junk removal and garage cleanouts are priced by finish level:
+ *     The Clear-Out from $495, The Standard Reset from $795,
+ *     The Pristine Transformation from $1,195.
+ *   - The $1,500 minimum charge applies to ESTATE cleanouts only.
+ *   - Specialised project work (hoarding, commercial, demolition, insurance,
+ *     pre-listing, pool) keeps its own published ranges.
  *
  * THE GUARANTEE ROCKY MUST NEVER BREAK
  *   Rocky quotes RANGES, never a firm number. The firm number is set in
@@ -26,7 +31,13 @@
 
 'use strict';
 
-const MINIMUM = 1500;
+const ESTATE_MINIMUM = 1500;   // minimum charge for estate cleanouts only
+const MINIMUM = ESTATE_MINIMUM;  // kept for older imports; means the ESTATE minimum
+const TIERS = [
+  { key: 'clear-out', name: 'The Clear-Out', from: 495, what: 'total removal, floor protection, broom-clean finish' },
+  { key: 'standard-reset', name: 'The Standard Reset', from: 795, what: 'cleared, cobwebs gone, industrial sweep, surfaces wiped' },
+  { key: 'pristine-transformation', name: 'The Pristine Transformation', from: 1195, what: 'degreased, deep-vacuumed, detailed, bare-concrete finish' }
+];
 const DEPOSIT_PCT = 30;
 const PHONE = '(416) 659-5401';
 const PHONE_E164 = '+14166595401';
@@ -75,7 +86,7 @@ const SERVICES = [
     name: 'Estate complete clearance',
     low: 2000, high: 7000,
     range: '$2,000 to $7,000+',
-    note: 'A standard clear starts at $2,000 and the Signature finish is $3,200. Large or multi-level properties, full basements, garages and outbuildings run to $7,000 and beyond.',
+    note: 'Estate cleanouts carry a $1,500 minimum charge. A standard clear starts at $2,000 and the Signature finish is $3,200. Large or multi-level properties, full basements, garages and outbuildings run to $7,000 and beyond.',
     url: '/estate-cleanouts/',
     drivers: ['property size and number of levels', 'how full it is', 'basement, attic and garage access', 'how much needs itemising for the estate file', 'finish level'],
     match: ['estate', 'probate', 'executor', 'passed away', 'passed', 'deceased', 'inherit', 'mother', 'father', 'parent']
@@ -122,20 +133,20 @@ const SERVICES = [
   },
   {
     key: 'garage',
-    name: 'Garage cleanout, Signature finish',
-    low: 1500, high: null,
-    range: 'from $1,500',
-    note: 'Packed to the rafters back to bare, degreased concrete, usually in one visit.',
+    name: 'Junk removal and garage cleanouts',
+    low: 495, high: null,
+    range: 'from $495 for The Clear-Out, $795 for The Standard Reset, or $1,195 for The Pristine Transformation',
+    note: 'Priced by finish level. The Clear-Out is total removal with a broom-clean floor; The Standard Reset adds cobwebs, an industrial sweep and a surface wipe; The Pristine Transformation is degreased, detailed, bare-concrete. Single items and small loads are welcome.',
     url: '/services/garage-cleanouts/',
     drivers: ['single, double or triple garage', 'how full it is and how heavy the contents are', 'whether the floor is degreased at the end', 'driveway access'],
-    match: ['garage', 'basement', 'attic', 'shed cleanout', 'house cleanout', 'property cleanout', 'junk removal', 'declutter']
+    match: ['garage', 'basement', 'attic', 'shed cleanout', 'junk removal', 'junk', 'declutter', 'couch', 'sofa', 'mattress', 'fridge', 'furniture', 'appliance', 'single item', 'one item', 'pickup']
   },
   {
     key: 'hottub',
     name: 'Hot tub and spa removal',
     low: 550, high: null,
     range: 'from $550, or from $900 with the surrounding deck',
-    note: 'This is the one service offered below the $1,500 project minimum.',
+    note: 'Drained, dismantled and hauled, pad swept.',
     url: '/services/',
     drivers: ['tub size', 'whether the surrounding deck comes down too', 'gate and side-yard access', 'whether it has to come over a fence'],
     match: ['hot tub', 'hottub', 'spa', 'jacuzzi', 'swim spa']
@@ -177,7 +188,11 @@ const EXTRA_FIGURES = [
   3200,    // the Signature estate finish
   8000,    // hoarding Tier 2 floor
   900,     // hot tub with deck
-  1500,    // the minimum, quoted in its own right
+  1500,    // the estate minimum, quoted in its own right
+  795,     // The Standard Reset
+  1195,    // The Pristine Transformation
+  620,     // video estimate: Clear-Out range top
+  950,     // video estimate: Standard Reset range top
   2        // "$2 million in commercial general liability"
 ];
 
@@ -235,7 +250,7 @@ function refusalFor(text) {
 }
 
 module.exports = {
-  MINIMUM, DEPOSIT_PCT, PHONE, PHONE_E164, EMAIL, MECP, LIABILITY,
+  MINIMUM, ESTATE_MINIMUM, TIERS, DEPOSIT_PCT, PHONE, PHONE_E164, EMAIL, MECP, LIABILITY,
   SERVICES, REFUSALS, ALLOWED_FIGURES,
   unapprovedFigures, classify, refusalFor
 };
