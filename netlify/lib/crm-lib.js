@@ -34,22 +34,26 @@ async function listRecords(store, prefix) {
 
 /** Find an open lead for the same phone in the last 14 days (so a caller who
  *  also fills the form becomes one lead with two notes, not two leads). */
-async function findRecentByPhone(store, phone) {
-  const d = digits(phone);
-  if (d.length !== 10) return null;
+async function findRecentByPhone(store, phone, email) {
+  const d = digits(phone).slice(-10), e = String(email || '').trim().toLowerCase();
+  if (d.length !== 10 && !e) return null;
   const leads = await listRecords(store, 'lead/');
   const cutoff = Date.now() - 14 * 864e5;
-  return leads.find((l) => digits(l.phone) === d && !['Done', 'Lost'].includes(l.status) && Date.parse(l.created) > cutoff) || null;
+  return leads.find((l) => ((d.length === 10 && digits(l.phone).slice(-10) === d) || (e && String(l.email || '').toLowerCase() === e)) && !['Done', 'Lost'].includes(l.status) && Date.parse(l.created) > cutoff) || null;
 }
 
 async function addInboundLead(store, data) {
   const now = new Date().toISOString();
   const note = { at: now, by: data.source || 'system', text: clean(data.note, 6000) };
-  const existing = await findRecentByPhone(store, data.phone);
+  const existing = await findRecentByPhone(store, data.phone, data.email);
   if (existing) {
     existing.notes = existing.notes || [];
     existing.notes.unshift({ ...note, text: `New ${data.source} enquiry. ${note.text}` });
     for (const k of ['email', 'town', 'address', 'job']) if (!existing[k] && data[k]) existing[k] = clean(data[k], 300);
+    if (!existing.phone && data.phone) existing.phone = prettyPhone(data.phone);
+    if ((!existing.name || existing.name === '(no name)') && data.name) existing.name = clean(data.name, 120);
+    if (data.links && data.links.length) existing.links = [...(existing.links || []), ...data.links.filter(Boolean)].slice(-20);
+    existing.unread = true;
     if (existing.status === 'New') existing.unread = true;
     if (data.partnerId && !existing.partnerId) existing.partnerId = clean(data.partnerId, 60);
     existing.updated = now;

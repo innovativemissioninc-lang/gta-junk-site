@@ -10,6 +10,7 @@
  * break the form email Fabian already gets.
  */
 const { addInboundLead, newId, clean, prettyPhone, digits, listRecords } = require('./crm-lib');
+const { notifyOwner } = require('./crm-notify');
 
 const SOURCES = {
   'quote-request': 'Website form',
@@ -75,6 +76,7 @@ exports.handle = async (body, store) => {
       partner.notes = [{ at: now, by: 'Website', text: `Referred ${pick(d, 'client_name') || 'a client'} (${pick(d, 'job_type') || 'job'}). Thank them!` }, ...(partner.notes || [])];
       partner.unreadReferral = true;
       await store.setJSON(`partner/${partner.id}`, partner);
+      await notifyOwner(store, res.id, { merged: res.merged, source: `referral from ${partner.name || partner.company || 'a partner'}` });
       return { statusCode: 200, body: JSON.stringify(res) };
     }
 
@@ -109,6 +111,7 @@ exports.handle = async (body, store) => {
       note: details,
       links
     });
+    await notifyOwner(store, res.id, { merged: res.merged, source });
     return { statusCode: 200, body: JSON.stringify(res) };
   } catch (e) {
     console.error('crm submission-created failed:', e && e.message);
