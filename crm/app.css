@@ -115,3 +115,5 @@ label.btn input[hidden]{display:none}
 .pth span{position:absolute;left:4px;bottom:4px;background:rgba(15,26,46,.7);color:#fff;font-size:11px;padding:1px 6px;border-radius:999px}
 .note.msg-in{border-left-color:var(--orange);background:#FFF8F1;border-radius:0 10px 10px 0}
 .note.msg-out{border-left-color:var(--blue)}
+header.top .hlogo{width:34px;height:34px;flex:none;display:block}
+.login img.logo.wide{width:min(280px,80vw);height:auto;border-radius:0;box-shadow:none}

@@ -58,7 +58,7 @@
     const newCount = S.leads.filter((l) => l.unread).length;
     const tab = (id, ic, label, badge) => `<button data-go="#/${id}" class="${opts.tab === id ? 'on' : ''}"><span class="ic">${ic}</span>${label}${badge ? `<span class="badge">${badge}</span>` : ''}</button>`;
     $app.innerHTML = `
-      <header class="top">${opts.back ? `<button class="back" data-back>‹</button>` : ''}<h1>${esc(title)}</h1>${opts.hbtn || ''}${opts.tab !== 'more' ? '<button class="gear" data-go="#/more" aria-label="Settings">⚙️</button>' : ''}</header>
+      <header class="top">${opts.back ? `<button class="back" data-back>‹</button>` : '<img class="hlogo" src="/assets/logo-badge.svg" alt="GTA Junk">'}<h1>${esc(title)}</h1>${opts.hbtn || ''}${opts.tab !== 'more' ? '<button class="gear" data-go="#/more" aria-label="Settings">⚙️</button>' : ''}</header>
       <main>${body}</main>
       ${opts.fab ? `<button class="fab" data-go="${opts.fab}" aria-label="Add">+</button>` : ''}
       <nav class="tabs">${tab('today', '☀️', 'Today')}${tab('leads', '📋', 'Leads', newCount)}<button data-go="#/ask" class="mic-tab ${opts.tab === 'ask' ? 'on' : ''}"><span class="mic-ic">🎙️</span>Assistant</button>${tab('calendar', '📅', 'Calendar')}${tab('partners', '🤝', 'Partners')}</nav>`;
@@ -814,7 +814,7 @@
   async function renderLogin() {
     let setup = false;
     try { setup = (await api('status')).setupNeeded; } catch (e) {}
-    $app.innerHTML = `<div class="login"><img class="logo" src="/crm/icon-192.png" alt=""><h1>GTA Junk CRM</h1><p>${setup ? 'First-time setup' : 'Log in with your name and PIN'}</p>
+    $app.innerHTML = `<div class="login"><img class="logo wide" src="/assets/logo-horizontal-light.svg" alt="GTA Junk and Property Cleanout"><h1>CRM</h1><p>${setup ? 'First-time setup' : 'Log in with your name and PIN'}</p>
       <form id="lg">${setup ? '<label class="f">Setup code</label><input class="in" name="code" autocomplete="off" required>' : ''}
       <label class="f">Your name</label><input class="in" name="name" autocomplete="username" required value="${esc((() => { try { return localStorage.getItem('gtjcrm_name') || ''; } catch (e) { return ''; } })())}">
       <label class="f">${setup ? 'Choose a PIN (4–8 digits)' : 'PIN'}</label><input class="in" name="pin" type="password" inputmode="numeric" autocomplete="current-password" required>

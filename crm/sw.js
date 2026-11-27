@@ -1,7 +1,7 @@
 // GTJ CRM service worker: caches the app shell so it opens instantly and
 // installs as a phone app. API calls always go to the network.
-const CACHE = 'gtj-crm-v6';
-const SHELL = ['/crm/', '/crm/app.css?v=6', '/crm/playbook.js?v=6', '/crm/app.js?v=6', '/crm/manifest.webmanifest', '/crm/icon-192.png'];
+const CACHE = 'gtj-crm-v7';
+const SHELL = ['/crm/', '/crm/app.css?v=7', '/crm/playbook.js?v=7', '/crm/app.js?v=7', '/crm/manifest.webmanifest', '/crm/icon-192.png', '/assets/logo-badge.svg', '/assets/logo-horizontal-light.svg'];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL))); self.skipWaiting(); });
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))));
