@@ -19,12 +19,8 @@ function validSignature(url, params, sig) {
 }
 const xmlEsc = (s) => String(s || '').replace(/[<>&"']/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' }[c]));
 
-async function handle({ url, params, signature, store }) {
-  if (!validSignature(url, params, signature)) return { status: 403, body: 'Forbidden' };
-  const settings = await getSettings(store);
-  const from = params.From || '';
-  const text = clean(params.Body, 1500);
-  const media = [...Array(Number(params.NumMedia || 0))].map((_, i) => params['MediaUrl' + i]).filter(Boolean);
+// Log one customer text on the matching lead (or a new lead). Returns the lead.
+async function logText(store, { from, text, media = [], line = '' }) {
   const now = new Date().toISOString();
   const d = digits(from);
 
@@ -33,11 +29,22 @@ async function handle({ url, params, signature, store }) {
   if (!lead) {
     lead = { id: newId('L'), created: now, status: 'New', source: 'Text message', name: prettyPhone(from), phone: prettyPhone(from), notes: [], links: [], checks: {} };
   }
-  lead.notes = [{ at: now, by: 'Customer (text)', text: text + (media.length ? `\n[${media.length} photo${media.length > 1 ? 's' : ''}]` : ''), in: true }, ...(lead.notes || [])];
+  lead.notes = [{ at: now, by: 'Customer (text' + (line ? ' to ' + line : '') + ')', text: text + (media.length ? `\n[${media.length} photo${media.length > 1 ? 's' : ''}]` : ''), in: true }, ...(lead.notes || [])];
   if (media.length) lead.links = [...(lead.links || []), ...media].slice(-20);
   lead.unread = true; lead.unreadReply = true; lead.updated = now;
   if (/^\s*(stop|unsubscribe|cancel|end|quit)\s*$/i.test(text)) { lead.checks = { ...(lead.checks || {}), optOut: now.slice(0, 10) }; lead.unreadReply = false; }
   await store.setJSON(`lead/${lead.id}`, lead);
+  return lead;
+}
+
+async function handle({ url, params, signature, store }) {
+  if (!validSignature(url, params, signature)) return { status: 403, body: 'Forbidden' };
+  const settings = await getSettings(store);
+  const from = params.From || '';
+  const d = digits(from);
+  const text = clean(params.Body, 1500);
+  const media = [...Array(Number(params.NumMedia || 0))].map((_, i) => params['MediaUrl' + i]).filter(Boolean);
+  const lead = await logText(store, { from, text, media });
 
   const owner = settings.ownerMobile;
   if (!owner || digits(owner) === d) return { status: 200, body: '<?xml version="1.0" encoding="UTF-8"?><Response></Response>' };
@@ -45,4 +52,4 @@ async function handle({ url, params, signature, store }) {
   return { status: 200, body: `<?xml version="1.0" encoding="UTF-8"?><Response><Message to="${xmlEsc(owner)}">${xmlEsc(fwd)}</Message></Response>` };
 }
 
-module.exports = { handle, validSignature };
+module.exports = { handle, validSignature, logText };
