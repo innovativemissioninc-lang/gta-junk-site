@@ -56,9 +56,7 @@ So Rocky physically cannot:
 - quote below The Clear-Out's $495 starting price, or below the $1,500 estate minimum on an estate
 
 Every range Rocky gives carries the same caveat you use yourself: the firm
-number is fixed in writing at a free on-site assessment. Small jobs (a single
-couch, a mattress, a few bags) are welcome under The Clear-Out from $495; the
-$1,500 minimum charge applies to estate cleanouts only.
+number is fixed in writing at a free on-site assessment. Rocky steers toward full-load jobs ($600+): garages, basements, sheds, whole homes. One- or two-item callers are pointed to municipal bulky pickup, honestly. The $1,500 minimum charge applies to estate cleanouts only.
 
 ### Where the prices live
 

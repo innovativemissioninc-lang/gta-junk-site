@@ -136,7 +136,7 @@ const SERVICES = [
     name: 'Junk removal and garage cleanouts',
     low: 495, high: null,
     range: 'from $495 for The Clear-Out, $795 for The Standard Reset, or $1,195 for The Pristine Transformation',
-    note: 'Priced by finish level. The Clear-Out is total removal with a broom-clean floor; The Standard Reset adds cobwebs, an industrial sweep and a surface wipe; The Pristine Transformation is degreased, detailed, bare-concrete. Single items and small loads are welcome.',
+    note: 'Priced by finish level. The Clear-Out is total removal with a broom-clean floor; The Standard Reset adds cobwebs, an industrial sweep and a surface wipe; The Pristine Transformation is degreased, detailed, bare-concrete. Built for full-load jobs: packed garages, basements, sheds and whole homes.',
     url: '/services/garage-cleanouts/',
     drivers: ['single, double or triple garage', 'how full it is and how heavy the contents are', 'whether the floor is degreased at the end', 'driveway access'],
     match: ['garage', 'basement', 'attic', 'shed cleanout', 'junk removal', 'junk', 'declutter', 'couch', 'sofa', 'mattress', 'fridge', 'furniture', 'appliance', 'single item', 'one item', 'pickup']
